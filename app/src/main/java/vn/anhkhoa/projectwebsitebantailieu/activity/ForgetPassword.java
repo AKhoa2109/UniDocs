@@ -1,4 +1,4 @@
-package vn.anhkhoa.projectwebsitebantailieu;
+package vn.anhkhoa.projectwebsitebantailieu.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,26 +11,28 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class SignUp extends AppCompatActivity {
+import vn.anhkhoa.projectwebsitebantailieu.R;
 
-    Button btnSignUp;
+public class ForgetPassword extends AppCompatActivity {
+    Button btnXacNhanOTP;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_sign_up);
+        setContentView(R.layout.activity_forget_password);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        btnSignUp = (Button) findViewById(R.id.btnSignUp);
+        //anh xa
+        btnXacNhanOTP = (Button) findViewById(R.id.btnSubmitOTP);
 
-        btnSignUp.setOnClickListener(new View.OnClickListener() {
+        btnXacNhanOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SignUp.this, MainActivity.class);
+                Intent intent = new Intent(ForgetPassword.this, VerificationOTP.class);
                 startActivity(intent);
             }
         });
