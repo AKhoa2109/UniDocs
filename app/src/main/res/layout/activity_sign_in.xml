@@ -5,54 +5,62 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#151316"
-    android:scrollbars="vertical"
+    android:background="#ffffff"
     tools:context=".activity.MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
+        android:id="@+id/constraintLayoutr"
         android:layout_width="match_parent"
-        android:layout_height="290dp"
-        android:background="@drawable/bg_login1"
-        tools:ignore="MissingConstraints">
+        android:layout_height="280dp"
+        android:background="@drawable/top_background2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="210dp"
-            android:text="Chào mừng trở lại !!!"
-            android:textColor="#EFEFEF"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Welcome Back"
+            android:textColor="#000000"
             android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintHorizontal_bias="0.993"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
         </TextView>
 
         <TextView
+            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="welcome back we missed you"
-            android:textColor="#A4A4A4"
-            android:textSize="15sp"
+            android:layout_gravity="end"
+            android:layout_marginTop="12dp"
+            android:fontFamily="sans-serif-light"
+            android:text="Sign In !"
+            android:textColor="#000000"
+            android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.843"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView">
+            app:layout_constraintTop_toBottomOf="@+id/textView1">
 
         </TextView>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="340dp"
+        android:layout_marginTop="20dp"
+        android:layout_height="400dp"
         android:layout_gravity="center"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutr">
         <LinearLayout
             android:orientation="vertical"
             android:layout_gravity="center_vertical"
@@ -62,25 +70,23 @@
                 android:id="@+id/textField"
                 android:layout_gravity="center"
                 android:layout_width="280dp"
-                app:hintTextColor="@color/white"
+                app:hintTextColor="@color/black"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
                 app:startIconDrawable="@drawable/user_icon"
                 android:hint="Email">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     />
-
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textField1"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:layout_gravity="center"
                 android:layout_width="280dp"
-                app:hintTextColor="@color/white"
+                app:hintTextColor="@color/black"
                 android:layout_height="wrap_content"
                 app:endIconMode="password_toggle"
                 app:startIconDrawable="@drawable/password_icon"
@@ -89,26 +95,25 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-
+                    android:textColor="@color/black"
                     android:inputType="textPassword"
                     />
-                <TextView
-                    android:id="@+id/txtForgotPassword"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Quên mật khẩu?"
-                    android:textSize="14sp"
-                    android:textColor="#A4A4A4"
-                    android:layout_weight="1"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="5dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/txtForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quên mật khẩu?"
+                android:textSize="14sp"
+                android:textColor="#A4A4A4"
+                android:layout_gravity="end"
+                android:layout_marginTop="5dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="60dp"
                 android:orientation="vertical">
 
                 <Button
@@ -123,47 +128,43 @@
                     android:text="Sign In"
                     android:textSize="20sp">
                 </Button>
+
             </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="20dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Hoặc đăng kí với? "
-                    android:textColor="#EFEFEF"
+                    android:textColor="@color/black"
                     android:textSize="15sp">
                 </TextView>
+
                 <TextView
                     android:id="@+id/txtRegister"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Đăng kí"
-                    android:textSize="15sp"
-                    android:textColor="#EFEFEF"
-                    />
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
             </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGoogle"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:padding="10dp"
@@ -175,7 +176,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnFacebook"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:padding="10dp"
