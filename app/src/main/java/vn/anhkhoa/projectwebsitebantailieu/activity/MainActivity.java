@@ -11,12 +11,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentTransaction;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnSignIn;
-    TextView txtForgetPass;
+    ActivityMainBinding binding;
+
+    private HomeFragment homeFragment;
+    private ShopFragment shopFragment;
+    private AccountFragment accountFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,25 +37,46 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Khởi tạo các fragment
+        homeFragment = new HomeFragment();
+        shopFragment = new ShopFragment();
+        accountFragment = new AccountFragment();
 
-        //anh xa
-        btnSignIn = (Button) findViewById(R.id.btnSignin);
-        txtForgetPass = (TextView) findViewById(R.id.txtForgotPassword);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SignUp.class);
-                startActivity(intent);
+        // Thêm fragment mặc định
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.frame_layout, homeFragment)
+                .commit();
+        binding.bottomNavigationView.setOnItemSelectedListener(item->{
+            int id = item.getItemId();
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            // Ẩn tất cả các fragment trước khi hiển thị fragment được chọn
+            if (homeFragment.isAdded()) transaction.hide(homeFragment);
+            if (shopFragment.isAdded()) transaction.hide(shopFragment);
+            if (accountFragment.isAdded()) transaction.hide(accountFragment);
+
+            if (id == R.id.home) {
+                if (!homeFragment.isAdded()) {
+                    transaction.add(R.id.frame_layout, homeFragment);
+                }
+                transaction.show(homeFragment);
+            } else if (id == R.id.shop) {
+                if (!shopFragment.isAdded()) {
+                    transaction.add(R.id.frame_layout, shopFragment);
+                }
+                transaction.show(shopFragment);
+            } else if (id == R.id.account) {
+                if (!accountFragment.isAdded()) {
+                    transaction.add(R.id.frame_layout, accountFragment);
+                }
+                transaction.show(accountFragment);
             }
-        });
-
-        txtForgetPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ForgetPassword.class);
-                startActivity(intent);
-            }
+            transaction.commit();
+            return true;
         });
     }
+
 }
