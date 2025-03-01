@@ -12,7 +12,7 @@
         android:id="@+id/constraintLayoutr"
         android:layout_width="match_parent"
         android:layout_height="280dp"
-        android:background="@drawable/top_background2"
+        android:background="@drawable/top_background"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -21,13 +21,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="152dp"
             android:fontFamily="sans-serif-black"
             android:text="Welcome Back"
             android:textColor="#000000"
-            android:textSize="30sp"
+            android:textSize="40sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.993"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -38,13 +38,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="12dp"
-            android:fontFamily="sans-serif-light"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif-black"
             android:text="Sign In !"
             android:textColor="#000000"
             android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.843"
+            app:layout_constraintHorizontal_bias="0.862"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView1">
 
@@ -107,7 +107,7 @@
                 android:layout_height="wrap_content"
                 android:text="Quên mật khẩu?"
                 android:textSize="14sp"
-                android:textColor="#A4A4A4"
+                android:textColor="@color/black"
                 android:layout_gravity="end"
                 android:layout_marginTop="5dp" />
 
@@ -124,7 +124,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/button_background"
-                    android:backgroundTint="@null"
+                    app:backgroundTint="@null"
                     android:text="Sign In"
                     android:textSize="20sp">
                 </Button>
@@ -159,30 +159,35 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:orientation="horizontal">
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/btnGoogle"
-                android:layout_width="150dp"
+                android:layout_width="120dp"
                 android:layout_height="match_parent"
                 android:textSize="16sp"
                 android:textColor="@android:color/black"
                 android:padding="10dp"
+                android:background="@drawable/button_background"
+                app:backgroundTint="@null"
                 app:icon="@drawable/google_icon"
                 app:iconGravity="textStart"
                 android:layout_marginEnd="20dp"
                 app:iconPadding="0dp"/>
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/btnFacebook"
-                android:layout_width="150dp"
+                android:layout_width="120dp"
                 android:layout_height="match_parent"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
+                android:background="@drawable/button_background"
                 android:padding="10dp"
+                android:textColor="@android:color/black"
+                app:backgroundTint="@null"
+                android:textSize="16sp"
                 app:icon="@drawable/facebook_icon"
                 app:iconGravity="textStart"
-                app:iconPadding="0dp"/>
+                app:iconPadding="0dp" />
         </LinearLayout>
 
     </LinearLayout>

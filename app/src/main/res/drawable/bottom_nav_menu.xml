@@ -2,15 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/home"
-        android:icon="@drawable/img_home"
+        android:id="@+id/home_icon"
+        android:icon="@drawable/home_icon"
         android:title="Home" />
     <item
         android:id="@+id/shop"
         android:icon="@drawable/img_shop"
         android:title="Shop" />
     <item
+        android:id="@+id/fab"
+        android:title=""
+        android:enabled="false"/>
+    <item
         android:id="@+id/account"
         android:icon="@drawable/img_acount"
         android:title="Account" />
+    <item
+        android:id="@+id/chat"
+        android:icon="@drawable/chat_icon"
+        android:title="Chat" />
 </menu>
