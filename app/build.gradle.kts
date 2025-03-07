@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.converterGson) // Convert JSON sang Object Java
     implementation(libs.gson)
     implementation(libs.glide)
+    implementation(libs.viewpager2)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
