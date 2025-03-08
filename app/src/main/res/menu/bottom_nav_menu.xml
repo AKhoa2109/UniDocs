@@ -11,8 +11,8 @@
         android:title="Shop" />
     <item
         android:id="@+id/fab"
-        android:title=""
-        android:enabled="false"/>
+        android:enabled="false"
+        android:title="" />
     <item
         android:id="@+id/chat"
         android:icon="@drawable/chat_icon"

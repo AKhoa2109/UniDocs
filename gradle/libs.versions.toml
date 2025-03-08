@@ -12,6 +12,7 @@ converterGson = "2.9.0"
 gson = "2.9.0"
 glide = "4.14.2"
 viewpager2 = "1.0.0"
+circleimageview  = "3.1.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +30,8 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 glideCompiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
 #carousel
 viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
+# circleImage
+circleimageview = {group= "de.hdodenhof", name = "circleimageview", version.ref ="circleimageview"}
 
 
 [plugins]

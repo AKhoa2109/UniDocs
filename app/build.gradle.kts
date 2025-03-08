@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.glide)
     implementation(libs.viewpager2)
+    implementation(libs.circleimageview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
