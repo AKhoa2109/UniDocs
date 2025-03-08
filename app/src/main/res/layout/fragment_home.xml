@@ -167,7 +167,7 @@
 
         <!-- Danh sách danh mục -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCategories"
+            android:id="@+id/rcvDocument"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             app:layout_constraintTop_toBottomOf="@id/tvCategoryTitle"
@@ -175,9 +175,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:orientation="horizontal"
-            app:layoutManager="LinearLayoutManager"
-            app:layoutManagerOrientation="horizontal"/>
+            android:orientation="horizontal" />
 
         <!-- Tiêu đề tài liệu mới -->
         <TextView
@@ -187,7 +185,7 @@
             android:text="Tài liệu mới"
             android:textStyle="bold"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/rvCategories"
+            app:layout_constraintTop_toBottomOf="@id/rcvDocument"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_margin="16dp"/>
 
@@ -201,9 +199,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:orientation="horizontal"
-            app:layoutManager="LinearLayoutManager"
-            app:layoutManagerOrientation="horizontal"/>
+            android:orientation="horizontal" />
 
 
     </LinearLayout>
