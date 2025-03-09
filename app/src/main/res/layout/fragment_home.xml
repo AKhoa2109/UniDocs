@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="horizontal"
     android:fillViewport="true">
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,15 +13,16 @@
         android:orientation="vertical">
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:layout_marginBottom="10dp"
+            android:background="@drawable/rounded_background"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="Hi Khoa !!"
                 android:textSize="25sp"
@@ -155,30 +157,26 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:layout_height="wrap_content">
+
+            <!-- ViewPager2 để hiển thị nội dung -->
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:clipChildren="false"
-                android:paddingLeft="40dp"
-                android:paddingRight="40dp"
                 android:overScrollMode="never"/>
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
+            <com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator
+                android:id="@+id/dotsIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                app:tabIndicatorColor="@android:color/transparent"
-                app:tabGravity="center"
-                app:tabIndicator="@null"/>
-        </LinearLayout>
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginTop="16dp"/>
+        </FrameLayout>
 
 
         <!-- Tiêu đề danh mục -->
@@ -228,7 +226,5 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:orientation="horizontal" />
-
-
     </LinearLayout>
 </ScrollView>

@@ -7,11 +7,17 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +26,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.BannerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentHomeBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 
 /**
@@ -31,6 +39,12 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+    private ViewPager2 viewPager;
+
+    WormDotsIndicator dotsIndicator;
+    private Handler sliderHandler = new Handler();
+    private List<String> bannerImages = new ArrayList<>();
+    private Runnable sliderRunnable;
 
     RecyclerView rcvDocument;
 
@@ -81,6 +95,10 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         rcvDocument = view.findViewById(R.id.rcvDocument);
+        viewPager = view.findViewById(R.id.viewPager);
+        dotsIndicator = view.findViewById(R.id.dotsIndicator);
+        initBannerImages();
+        setupViewPager();
 
         GridLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
         rcvDocument.setLayoutManager(linearLayoutManager);
@@ -114,4 +132,56 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+    private void initBannerImages() {
+        // Thêm dữ liệu ảnh mẫu (thay thế bằng dữ liệu thực tế)
+        bannerImages.add("https://as2.ftcdn.net/jpg/04/32/48/41/1000_F_432484133_WnmdDXCWu7i2tR90K7flMtnJ4zOOfnM2.jpg");
+        bannerImages.add("https://static.vecteezy.com/system/resources/previews/023/107/446/non_2x/promo-sale-banner-with-reading-stack-of-books-wooden-letter-tiles-school-books-pile-world-book-day-bookstore-bookshop-library-book-lover-bibliophile-education-a4-for-poster-cover-vector.jpg");
+        bannerImages.add("https://www.shutterstock.com/image-vector/promo-sale-banner-library-bookshop-260nw-1790872166.jpg");
+    }
+
+    private void setupViewPager() {
+        // Khởi tạo Adapter
+        BannerAdapter bannerAdapter = new BannerAdapter(bannerImages);
+        viewPager.setAdapter(bannerAdapter);
+
+        // Kết nối WormDotsIndicator với ViewPager2
+        dotsIndicator.attachTo(viewPager);
+
+        // Tự động chuyển slide
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                sliderHandler.removeCallbacks(sliderRunnable);
+                sliderHandler.postDelayed(sliderRunnable, 3000); // 3 giây
+            }
+        });
+
+        sliderRunnable = new Runnable() {
+            @Override
+            public void run() {
+                int currentPosition = viewPager.getCurrentItem();
+                if (currentPosition == bannerImages.size() - 1) {
+                    viewPager.setCurrentItem(0);
+                } else {
+                    viewPager.setCurrentItem(currentPosition + 1);
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        sliderHandler.postDelayed(sliderRunnable, 3000);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sliderHandler.removeCallbacks(sliderRunnable);
+    }
+
+
 }
