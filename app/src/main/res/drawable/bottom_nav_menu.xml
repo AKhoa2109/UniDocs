@@ -10,9 +10,9 @@
         android:icon="@drawable/img_shop"
         android:title="Shop" />
     <item
-        android:id="@+id/fab"
-        android:title=""
-        android:enabled="false"/>
+        android:id="@+id/add_product"
+        android:icon="@drawable/icon_add"
+        android:title="Add product" />
     <item
         android:id="@+id/account"
         android:icon="@drawable/img_acount"

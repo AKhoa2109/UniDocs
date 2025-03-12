@@ -22,21 +22,9 @@
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="labeled"
+        android:theme="@style/MyTheme"
         app:itemIconTint="@color/colorSecondary"
         app:itemTextColor="@color/black"
         android:elevation="4dp" />
-
-    <!-- FloatingActionButton nằm trong BottomNavigationView -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/baseline_add_24"
-        android:theme="@style/MyTheme"
-        app:backgroundTint="@color/colorSecondary"
-        app:layout_anchor="@id/bottomNavigationView"
-        app:layout_anchorGravity="center_horizontal"
-        android:elevation="8dp"
-        android:layout_marginBottom="20dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
