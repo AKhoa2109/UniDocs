@@ -11,14 +11,13 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:layout_height="wrap_content">
 
         <!-- Hình ảnh đại diện của Document -->
         <ImageView
             android:id="@+id/img_document"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
             android:scaleType="centerCrop"
             android:background="@drawable/bg_round_image"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:maxLines="1"
+            android:maxLines="2"
             android:text="Toán 1"
             android:textSize="14sp"
             android:textStyle="bold"

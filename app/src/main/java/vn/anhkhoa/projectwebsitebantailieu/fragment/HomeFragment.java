@@ -48,7 +48,7 @@ public class HomeFragment extends Fragment {
 
     RecyclerView rcvDocument;
 
-    List<DocumentDto> documentDtos;
+    List<DocumentDto> documentDtos = new ArrayList<>();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -119,15 +119,19 @@ public class HomeFragment extends Fragment {
                 ResponseData<List<DocumentDto>> data = response.body();
 
                 if(data == null)
+                {
+                    Toast.makeText(getContext(), "Dữ liệu trả về null", Toast.LENGTH_SHORT).show();
                     return;
-                documentDtos = data.getData();
+                }
+                documentDtos.clear();
+                documentDtos= data.getData();
                 DocumentAdapter documentAdapter = new DocumentAdapter(documentDtos);
                 rcvDocument.setAdapter(documentAdapter);
             }
 
             @Override
             public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
-                Toast.makeText(getContext(), "bi loi roi", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
                 t.printStackTrace();
             }
         });
@@ -174,7 +178,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        sliderHandler.postDelayed(sliderRunnable, 3000);
+        sliderHandler.postDelayed(sliderRunnable, 5000);
     }
 
     @Override
