@@ -186,6 +186,4 @@ public class HomeFragment extends Fragment {
         super.onPause();
         sliderHandler.removeCallbacks(sliderRunnable);
     }
-
-
 }

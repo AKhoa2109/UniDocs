@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private ShopFragment shopFragment;
     private AccountFragment accountFragment;
+    private ConversationListFragment conversationListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         homeFragment = new HomeFragment();
         shopFragment = new ShopFragment();
         accountFragment = new AccountFragment();
+        conversationListFragment = new ConversationListFragment();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
             if (homeFragment.isAdded()) transaction.hide(homeFragment);
             if (shopFragment.isAdded()) transaction.hide(shopFragment);
             if (accountFragment.isAdded()) transaction.hide(accountFragment);
+            if (conversationListFragment.isAdded()) transaction.hide(conversationListFragment);
 
             if (id == R.id.home) {
                 if (!homeFragment.isAdded()) {
@@ -68,7 +72,12 @@ public class MainActivity extends AppCompatActivity {
                     transaction.add(R.id.frame_layout, shopFragment);
                 }
                 transaction.show(shopFragment);
-            } else if (id == R.id.account) {
+            } else if (id == R.id.chat) {
+                if (!conversationListFragment.isAdded()) {
+                    transaction.add(R.id.frame_layout, conversationListFragment);
+                }
+                transaction.show(conversationListFragment);
+            }else if (id == R.id.account) {
                 if (!accountFragment.isAdded()) {
                     transaction.add(R.id.frame_layout, accountFragment);
                 }

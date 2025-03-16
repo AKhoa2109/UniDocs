@@ -8,4 +8,5 @@
     <color name="gray">#757575</color>
     <color name="colorSecondary">#FFA364</color>
     <color name="lavender">#E6E6FA</color>
+    <color name="purple_500">#6200EE</color>
 </resources>
