@@ -19,11 +19,10 @@
         <!-- Nút back nếu cần -->
         <ImageView
             android:id="@+id/ivBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:src="@drawable/ic_arrow_back"
             android:padding="4dp"
-            android:visibility="visible"  <!-- Cho ẩn/hiện tùy nhu cầu -->
         />
 
         <!-- Ảnh đại diện (avatar) -->
@@ -86,8 +85,6 @@
     </LinearLayout>
 
     <!-- Khu vực hiển thị tin nhắn (RecyclerView) -->
-
-    <!-- Khu vực nhập tin nhắn (input area) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMessages"
         android:layout_width="match_parent"
@@ -104,7 +101,6 @@
         android:padding="8dp"
         android:background="@color/white">
 
-        <!-- Nút đính kèm, emoji, v.v. -->
         <ImageView
             android:id="@+id/ivAttachment"
             android:layout_width="24dp"

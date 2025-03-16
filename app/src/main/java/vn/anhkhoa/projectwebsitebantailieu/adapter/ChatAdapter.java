@@ -21,15 +21,11 @@ import vn.anhkhoa.projectwebsitebantailieu.model.ChatModel;
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
     private List<ChatModel> chatList;
     private Context context;
-    private OnChatItemClickListener listener;
+    private OnItemClickListener listener;
 
     public ChatAdapter(List<ChatModel> chatList, Context context) {
         this.chatList = chatList;
         this.context = context;
-    }
-
-    public void setOnChatItemClickListener(OnChatItemClickListener listener) {
-        this.listener = listener;
     }
 
     @NonNull
@@ -67,7 +63,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         holder.itemView.setOnClickListener(v -> {
             if(listener != null) {
                 //khi nhan se truyen vao doi tuong cha
-                listener.onChatItemClick(chat);
+                listener.onItemClick();
             }
         });
     }
@@ -77,9 +73,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return chatList != null ? chatList.size() : 0;
     }
 
-    //interface lang nghe su kien
-    public interface OnChatItemClickListener {
-        void onChatItemClick(ChatModel chat);
+    // Interface để xử lý click
+    public interface OnItemClickListener {
+        void onItemClick();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     public class ChatViewHolder extends RecyclerView.ViewHolder {

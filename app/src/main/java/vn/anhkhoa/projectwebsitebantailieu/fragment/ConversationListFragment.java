@@ -84,13 +84,14 @@ public class ConversationListFragment extends Fragment {
         chatAdapter = new ChatAdapter(chatList, getContext());
         binding.recyclerViewChatList.setAdapter(chatAdapter);
 
-        chatAdapter.setOnChatItemClickListener(chat -> {
-            Toast.makeText(getContext(), "Click "+ chat.getName(), Toast.LENGTH_SHORT).show();
+        chatAdapter.setOnItemClickListener(() -> {
+            //Toast.makeText(getContext(), "Click ", Toast.LENGTH_SHORT).show();
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openChatFragment();
+            }
         });
 
     }
-
-
 
     public void AnhXa(){
         chatList = new ArrayList<>();
@@ -102,7 +103,6 @@ public class ConversationListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         binding = FragmentConversationListBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
