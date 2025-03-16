@@ -6,7 +6,10 @@
     <color name="colorPrimary">#FF5722</color>
     <color name="black">#FF000000</color>
     <color name="gray">#757575</color>
+    <color name="blue">#2196F3</color>
     <color name="colorSecondary">#FFA364</color>
     <color name="lavender">#E6E6FA</color>
     <color name="purple_500">#6200EE</color>
+    <color name="chat_line_sent">#6852d6</color>
+    <color name="chat_line_received">#e8e8e8</color>
 </resources>
