@@ -27,10 +27,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.BannerAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.CategoryAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentHomeBinding;
+import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 
 /**
@@ -47,8 +49,10 @@ public class HomeFragment extends Fragment {
     private Runnable sliderRunnable;
 
     RecyclerView rcvDocument;
+    RecyclerView rcvCate;
 
     List<DocumentDto> documentDtos = new ArrayList<>();
+    List<CategoryDto> categoryDtos = new ArrayList<>();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -94,6 +98,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        rcvCate = view.findViewById(R.id.rcvCategory);
         rcvDocument = view.findViewById(R.id.rcvDocument);
         viewPager = view.findViewById(R.id.viewPager);
         dotsIndicator = view.findViewById(R.id.dotsIndicator);
@@ -103,11 +108,12 @@ public class HomeFragment extends Fragment {
         GridLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
         rcvDocument.setLayoutManager(linearLayoutManager);
 
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        rcvDocument.addItemDecoration(itemDecoration);
+        LinearLayoutManager  linearLayoutCateManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL,false);
+        rcvCate.setLayoutManager(linearLayoutCateManager);
 
         documentDtos = new ArrayList<>();
         callApiGetListDocument();
+        callApiGetListCategory();
 
         return view;
     }
@@ -131,6 +137,32 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
+                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
+            }
+        });
+    }
+
+    private void callApiGetListCategory(){
+        ApiService.apiService.getListCategory().enqueue(new Callback<ResponseData<List<CategoryDto>>>() {
+            @Override
+            public void onResponse(Call<ResponseData<List<CategoryDto>>> call, Response<ResponseData<List<CategoryDto>>> response) {
+                if(response.isSuccessful()){
+                    ResponseData<List<CategoryDto>> data = response.body();
+                    if(data == null)
+                    {
+                        Toast.makeText(getContext(), "Dữ liệu trả về null", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    categoryDtos.clear();
+                    categoryDtos= data.getData();
+                    CategoryAdapter categoryAdapter = new CategoryAdapter(categoryDtos);
+                    rcvCate.setAdapter(categoryAdapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<List<CategoryDto>>> call, Throwable t) {
                 Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
                 t.printStackTrace();
             }
