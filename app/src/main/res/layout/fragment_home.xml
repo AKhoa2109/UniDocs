@@ -44,13 +44,21 @@
                         android:src="@android:drawable/ic_menu_search" />
 
                     <EditText
+                        android:id="@+id/edtSearch"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:inputType="none"
                         android:background="@null"
                         android:hint="Tìm kiếm"
                         android:maxLines="1"
                         android:paddingStart="8dp"
+                        android:focusable="false"
                         android:textSize="15sp" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@android:drawable/ic_menu_camera" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

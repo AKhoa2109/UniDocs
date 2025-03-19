@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,9 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
@@ -26,6 +29,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.SearchActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.BannerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.CategoryAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentAdapter;
@@ -48,6 +52,7 @@ public class HomeFragment extends Fragment {
     private List<String> bannerImages = new ArrayList<>();
     private Runnable sliderRunnable;
 
+    private EditText edtSearch;
     RecyclerView rcvDocument;
     RecyclerView rcvCate;
 
@@ -92,6 +97,7 @@ public class HomeFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
     }
 
     @Override
@@ -102,6 +108,16 @@ public class HomeFragment extends Fragment {
         rcvDocument = view.findViewById(R.id.rcvDocument);
         viewPager = view.findViewById(R.id.viewPager);
         dotsIndicator = view.findViewById(R.id.dotsIndicator);
+        edtSearch = view.findViewById(R.id.edtSearch);
+
+        edtSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(requireContext(), SearchActivity.class);
+                startActivity(intent);
+                requireActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        });
         initBannerImages();
         setupViewPager();
 
@@ -137,8 +153,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
-                t.printStackTrace();
+                Toast.makeText(getContext(), "Error" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -163,8 +178,8 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<CategoryDto>>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
-                t.printStackTrace();
+                Toast.makeText(getContext(), "Error" +t.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -218,6 +233,7 @@ public class HomeFragment extends Fragment {
         super.onPause();
         sliderHandler.removeCallbacks(sliderRunnable);
     }
+
 
 
 }

@@ -1,10 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +17,6 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
-
     private HomeFragment homeFragment;
     private ShopFragment shopFragment;
     private AccountFragment accountFragment;
@@ -77,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             transaction.commit();
             return true;
         });
+
     }
 
 }

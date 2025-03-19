@@ -6,6 +6,27 @@ public class DocumentDto {
     private String doc_image_url;
     private Double sell_price;
 
+    public DocumentDto() {
+
+    }
+    public DocumentDto(Long doc_id, String doc_name) {
+        this.doc_id = doc_id;
+        this.doc_name = doc_name;
+    }
+
+    public DocumentDto(Long doc_id, String doc_name, String doc_image_url) {
+        this.doc_id = doc_id;
+        this.doc_name = doc_name;
+        this.doc_image_url = doc_image_url;
+    }
+    public DocumentDto(Long doc_id, String doc_name, String doc_image_url, Double sell_price) {
+        this.doc_id = doc_id;
+        this.doc_name = doc_name;
+        this.doc_image_url = doc_image_url;
+        this.sell_price = sell_price;
+    }
+
+
     public Long getDoc_id() {
         return doc_id;
     }
