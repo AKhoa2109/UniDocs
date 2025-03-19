@@ -234,6 +234,4 @@ public class HomeFragment extends Fragment {
         sliderHandler.removeCallbacks(sliderRunnable);
     }
 
-
-
 }
