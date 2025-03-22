@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="10dp">
                 <EditText
                     android:id="@+id/edtSearch"
                     android:layout_width="0dp"
