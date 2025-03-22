@@ -3,6 +3,8 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,8 @@ import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ChatAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentConversationListBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatModel;
+
+import androidx.core.view.ViewCompat;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -75,6 +79,13 @@ public class ConversationListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
+        View mainView = view.findViewById(R.id.fragment_conversation_layout);
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         binding.svConversation.setQueryHint("Tìm kiếm");
         AnhXa();
 
