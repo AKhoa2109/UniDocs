@@ -17,27 +17,23 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
-
 import java.util.ArrayList;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.HistorySearchAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
-import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
-import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchFragment;
+import vn.anhkhoa.projectwebsitebantailieu.database.HistorySearchDao;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 
 public class SearchActivity extends AppCompatActivity {
 
-    private SearchFragment searchFragment;
-    DatabaseHandler databaseHandler;
-    RecyclerView rcHistorySearch;
-    EditText edtSearch;
-    ArrayList<DocumentDto> documents;
-    HistorySearchAdapter historySearchAdapter;
+    private DatabaseHandler databaseHandler;
+    private HistorySearchDao historySearchDao;
+    private RecyclerView rcHistorySearch;
+    private EditText edtSearch;
+    private ArrayList<DocumentDto> documents;
+    private HistorySearchAdapter historySearchAdapter;
 
-    private int id = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,67 +45,75 @@ public class SearchActivity extends AppCompatActivity {
             return insets;
         });
 
-        AnhXa();
+        // Khởi tạo các view
+        initViews();
+        databaseHandler = DatabaseHandler.getInstance(this);
+        historySearchDao = new HistorySearchDao(this);
 
+        // Khởi tạo danh sách tài liệu và adapter
         documents = new ArrayList<>();
+        historySearchAdapter = new HistorySearchAdapter(documents);
+        rcHistorySearch.setAdapter(historySearchAdapter);
 
-        LinearLayoutManager linearLayoutCateManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
-        rcHistorySearch.setLayoutManager(linearLayoutCateManager);
-
+        // Thiết lập layout manager và divider cho RecyclerView
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        rcHistorySearch.setLayoutManager(linearLayoutManager);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         rcHistorySearch.addItemDecoration(dividerItemDecoration);
 
-        initDatabase();
-
+        // Xử lý sự kiện khi người dùng nhấn Enter hoặc nút Done trên bàn phím
         edtSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_DONE ||
+                if (actionId == EditorInfo.IME_ACTION_DONE ||
                         actionId == EditorInfo.IME_ACTION_SEND ||
-                        (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)){
-                    String name = edtSearch.getText().toString().trim();
-                    if (!name.isEmpty()) {
-                        databaseHandler.QueryData("INSERT INTO HistorySearch VALUES('"+id+"','"+name+"')");
-                        id+=1;
-                        loadAllHistory();
+                        (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                    String searchQuery = edtSearch.getText().toString().trim();
+                    if (!searchQuery.isEmpty()) {
+                        addSearchHistory(searchQuery);
+                        loadAllHistory(); // Tải lại lịch sử tìm kiếm
                     }
                     return true;
                 }
                 return false;
-
             }
         });
 
-        historySearchAdapter = new HistorySearchAdapter(documents);
-        rcHistorySearch.setAdapter(historySearchAdapter);
-
+        // Tải lịch sử tìm kiếm khi khởi động activity
+        loadAllHistory();
     }
 
     @Override
     protected void onDestroy() {
-        databaseHandler.close();
+        // Đóng kết nối database khi activity bị hủy
+        if (databaseHandler != null) {
+            databaseHandler.close();
+        }
         super.onDestroy();
     }
 
-    private void AnhXa(){
-        edtSearch = (EditText) findViewById(R.id.edtSearch);
-        rcHistorySearch = (RecyclerView) findViewById(R.id.rcHistorySearch);
+    private void initViews() {
+        edtSearch = findViewById(R.id.edtSearch);
+        rcHistorySearch = findViewById(R.id.rcHistorySearch);
     }
 
-    private void loadAllHistory(){
-        documents.clear();
-        Cursor cursor = databaseHandler.GetData("SELECT * FROM HistorySearch ORDER BY Id DESC");
-        while(cursor.moveToNext()){
-            Long id = cursor.getLong(0);
-            String name = cursor.getString(1);
-            documents.add(new DocumentDto(id, name));
+    private void addSearchHistory(String name) {
+        // Kiểm tra xem tìm kiếm đã tồn tại chưa
+        if (!isSearchExist(name)) {
+            historySearchDao.addSearchQuery(name);
+        } else {
+            Toast.makeText(this, "Tìm kiếm đã tồn tại trong lịch sử", Toast.LENGTH_SHORT).show();
         }
-        historySearchAdapter.notifyDataSetChanged();
-        cursor.close();
     }
 
-    private void initDatabase(){
-        databaseHandler = new DatabaseHandler(this, "historySearch.sqlite",null,1);
-        databaseHandler.QueryData("CREATE TABLE IF NOT EXISTS HistorySearch(Id INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(200))");
+    private boolean isSearchExist(String searchQuery) {
+        boolean exists = historySearchDao.queryExists(searchQuery);
+        return exists;
+    }
+
+    private void loadAllHistory() {
+        ArrayList<DocumentDto> newDocuments = historySearchDao.getAllHistory();
+        documents.addAll(newDocuments);
+        historySearchAdapter.notifyDataSetChanged();
     }
 }

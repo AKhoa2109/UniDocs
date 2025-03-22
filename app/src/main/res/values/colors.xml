@@ -12,4 +12,5 @@
     <color name="purple_500">#6200EE</color>
     <color name="chat_line_sent">#6852d6</color>
     <color name="chat_line_received">#e8e8e8</color>
+    <color name="custom_gray">#F3F3F2</color>
 </resources>

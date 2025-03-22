@@ -13,12 +13,7 @@
         android:gravity="center_vertical"
         android:layout_weight="1"
         android:textSize="15sp"
+        android:paddingStart="20dp"
+        android:maxLines="1"
         android:text="TextView" />
-
-    <ImageView
-        android:id="@+id/imageViewDocument"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/icon_camera" />
 </LinearLayout>

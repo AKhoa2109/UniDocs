@@ -35,9 +35,7 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
         DocumentDto documentDto = documents.get(position);
         if (documentDto == null)
             return;
-        Glide.with(holder.itemView.getContext())
-                .load(documentDto.getDoc_image_url())
-                .into(holder.ivDoc);
+
         holder.txtNameDoc.setText(documentDto.getDoc_name());
     }
 
@@ -49,13 +47,11 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        private ImageView ivDoc;
         private TextView txtNameDoc;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            ivDoc = itemView.findViewById(R.id.imageViewDocument);
             txtNameDoc = itemView.findViewById(R.id.tvNameDoc);
         }
     }
