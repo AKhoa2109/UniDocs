@@ -27,12 +27,12 @@ public class SignUp extends AppCompatActivity {
             return insets;
         });
 
-        btnSignUp = (Button) findViewById(R.id.btnSignUp);
+        btnSignUp = (Button) findViewById(R.id.btnSignup);
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(SignUp.this, MainActivity.class);
+                Intent intent = new Intent(SignUp.this, SignIn.class);
                 startActivity(intent);
             }
         });

@@ -5,191 +5,149 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:gravity="center"
+    android:background="@drawable/unidocbackground"
     tools:context=".activity.SignIn">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayoutr"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cvLogin"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
-        android:background="@drawable/top_background"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="140dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="152dp"
-            android:fontFamily="sans-serif-black"
-            android:text="Welcome Back"
-            android:textColor="#000000"
-            android:textSize="40sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </TextView>
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="16dp"
-            android:fontFamily="sans-serif-black"
-            android:text="Sign In !"
-            android:textColor="#000000"
-            android:textSize="30sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.862"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView1">
-
-        </TextView>
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_marginTop="20dp"
-        android:layout_height="400dp"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayoutr">
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_gravity="center_vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/loginText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đăng nhập"
+                android:textAlignment="center"
+                android:textColor="@color/colorSecondary"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textField"
-                android:layout_gravity="center"
-                android:layout_width="280dp"
-                app:hintTextColor="@color/black"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Email"
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@drawable/user_icon"
-                android:hint="Email">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    />
-            </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textField1"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="center"
-                android:layout_width="280dp"
                 app:hintTextColor="@color/black"
-                android:layout_height="wrap_content"
-                app:endIconMode="password_toggle"
-                app:startIconDrawable="@drawable/password_icon"
-                android:hint="Password">
+                app:startIconDrawable="@drawable/user_icon">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textField1"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:hint="Password"
+                app:endIconMode="password_toggle"
+                app:hintTextColor="@color/black"
+                app:startIconDrawable="@drawable/password_icon">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    />
+                    android:maxLines="1"
+                    android:textColor="@color/black" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/txtForgotPassword"
+                android:id="@+id/tvForgotPassword"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Quên mật khẩu?"
-                android:textSize="14sp"
-                android:textColor="@color/black"
                 android:layout_gravity="end"
-                android:layout_marginTop="5dp" />
+                android:layout_marginTop="5dp"
+                android:text="Quên mật khẩu?"
+                android:textColor="@color/colorSecondary"
+                android:textSize="14sp" />
 
-            <LinearLayout
+            <Button
+                android:id="@+id/btnSignin"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/btnSignin"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/button_background"
-                    app:backgroundTint="@null"
-                    android:text="Sign In"
-                    android:textSize="20sp">
-                </Button>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hoặc đăng kí với? "
-                    android:textColor="@color/black"
-                    android:textSize="15sp">
-                </TextView>
-
-                <TextView
-                    android:id="@+id/txtRegister"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Đăng kí"
-                    android:textColor="@color/black"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/colorSecondary"
+                android:text="Login"
+                android:textSize="20sp"
+                app:cornerRadius="20dp" />
         </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/cvLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center">
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/btnGoogle"
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:padding="10dp"
-                android:background="@drawable/button_background"
-                app:backgroundTint="@null"
-                app:icon="@drawable/google_icon"
-                app:iconGravity="textStart"
-                android:layout_marginEnd="20dp"
-                app:iconPadding="0dp"/>
+            android:text="Hoặc đăng kí với? "
+            android:textColor="@color/colorSecondary"
+            android:textSize="15sp">
+        </TextView>
 
-            <Button
-                android:id="@+id/btnFacebook"
-                android:layout_width="120dp"
-                android:layout_height="match_parent"
-                android:background="@drawable/button_background"
-                android:padding="10dp"
-                android:textColor="@android:color/black"
-                app:backgroundTint="@null"
-                android:textSize="16sp"
-                app:icon="@drawable/facebook_icon"
-                app:iconGravity="textStart"
-                app:iconPadding="0dp" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng kí"
+            android:textColor="@color/colorSecondary"
+            android:textSize="15sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civGoogle"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            app:backgroundTint="@null"
+            android:src="@drawable/google_icon"
+            android:layout_marginEnd="30dp" />
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civFacebook"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            app:backgroundTint="@null"
+            android:src="@drawable/facebook_icon" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

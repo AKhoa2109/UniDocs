@@ -17,7 +17,7 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 public class SignIn extends AppCompatActivity {
 
     Button btnSignIn;
-    TextView txtForgetPass;
+    TextView tvForgetPass, tvRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +32,26 @@ public class SignIn extends AppCompatActivity {
 
         //anh xa
         btnSignIn = (Button) findViewById(R.id.btnSignin);
-        txtForgetPass = (TextView) findViewById(R.id.txtForgotPassword);
+        tvForgetPass = (TextView) findViewById(R.id.tvForgotPassword);
+        tvRegister = (TextView) findViewById(R.id.tvRegister);
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SignIn.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        tvForgetPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SignIn.this, ForgetPassword.class);
+                startActivity(intent);
+            }
+        });
+
+        tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SignIn.this, SignUp.class);
@@ -42,12 +59,6 @@ public class SignIn extends AppCompatActivity {
             }
         });
 
-        txtForgetPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SignIn.this, ForgetPassword.class);
-                startActivity(intent);
-            }
-        });
+
     }
 }

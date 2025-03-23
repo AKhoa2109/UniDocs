@@ -153,7 +153,9 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -178,7 +180,9 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<CategoryDto>>> call, Throwable t) {
-                Toast.makeText(getContext(), "Error" +t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (isAdded() && getContext() != null) {
+                    Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
