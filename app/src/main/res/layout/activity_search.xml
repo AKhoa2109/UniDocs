@@ -46,6 +46,9 @@
                     android:background="@null"
                     android:textSize="15sp"
                     android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/cameraIcon"
                     app:layout_constraintTop_toTopOf="parent"
@@ -63,30 +66,51 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
     <!-- Content Area -->
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fitsSystemWindows="true"
         app:layout_constraintTop_toBottomOf="@id/searchBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcHistorySearch"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Gợi ý tìm kiếm"
-            android:textSize="16sp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:paddingStart="20dp"
-            android:textStyle="bold"/>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcSearchSuggestion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcHistorySearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+            <TextView
+                android:id="@+id/tvHandleRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xem thêm"
+                android:textSize="16sp"
+                android:gravity="center"/>
+            <TextView
+                android:id="@+id/tvSuggestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gợi ý tìm kiếm"
+                android:textSize="16sp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:paddingStart="20dp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcSuggestionDocument"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

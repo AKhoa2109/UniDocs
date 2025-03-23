@@ -33,8 +33,8 @@ public class HistorySearchDao extends BaseDao{
         return insert(values);
     }
 
-    public int deleteSearchQuery(String query) {
-        return delete(COLUMN_ID + " = ?", new String[]{query});
+    public int deleteSearchQuery() {
+        return delete(null, null);
     }
 
     public ArrayList<DocumentDto> getAllHistory()
