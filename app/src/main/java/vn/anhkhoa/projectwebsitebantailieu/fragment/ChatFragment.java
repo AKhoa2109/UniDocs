@@ -69,7 +69,7 @@ public class ChatFragment extends Fragment {
 
     // Giả sử conId của cuộc trò chuyện là "123"
     private final Long conversationId = 3L;
-    private final Long userId = 1L;
+    private final Long userId = 2L;
 
     private StompClient mStompClient;
     private Disposable topicSubscription;
@@ -147,6 +147,8 @@ public class ChatFragment extends Fragment {
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false); // Tắt animation thay đổi
         }
+
+        chatLineDtoList = new ArrayList<>();
         //adapter
         chatAdapter = new ChatAdapter(userId);
         rvMessages.setAdapter(chatAdapter);
@@ -162,9 +164,10 @@ public class ChatFragment extends Fragment {
             public void onResponse(Call<ResponseData<List<ChatLineDto>>> call, Response<ResponseData<List<ChatLineDto>>> response) {
                 if(response.isSuccessful() && response.body() != null){
                     ResponseData<List<ChatLineDto>> data = response.body();
-                    chatLineDtoList.clear();
-
-                    chatLineDtoList.addAll(data.getData());
+                   // chatLineDtoList.clear();
+                    List<ChatLineDto> newLines = data.getData();
+                    Log.d("aaaa", newLines.get(1).toString());
+                    chatLineDtoList.addAll(newLines);
                     chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
                     //cuon den tn cuoi
                     rvMessages.post(() -> rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));

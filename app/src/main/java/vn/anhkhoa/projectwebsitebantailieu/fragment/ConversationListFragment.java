@@ -79,8 +79,7 @@ public class ConversationListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
-        View mainView = view.findViewById(R.id.fragment_conversation_layout);
-        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentConversationLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
