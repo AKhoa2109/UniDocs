@@ -20,7 +20,7 @@
 
         <!-- Nút back nếu cần -->
         <ImageView
-            android:id="@+id/ivBack"
+            android:id="@+id/btnBack"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:src="@drawable/ic_arrow_back"
@@ -87,6 +87,7 @@
     </LinearLayout>
 
     <!-- Khu vực hiển thị tin nhắn (RecyclerView) -->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMessages"
         android:layout_width="match_parent"
@@ -98,10 +99,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:background="@color/white"
         android:gravity="center_vertical"
-        android:padding="8dp"
-        android:background="@color/white">
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <ImageView
             android:id="@+id/ivAttachment"
@@ -117,23 +118,25 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:hint="Tin nhắn"
             android:background="@null"
+            android:hint="Tin nhắn"
             android:inputType="textMultiLine|textCapSentences" />
 
         <!-- Nút gửi -->
         <FrameLayout
+            android:id="@+id/flSendButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_gravity="center"
             android:background="@drawable/bg_send_button"
-            android:layout_gravity="center">
+            android:clickable="true">
 
             <ImageView
                 android:id="@+id/ivSend"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_send"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:src="@drawable/ic_send" />
         </FrameLayout>
     </LinearLayout>
 </LinearLayout>

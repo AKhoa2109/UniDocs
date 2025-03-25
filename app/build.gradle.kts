@@ -35,7 +35,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -47,7 +46,13 @@ dependencies {
     implementation(libs.viewpager2)
     implementation(libs.circleimageview)
     implementation(libs.dotsindicator)
+    implementation(libs.stomp)
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
+    implementation(libs.protolite.well.known.types)
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     annotationProcessor(libs.glideCompiler)

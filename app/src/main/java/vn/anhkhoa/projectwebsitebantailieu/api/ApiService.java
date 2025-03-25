@@ -9,14 +9,16 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 
 public interface ApiService {
     Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.13:8080/api/")
+            .baseUrl("http://10.0.2.2:8080/api/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);
@@ -29,4 +31,8 @@ public interface ApiService {
 
     @GET("document/search-document")
     Call<ResponseData<List<DocumentDto>>> searchDocument(@Query("keyword") String keyword);
+
+    //chat
+    @GET("conversations/{conversationId}/messages")
+    Call<ResponseData<List<ChatLineDto>>> getChatMessages(@Path("conversationId") Long conversationId);
 }
