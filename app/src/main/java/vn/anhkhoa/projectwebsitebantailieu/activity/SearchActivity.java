@@ -12,8 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchDocumentFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchFragment;
 
 public class SearchActivity extends AppCompatActivity {
@@ -42,8 +44,6 @@ public class SearchActivity extends AppCompatActivity {
             transaction.commit();
         }
 
-        SearchFragment searchFragment = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-
         // Xử lý sự kiện
         handlerEditText();
         handlerEditTextChange();
@@ -61,9 +61,12 @@ public class SearchActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String searchQuery = edtSearch.getText().toString().trim();
-                    SearchFragment searchFragment = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-                    if (!searchQuery.isEmpty() && searchFragment != null) {
+                    Fragment currentFragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+                    if (!searchQuery.isEmpty() && currentFragment instanceof SearchFragment) {
+                        SearchFragment searchFragment = (SearchFragment) currentFragment;
                         searchFragment.handlerSaveHistorySearch(searchQuery);
+                        openSearchDocumentFragment(searchQuery);
+
                     }
                     return true;
                 }
@@ -89,15 +92,17 @@ public class SearchActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         String query = edtSearch.getText().toString().trim();
-                        SearchFragment searchFragment = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-                        if(!query.isEmpty() && searchFragment !=null){
-                            searchFragment.handlerEditSearchChange(query);
-                        }
-                        else{
-                            if(searchFragment!=null){
+                        Fragment currentFragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+                        if(currentFragment instanceof SearchFragment){
+                            SearchFragment searchFragment = (SearchFragment) currentFragment;
+                            if(!query.isEmpty()){
+                                searchFragment.handlerEditSearchChange(query);
+                            }
+                            else{
                                 searchFragment.handlerEditSearchNotChange(query);
                             }
                         }
+
                     }
                 };
                 searchHandler.postDelayed(searchRunnable, 300);
@@ -108,5 +113,18 @@ public class SearchActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    public void openSearchDocumentFragment(String query){
+        SearchDocumentFragment searchDocumentFragment = new SearchDocumentFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("SEARCH_QUERY", query);
+        searchDocumentFragment.setArguments(bundle);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameLayout, searchDocumentFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
