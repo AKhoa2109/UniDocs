@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="start"
-    android:padding="8dp">
+    android:padding="3dp">
 
     <TextView
         android:id="@+id/tvMessage"
@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_received_message"
         android:text="xin chao"
+        android:textSize="18sp"
         android:padding="12dp"
         android:textColor="@color/black"/>
 
@@ -23,6 +24,7 @@
         android:text="13:27"
         android:textSize="12sp"
         android:textColor="@color/gray"
+        android:layout_marginStart="3dp"
         android:layout_marginTop="4dp"/>
 
 </LinearLayout>

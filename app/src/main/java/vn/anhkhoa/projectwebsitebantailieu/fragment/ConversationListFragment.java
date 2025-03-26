@@ -19,7 +19,7 @@ import java.util.List;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
-import vn.anhkhoa.projectwebsitebantailieu.adapter.ChatAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.ConversationAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentConversationListBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatModel;
 
@@ -37,7 +37,7 @@ public class ConversationListFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private RecyclerView rcChat;
-    private ChatAdapter chatAdapter;
+    private ConversationAdapter conversationAdapter;
     private List<ChatModel> chatList;
     private FragmentConversationListBinding binding;
 
@@ -79,8 +79,7 @@ public class ConversationListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
-        View mainView = view.findViewById(R.id.fragment_conversation_layout);
-        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentConversationLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -92,10 +91,10 @@ public class ConversationListFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         binding.recyclerViewChatList.setLayoutManager(layoutManager);
 
-        chatAdapter = new ChatAdapter(chatList, getContext());
-        binding.recyclerViewChatList.setAdapter(chatAdapter);
+        conversationAdapter = new ConversationAdapter(chatList, getContext());
+        binding.recyclerViewChatList.setAdapter(conversationAdapter);
 
-        chatAdapter.setOnItemClickListener(() -> {
+        conversationAdapter.setOnItemClickListener(() -> {
             //Toast.makeText(getContext(), "Click ", Toast.LENGTH_SHORT).show();
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).openChatFragment();
