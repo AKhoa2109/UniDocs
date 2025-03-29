@@ -17,14 +17,16 @@ import java.util.List;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemConsersationBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatModel;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.DateTimeUtils;
 
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
-    private List<ChatModel> chatList;
+    private List<ConversationOverviewDto> conList;
     private Context context;
     private OnItemClickListener listener;
 
-    public ConversationAdapter(List<ChatModel> chatList, Context context) {
-        this.chatList = chatList;
+    public ConversationAdapter(List<ConversationOverviewDto> conList, Context context) {
+        this.conList = conList;
         this.context = context;
     }
 
@@ -37,24 +39,25 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ChatModel chat = chatList.get(position);
-
-        // Gán dữ liệu vào View
-        holder.binding.tvName.setText(chat.getName());
-        holder.binding.tvName.setText(chat.getName());
-        holder.binding.tvLastMessage.setText(chat.getLastMessage());
-        holder.binding.tvTime.setText(chat.getTime());
+        ConversationOverviewDto con = conList.get(position);
 
         // Hiển thị avatar
         Glide.with(context)
-                .load(chat.getAvatar())
+                .load(con.getAvatarUrl())
                 .placeholder(R.drawable.ic_person)
                 .into(holder.binding.imgAvatar);
 
+        // Gán dữ liệu vào View
+        holder.binding.tvName.setText(con.getDisplayName());
+        holder.binding.tvLastMessage.setText(con.getLastMessageContent());
+        int unreadCountInt = (con.getUnreadCount() != null ? con.getUnreadCount().intValue() : 0);
+        holder.binding.tvUnreadCount.setText(String.valueOf(unreadCountInt));
+        holder.binding.tvTime.setText(DateTimeUtils.formatTime(con.getLastMessageTime()));
+
         // Hiển thị badge tin nhắn chưa đọc nếu > 0
-        if(chat.getUnreadCount() > 0) {
+        if(con.getUnreadCount() > 0) {
             holder.binding.tvUnreadCount.setVisibility(View.VISIBLE);
-            holder.binding.tvUnreadCount.setText(String.valueOf(chat.getUnreadCount()));
+            holder.binding.tvUnreadCount.setText(String.valueOf(con.getUnreadCount()));
         } else {
             holder.binding.tvUnreadCount.setVisibility(View.GONE);
         }
@@ -63,19 +66,19 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         holder.itemView.setOnClickListener(v -> {
             if(listener != null) {
                 //khi nhan se truyen vao doi tuong cha
-                listener.onItemClick();
+                listener.onItemClick(con);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return chatList != null ? chatList.size() : 0;
+        return conList != null ? conList.size() : 0;
     }
 
     // Interface để xử lý click
     public interface OnItemClickListener {
-        void onItemClick();
+        void onItemClick(ConversationOverviewDto item);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

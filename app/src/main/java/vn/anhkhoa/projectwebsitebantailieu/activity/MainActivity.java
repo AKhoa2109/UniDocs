@@ -12,6 +12,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.io.Serializable;
+
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
@@ -19,6 +21,7 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.ChatFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
@@ -115,20 +118,19 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
-    public void openChatFragment() {
+    public void openChatFragment(ConversationOverviewDto conversation) {
         // Tạo ChatFragment và truyền dữ liệu
         ChatFragment chatFragment = new ChatFragment();
         Bundle args = new Bundle();
-        args.putString("conversationId", "1");
+        args.putSerializable("conversationOverviewDto", conversation);
         chatFragment.setArguments(args);
 
         // Thực hiện Fragment Transaction
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, chatFragment)
-                .addToBackStack("chat") // Thêm vào Back Stack
+                .addToBackStack("chat")
                 .commit();
 
-        // Ẩn BottomNavigationView (tuỳ chọn)
         binding.bottomNavigationView.setVisibility(View.GONE);
     }
 

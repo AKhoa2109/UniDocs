@@ -22,6 +22,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserResponse;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 
@@ -53,4 +54,8 @@ public interface ApiService {
     //user
     @POST("user/login")
     Call<ResponseData<UserResponse>> login(@Body LoginRequest request);
+
+    //conversation
+    @GET("conversation/{userId}")
+    Call<ResponseData<List<ConversationOverviewDto>>> findConversationsOverview(@Path("userId") Long userId);
 }

@@ -39,10 +39,13 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ChatAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentChatBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.ChatStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,15 +62,13 @@ public class ChatFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private FragmentChatBinding binding;
     private List<ChatLineDto> chatLineDtoList;
     private ChatAdapter chatAdapter;
-    private RecyclerView rvMessages;
-    private ImageView btnBack;
-    private FrameLayout flSendButton;
-    private EditText etMessage;
-
 
     // Giả sử conId của cuộc trò chuyện là "123"
+    private ConversationOverviewDto conversationOverviewDto;
+    SessionManager sessionManager;
     private final Long conversationId = 3L;
     private final Long userId = 2L;
 
@@ -97,13 +98,6 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat, container, false);
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         View mainView = view.findViewById(R.id.fragment_chat_layout);
@@ -119,11 +113,15 @@ public class ChatFragment extends Fragment {
         } else {
             gson = null;
         }
+        sessionManager = SessionManager.getInstance(requireContext());
 
-        AnhXa(view);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            conversationOverviewDto = (ConversationOverviewDto) bundle.getSerializable("conversationOverviewDto");
+        }
 
         //btnBack
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //goi su kien back cua he thong
@@ -132,7 +130,7 @@ public class ChatFragment extends Fragment {
         });
 
         //btn gui
-        flSendButton.setOnClickListener(new View.OnClickListener() {
+        binding.flSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendMessage();
@@ -143,34 +141,34 @@ public class ChatFragment extends Fragment {
 
 
        // rvMessages.getItemAnimator().setChangeDuration(false);
-        RecyclerView.ItemAnimator animator = rvMessages.getItemAnimator();
+        RecyclerView.ItemAnimator animator = binding.rvMessages.getItemAnimator();
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false); // Tắt animation thay đổi
         }
 
         chatLineDtoList = new ArrayList<>();
         //adapter
-        chatAdapter = new ChatAdapter(userId);
-        rvMessages.setAdapter(chatAdapter);
+        chatAdapter = new ChatAdapter(sessionManager.getUser().getUserId());
+        binding.rvMessages.setAdapter(chatAdapter);
         //layout manager từ dưới lên
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         layoutManager.setStackFromEnd(true);
-        rvMessages.setLayoutManager(layoutManager);
+        binding.rvMessages.setLayoutManager(layoutManager);
 
         chatAdapter.submitList(chatLineDtoList);
 
-        ApiService.apiService.getChatMessages(conversationId).enqueue(new Callback<ResponseData<List<ChatLineDto>>>() {
+        ApiService.apiService.getChatMessages(conversationOverviewDto.getConversationId()).enqueue(new Callback<ResponseData<List<ChatLineDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<ChatLineDto>>> call, Response<ResponseData<List<ChatLineDto>>> response) {
                 if(response.isSuccessful() && response.body() != null){
                     ResponseData<List<ChatLineDto>> data = response.body();
                    // chatLineDtoList.clear();
                     List<ChatLineDto> newLines = data.getData();
-                    Log.d("aaaa", newLines.get(1).toString());
+                    //Log.d("aaaa", newLines.get(1).toString());
                     chatLineDtoList.addAll(newLines);
                     chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
                     //cuon den tn cuoi
-                    rvMessages.post(() -> rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
+                    binding.rvMessages.post(() -> binding.rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
                 }
             }
 
@@ -189,7 +187,7 @@ public class ChatFragment extends Fragment {
         mStompClient.connect();
 
         // Đăng ký subscribe topic nhận tin nhắn từ server
-        topicSubscription = mStompClient.topic("/topic/conversation/" + String.valueOf(conversationId))
+        topicSubscription = mStompClient.topic("/topic/conversation/" + conversationOverviewDto.getConversationId())
                 .subscribe(topicMessage -> {
                     // Lấy payload (JSON) và deserialize thành ChatLine
                     ChatLineDto chatLineDto = gson.fromJson(topicMessage.getPayload(), ChatLineDto.class);
@@ -198,20 +196,20 @@ public class ChatFragment extends Fragment {
                     chatLineDtoList.add(chatLineDto);
                     chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
                 }, throwable -> {
-                    // Xử lý lỗi khi subscribe
+                    // Xử lý lỗi khi subscribes
                     throwable.printStackTrace();
                 });
     }
 
     private void sendMessage() {
        // Toast.makeText(getContext(), "da nhan gui", Toast.LENGTH_SHORT).show();
-        String content = etMessage.getText().toString().trim();
+        String content = binding.etMessage.getText().toString().trim();
         if (!content.isEmpty()) {
             ChatLineDto message = new ChatLineDto();
 
             // thuoc tinh
-            message.setConId(conversationId);
-            message.setUserId(userId);
+            message.setConId(conversationOverviewDto.getConversationId());
+            message.setUserId(sessionManager.getUser().getUserId());
             message.setContent(content);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 message.setSendAt(LocalDateTime.now());
@@ -226,21 +224,14 @@ public class ChatFragment extends Fragment {
             Log.d("JSON Output", jsonMessage);
 
             // Gửi tin nhắn tới endpoint /app/chat/{conId}
-            mStompClient.send("/app/chat/" + conversationId, jsonMessage).subscribe();
+            mStompClient.send("/app/chat/" + conversationOverviewDto.getConversationId(), jsonMessage).subscribe();
 
             // Xóa nội dung EditText sau khi gửi
-            etMessage.setText("");
+            binding.etMessage.setText("");
 
             //cuon den cuoi
-            rvMessages.post(() -> rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
+            binding.rvMessages.post(() -> binding.rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
         }
-    }
-
-    private void AnhXa(View view) {
-        rvMessages = view.findViewById(R.id.rvMessages);
-        btnBack = view.findViewById(R.id.btnBack);
-        flSendButton = view.findViewById(R.id.flSendButton);
-        etMessage = view.findViewById(R.id.etMessage);
     }
 
     @Override
@@ -252,5 +243,12 @@ public class ChatFragment extends Fragment {
             mStompClient.disconnect();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentChatBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 }
