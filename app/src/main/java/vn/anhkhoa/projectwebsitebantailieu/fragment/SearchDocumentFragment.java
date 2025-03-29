@@ -10,6 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.android.material.chip.ChipGroup;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchDocumentBinding;
@@ -76,6 +81,22 @@ public class SearchDocumentFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         View view = getLayoutInflater().inflate(R.layout.dialog_filter, null);
         builder.setView(view);
+
+        ChipGroup cgCategory = view.findViewById(R.id.cgCategory);
+        ChipGroup cgRating = view.findViewById(R.id.cgRating);
+        // Thêm các nút Apply và Cancel
+        builder.setPositiveButton("Áp dụng", (dialog, which) -> {
+            List<Integer> selectedCats = cgCategory.getCheckedChipIds();
+
+        });
+
+        builder.setNegativeButton("Hủy", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
     private void handlerFilter(){

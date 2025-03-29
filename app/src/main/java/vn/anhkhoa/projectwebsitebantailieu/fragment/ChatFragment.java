@@ -166,7 +166,7 @@ public class ChatFragment extends Fragment {
                     ResponseData<List<ChatLineDto>> data = response.body();
                    // chatLineDtoList.clear();
                     List<ChatLineDto> newLines = data.getData();
-                    Log.d("aaaa", newLines.get(1).toString());
+                   //Log.d("aaaa", newLines.get(0).toString());
                     chatLineDtoList.addAll(newLines);
                     chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
                     //cuon den tn cuoi
@@ -185,7 +185,7 @@ public class ChatFragment extends Fragment {
     }
     public void connectSocket(){
         // Khởi tạo STOMP client với endpoint (chú ý: endpoint của SockJS có thể cần /websocket)
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://196.169.5.179:8080/ws/websocket");
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://172.16.30.82:8080/ws/websocket");
         mStompClient.connect();
 
         // Đăng ký subscribe topic nhận tin nhắn từ server

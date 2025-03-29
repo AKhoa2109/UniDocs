@@ -30,7 +30,7 @@ public class SessionManager {
 
     public static synchronized SessionManager getInstance(Context context) {
         if (instance == null) {
-            // 🚨 Kiểm tra context có null không
+            // Kiểm tra context có null không
             if (context == null) {
                 throw new IllegalArgumentException("Context không được null!");
             }

@@ -7,4 +7,8 @@
         <item>Giá tăng dần</item>
         <item>Giá giảm dần</item>
     </string-array>
+    <array name="default_values_price">
+        <item>0</item>
+        <item>100000</item>
+    </array>
 </resources>

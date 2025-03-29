@@ -92,7 +92,7 @@ public class SignIn extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
 
                     ResponseData<UserResponse> responseData = response.body();
-                    //kiem tra du lieu trong
+                    //kiểm tra dữ liệu rỗng
                     if (responseData != null && responseData.getData() != null) {
                         UserResponse userResponse = responseData.getData();
                         Log.d("Login", "User: " + userResponse.getName());

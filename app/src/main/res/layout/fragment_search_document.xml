@@ -76,8 +76,6 @@
                     android:layout_marginStart="8dp"
                     android:spinnerMode="dropdown"/>
             </LinearLayout>
-
         </HorizontalScrollView>
-
     </LinearLayout>
 </LinearLayout>

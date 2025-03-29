@@ -32,7 +32,7 @@ public interface ApiService {
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("http://196.169.5.179:8080/api/")
+            .baseUrl("http://172.16.30.82:8080/api/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);

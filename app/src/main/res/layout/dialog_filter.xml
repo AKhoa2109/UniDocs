@@ -31,13 +31,21 @@
             android:textStyle="bold"
             android:layout_marginTop="16dp"/>
 
-<!--        <com.google.android.material.slider.RangeSlider
+        <com.google.android.material.slider.RangeSlider
             android:id="@+id/rangeSlider"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:valueFrom="0"
-            app:valueTo="100"
-            app:stepSize="1" />-->
+            android:valueFrom="0"
+            android:valueTo="100000"
+            android:stepSize="10000"
+            app:labelBehavior="withinBounds"
+            app:trackHeight="4dp"
+            app:haloRadius="12dp"
+            app:values="@array/default_values_price"
+            app:thumbStrokeWidth="2dp"
+            app:thumbStrokeColor="@color/white"
+            app:theme="@style/Widget.Material3.Slider"
+         />
 
         <!-- Đánh giá -->
         <TextView
