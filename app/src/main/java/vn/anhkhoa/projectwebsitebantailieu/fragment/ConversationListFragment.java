@@ -3,6 +3,7 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -89,7 +90,6 @@ public class ConversationListFragment extends Fragment {
             return insets;
         });
         sessionManager = SessionManager.getInstance(requireContext());
-
         binding.svConversation.setQueryHint("Tìm kiếm");
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -107,6 +107,41 @@ public class ConversationListFragment extends Fragment {
             }
         });
 
+        binding.svConversation.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterList(newText);
+                return false;
+            }
+        });
+
+    }
+
+    //loc conversation theo ten trong recyclerview
+    private void filterList(String newText) {
+        // Chưa có dữ liệu , thì không loc
+        if (conList.isEmpty()) {
+            return;
+        }
+        List<ConversationOverviewDto> filteredList  = new ArrayList<>();
+
+        String query = (newText == null) ? "" : newText.trim();
+        if(query.isEmpty()){
+            filteredList.addAll(conList);
+        }else {
+            for(ConversationOverviewDto con : conList){
+                if(con.getDisplayName().toLowerCase().contains(query.toLowerCase())){
+                    filteredList.add(con);
+                }
+            }
+        }
+
+        conversationAdapter.updateList(filteredList);
     }
 
     public void getConversation() {

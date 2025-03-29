@@ -71,6 +71,12 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         });
     }
 
+    // Phương thức cập nhật danh sách dữ liệu mới
+    public void updateList(List<ConversationOverviewDto> newList) {
+        this.conList = newList;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return conList != null ? conList.size() : 0;
