@@ -23,6 +23,7 @@ import java.util.Objects;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemMessageReceivedBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemMessageSentBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.DateTimeUtils;
 
 public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_SENT = 1;
@@ -93,7 +94,7 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
             sentBinding.tvMessage.setText(message.getContent());
             //kiem tra hien thoi gian
             if (showTime) {
-                sentBinding.tvTime.setText(formatTime(message.getSendAt()));
+                sentBinding.tvTime.setText(DateTimeUtils.formatTime(message.getSendAt()));
                 sentBinding.tvTime.setVisibility(View.VISIBLE);
             } else {
                 sentBinding.tvTime.setVisibility(View.GONE);
@@ -114,24 +115,12 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
             receivedBinding.tvMessage.setText(message.getContent());
             //kiem tra hien thoi gian
             if (showTime) {
-                receivedBinding.tvTime.setText(formatTime(message.getSendAt()));
+                receivedBinding.tvTime.setText(DateTimeUtils.formatTime(message.getSendAt()));
                 receivedBinding.tvTime.setVisibility(View.VISIBLE);
             } else {
                 receivedBinding.tvTime.setVisibility(View.GONE);
             }
         }
-    }
-
-    private static String formatTime(LocalDateTime dateTime) {
-        if(dateTime == null) {
-            return "";
-        }
-        DateTimeFormatter formatter = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            formatter = DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault());
-            return dateTime.format(formatter);
-        }
-        return "";
     }
 
     //so sanh de cap nhat

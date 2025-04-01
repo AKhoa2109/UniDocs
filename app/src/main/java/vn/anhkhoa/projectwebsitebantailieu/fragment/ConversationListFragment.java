@@ -3,6 +3,7 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
@@ -12,16 +13,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import vn.anhkhoa.projectwebsitebantailieu.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ConversationAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
+import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentConversationListBinding;
-import vn.anhkhoa.projectwebsitebantailieu.model.ChatModel;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 import androidx.core.view.ViewCompat;
 
@@ -36,11 +41,11 @@ public class ConversationListFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private RecyclerView rcChat;
     private ConversationAdapter conversationAdapter;
-    private List<ChatModel> chatList;
+    private List<ConversationOverviewDto> conList;
     private FragmentConversationListBinding binding;
 
+    private SessionManager sessionManager;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -84,30 +89,78 @@ public class ConversationListFragment extends Fragment {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        sessionManager = SessionManager.getInstance(requireContext());
         binding.svConversation.setQueryHint("Tìm kiếm");
-        AnhXa();
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         binding.recyclerViewChatList.setLayoutManager(layoutManager);
 
-        conversationAdapter = new ConversationAdapter(chatList, getContext());
+        conList = new ArrayList<>();
+        conversationAdapter = new ConversationAdapter(conList, getContext());
         binding.recyclerViewChatList.setAdapter(conversationAdapter);
 
-        conversationAdapter.setOnItemClickListener(() -> {
+        getConversation();
+        conversationAdapter.setOnItemClickListener((conversation) -> {
             //Toast.makeText(getContext(), "Click ", Toast.LENGTH_SHORT).show();
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).openChatFragment();
+                ((MainActivity) getActivity()).openChatFragment(conversation);
+            }
+        });
+
+        binding.svConversation.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterList(newText);
+                return false;
             }
         });
 
     }
 
-    public void AnhXa(){
-        chatList = new ArrayList<>();
-        chatList.add(new ChatModel("George Alan", "Lorem ipsum dolor sit amet", "4:30 PM", 1, "https://nano-ceramic.vn/wp-content/uploads/2024/12/300-hinh-anh-dai-dien-dep-cho-facebook-tiktok-zalo-79.jpg"));
-        chatList.add(new ChatModel("Uber Cars", "Sender: Lorem ipsum...", "4:20 PM", 0, "https://nano-ceramic.vn/wp-content/uploads/2024/12/300-hinh-anh-dai-dien-dep-cho-facebook-tiktok-zalo-79.jpg"));
-        chatList.add(new ChatModel("Safiya Fareena", "Video", "4:15 PM", 2, "https://nano-ceramic.vn/wp-content/uploads/2024/12/300-hinh-anh-dai-dien-dep-cho-facebook-tiktok-zalo-79.jpg"));
+    //loc conversation theo ten trong recyclerview
+    private void filterList(String newText) {
+        // Chưa có dữ liệu , thì không loc
+        if (conList.isEmpty()) {
+            return;
+        }
+        List<ConversationOverviewDto> filteredList  = new ArrayList<>();
+
+        String query = (newText == null) ? "" : newText.trim();
+        if(query.isEmpty()){
+            filteredList.addAll(conList);
+        }else {
+            for(ConversationOverviewDto con : conList){
+                if(con.getDisplayName().toLowerCase().contains(query.toLowerCase())){
+                    filteredList.add(con);
+                }
+            }
+        }
+
+        conversationAdapter.updateList(filteredList);
+    }
+
+    public void getConversation() {
+        ApiService.apiService.findConversationsOverview(sessionManager.getUser().getUserId()).enqueue(new Callback<ResponseData<List<ConversationOverviewDto>>>() {
+            @Override
+            public void onResponse(Call<ResponseData<List<ConversationOverviewDto>>> call, Response<ResponseData<List<ConversationOverviewDto>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    conList.clear();
+                    ResponseData<List<ConversationOverviewDto>> responseData = response.body();
+                    conList.addAll(responseData.getData());
+                    conversationAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<List<ConversationOverviewDto>>> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override
