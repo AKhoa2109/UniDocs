@@ -67,6 +67,13 @@
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+        <ImageView
+            android:id="@+id/ivFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:padding="10dp"
+            android:src="@drawable/filter_icon"/>
     </LinearLayout>
     <FrameLayout
         android:id="@+id/frameLayout"

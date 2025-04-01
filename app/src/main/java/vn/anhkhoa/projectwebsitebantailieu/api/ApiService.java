@@ -32,7 +32,7 @@ public interface ApiService {
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("http://172.16.30.82:8080/api/")
+            .baseUrl("http://192.168.1.172:8080/api/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);
@@ -45,6 +45,14 @@ public interface ApiService {
 
     @GET("document/search-document")
     Call<ResponseData<List<DocumentDto>>> searchDocument(@Query("keyword") String keyword);
+
+    @GET("document/filter")
+    Call<ResponseData<List<DocumentDto>>> filterDocument(@Query("keyword") String keyword,
+                                                         @Query("sortType") String sortType,
+                                                         @Query("categoryId") List<Long> categoryId,
+                                                         @Query("minPrice") Double minPrice,
+                                                         @Query("maxPrice") Double maxPrice,
+                                                         @Query("rating") List<Integer> rating);
 
     //chat
     @GET("conversations/{conversationId}/messages")

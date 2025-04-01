@@ -5,16 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f8a530db-75b9-4eb9-b4db-261556c7a413" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/SignIn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/SignIn.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/api/ApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/api/ApiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/ChatFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/ChatFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/ViewPagerAdapter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/FilterDocumentFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/layout/fragment_filter_document.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/SearchActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/SearchActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/SearchDocumentFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/SearchDocumentFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/utils/SessionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/utils/SessionManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/res/layout/dialog_filter.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/layout/dialog_filter.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/res/layout/activity_search.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/layout/activity_search.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/res/layout/fragment_search_document.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/layout/fragment_search_document.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/values/strings.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,9 +23,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2uzNQvunP2ErtoXEbrLRoIeDrTI" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -37,6 +36,8 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Nam3HK2/LapTrinhDiDong/Project/APIUniDocs",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
@@ -58,7 +59,11 @@
       <option name="presentableId" value="Default" />
       <updated>1743247430496</updated>
       <workItem from="1743247432672" duration="7000" />
+      <workItem from="1743309801683" duration="77000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>

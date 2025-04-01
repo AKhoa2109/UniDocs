@@ -185,7 +185,7 @@ public class ChatFragment extends Fragment {
     }
     public void connectSocket(){
         // Khởi tạo STOMP client với endpoint (chú ý: endpoint của SockJS có thể cần /websocket)
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://172.16.30.82:8080/ws/websocket");
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://192.168.1.172:8080/ws/websocket");
         mStompClient.connect();
 
         // Đăng ký subscribe topic nhận tin nhắn từ server

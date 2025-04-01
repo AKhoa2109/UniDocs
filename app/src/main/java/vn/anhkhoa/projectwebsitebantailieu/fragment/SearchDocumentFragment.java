@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.ViewPagerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchDocumentBinding;
 
@@ -27,7 +30,9 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchDocumentBin
 public class SearchDocumentFragment extends Fragment {
 
     FragmentSearchDocumentBinding binding;
+    private static final String sortType = "relevance";
 
+    private String keyword = "";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -65,6 +70,7 @@ public class SearchDocumentFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            keyword = getArguments().getString("SEARCH_QUERY");
         }
     }
 
@@ -73,37 +79,39 @@ public class SearchDocumentFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding =  FragmentSearchDocumentBinding.inflate(inflater, container, false);
-        handlerFilter();
+        binding.viewPager2.setAdapter(new ViewPagerAdapter(getChildFragmentManager(), getLifecycle(), keyword));
+        new TabLayoutMediator(binding.tabLayout, binding.viewPager2, (tab, position) -> {
+            switch (position) {
+                case 0: tab.setText("Liên quan"); break;
+                case 1: tab.setText("Mới nhất"); break;
+                case 2: tab.setText("Mua nhiều nhất"); break;
+                case 3: tab.setText("Tải nhiều nhất"); break;
+                case 4: tab.setText("Xem nhiều nhất"); break;
+                case 5: tab.setText("Giá thấp → cao"); break;
+                case 6: tab.setText("Giá cao → thấp"); break;
+            }
+        }).attach();
+        handlerTabLayout();
+
         return binding.getRoot();
     }
 
-    private void showFilterDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View view = getLayoutInflater().inflate(R.layout.dialog_filter, null);
-        builder.setView(view);
 
-        ChipGroup cgCategory = view.findViewById(R.id.cgCategory);
-        ChipGroup cgRating = view.findViewById(R.id.cgRating);
-        // Thêm các nút Apply và Cancel
-        builder.setPositiveButton("Áp dụng", (dialog, which) -> {
-            List<Integer> selectedCats = cgCategory.getCheckedChipIds();
-
-        });
-
-        builder.setNegativeButton("Hủy", (dialog, which) -> {
-            dialog.dismiss();
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-    }
-
-    private void handlerFilter(){
-        binding.ivFilter.setOnClickListener(new View.OnClickListener() {
+    private void handlerTabLayout(){
+        binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View view) {
-                showFilterDialog();
+            public void onTabSelected(TabLayout.Tab tab) {
+                binding.viewPager2.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
             }
         });
     }
