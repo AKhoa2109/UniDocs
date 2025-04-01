@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -156,22 +157,16 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void openSearchDocumentFragment(String query){
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        SearchDocumentFragment fragment = new SearchDocumentFragment();
+        Bundle args = new Bundle();
+        args.putString("SEARCH_QUERY", query);
+        args.putString("sortType","relevance");
+        fragment.setArguments(args);
 
-        if (currentFragment instanceof FilterDocumentFragment) {
-            ((FilterDocumentFragment) currentFragment).updateSearchQuery(query);
-        } else {
-            SearchDocumentFragment fragment = new SearchDocumentFragment();
-            Bundle args = new Bundle();
-            args.putString("SEARCH_QUERY", query);
-            args.putString("sortType","relevance");
-            fragment.setArguments(args);
-
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frameLayout, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frameLayout, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void handlerImgFilter(){
@@ -222,43 +217,51 @@ public class SearchActivity extends AppCompatActivity {
 
         // Thêm các nút Apply và Cancel
         builder.setPositiveButton("Áp dụng", (dialog, which) -> {
-
-            List<Long> selectedCateIds = new ArrayList<>();
-            for(int i=0;i<cgCategory.getChildCount();i++){
+            // Lấy danh sách category id dạng List<Long>
+            List<Long> selectedCateIdsList = new ArrayList<>();
+            for (int i = 0; i < cgCategory.getChildCount(); i++) {
                 Chip chip = (Chip) cgCategory.getChildAt(i);
-                if(chip.isChecked()){
-                    selectedCateIds.add(((long) chip.getId()));
+                if (chip.isChecked()) {
+                    Log.d("TESTFILTER", "" + chip.getId());
+                    selectedCateIdsList.add((long) chip.getId());
                 }
             }
-            if(selectedCateIds.isEmpty()){
-                selectedCateIds = Collections.emptyList();
-            }
+            // Chuyển sang mảng Long[]
+            Long[] selectedCateIds = selectedCateIdsList.isEmpty()
+                    ? new Long[0]
+                    : selectedCateIdsList.toArray(new Long[selectedCateIdsList.size()]);
 
-            List<Integer> selectedRating = new ArrayList<>();
-            for(int i=0;i<cgRating.getChildCount();i++){
+            // Lấy danh sách rating dạng List<Integer>
+            List<Integer> selectedRatingList = new ArrayList<>();
+            for (int i = 0; i < cgRating.getChildCount(); i++) {
                 Chip chip = (Chip) cgRating.getChildAt(i);
-                if(chip.isChecked()){
+                if (chip.isChecked()) {
+                    Log.d("TESTFILTER", "" + chip.getText());
                     String ratingText = chip.getText().toString().split(" ")[0];
-                    selectedRating.add(Integer.parseInt(ratingText));
+                    selectedRatingList.add(Integer.parseInt(ratingText));
                 }
             }
-            if(selectedRating.isEmpty()) {
-                selectedRating = Collections.emptyList();
-            }
+            // Chuyển sang mảng Integer[]
+            Integer[] selectedRating = selectedRatingList.isEmpty()
+                    ? new Integer[0]
+                    : selectedRatingList.toArray(new Integer[selectedRatingList.size()]);
+
+            // Lấy giá trị từ RangeSlider
             List<Float> priceValue = rangeSlider.getValues();
             Double minPrice = priceValue.get(0) > 0 ? (double) priceValue.get(0) : null;
             Double maxPrice = priceValue.get(1) < 100000 ? (double) priceValue.get(1) : null;
 
+            // Tạo đối tượng FilterCriteria với các mảng được truyền vào
             FilterCriteria criteria = new FilterCriteria(
-                    selectedCateIds.isEmpty() ? Collections.emptyList() : selectedCateIds,
-                    selectedRating.isEmpty() ? Collections.emptyList() : selectedRating,
+                    selectedCateIds,
+                    selectedRating,
                     minPrice,
                     maxPrice
             );
 
+            // Cập nhật ViewModel với tiêu chí lọc
             ShareViewModel viewModel = new ViewModelProvider(SearchActivity.this).get(ShareViewModel.class);
             viewModel.setFilterCriteria(criteria);
-
         });
 
         builder.setNegativeButton("Hủy", (dialog, which) -> {

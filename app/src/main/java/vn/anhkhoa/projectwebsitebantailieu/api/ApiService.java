@@ -50,10 +50,10 @@ public interface ApiService {
     @GET("document/filter")
     Call<ResponseData<List<DocumentDto>>> filterDocument(@Query("keyword") String keyword,
                                                          @Query("sortType") String sortType,
-                                                         @Query("categoryId") List<Long> categoryId,
+                                                         @Query("categoryIds") Long[] categoryIds,
                                                          @Query("minPrice") Double minPrice,
                                                          @Query("maxPrice") Double maxPrice,
-                                                         @Query("rating") List<Integer> rating);
+                                                         @Query("ratings") Integer[] ratings);
 
     //chat
     @GET("conversations/{conversationId}/messages")

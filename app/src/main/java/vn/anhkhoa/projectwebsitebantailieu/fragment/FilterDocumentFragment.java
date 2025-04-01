@@ -3,6 +3,8 @@
     import androidx.fragment.app.Fragment;
     import androidx.lifecycle.ViewModelProvider;
     import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+    import android.util.Log;
     import android.view.LayoutInflater;
     import android.view.View;
     import android.view.ViewGroup;
@@ -75,10 +77,10 @@
             initViews();
             updateSearchQuery(keyword);
             shareViewModel.getFilterCriteria().observe(getViewLifecycleOwner(), criteria -> {
-                List<Long> cateIds = criteria != null ? criteria.categoryId : null;
+                Long[] cateIds = criteria != null ? criteria.categoryId : null;
                 Double min = criteria != null ? criteria.minPrice : null;
                 Double max = criteria != null ? criteria.maxPrice : null;
-                List<Integer> rates = criteria != null ? criteria.rating : null;
+                Integer[] rates = criteria != null ? criteria.rating : null;
                 loadDocuments(keyword,cateIds, min, max, rates);
             });
             return binding.getRoot();
@@ -88,24 +90,20 @@
         private void initViews(){
             documents = new ArrayList<>();
             documentAdapter = new DocumentAdapter(documents);
-
             binding.rvFilterDocument.setAdapter(documentAdapter);
-
             binding.rvFilterDocument.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         }
 
         public void updateSearchQuery(String query){
-            this.keyword = query;
-            loadDocuments(keyword,null, null, null, null);
+            loadDocuments(query,null, null, null, null);
         }
 
 
-        public void loadDocuments(String keyword,List<Long> categoryId, Double minPrice, Double maxPrice, List<Integer> rating) {
+        public void loadDocuments(String keyword,Long[] categoryId, Double minPrice, Double maxPrice, Integer[] rating) {
             Toast.makeText(getContext(), sortType, Toast.LENGTH_SHORT).show();
             ApiService.apiService.filterDocument(keyword,sortType,categoryId,minPrice,maxPrice,rating).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
                 @Override
                 public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
-
                     if (response.isSuccessful() && response.body() != null) {
                         List<DocumentDto> data = response.body().getData();
 
@@ -114,17 +112,19 @@
                             binding.tvNotFound.setVisibility(View.GONE);
                             documents.clear();
                             documents.addAll(data);
+                            documentAdapter.notifyDataSetChanged();
                         } else {
                             // Hiển thị thông báo khi không có dữ liệu
                             binding.tvNotFound.setVisibility(View.VISIBLE);
                             documents.clear();
+                            documentAdapter.notifyDataSetChanged();
                         }
                     } else {
                         // Hiển thị thông báo khi response lỗi
                         binding.tvNotFound.setVisibility(View.VISIBLE);
                         documents.clear();
+                        documentAdapter.notifyDataSetChanged();
                     }
-                    documentAdapter.notifyDataSetChanged();
                 }
 
                 @Override
