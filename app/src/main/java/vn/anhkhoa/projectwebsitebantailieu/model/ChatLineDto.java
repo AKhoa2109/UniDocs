@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Objects;
 
 import vn.anhkhoa.projectwebsitebantailieu.enums.ChatStatus;
+import vn.anhkhoa.projectwebsitebantailieu.enums.ChatType;
 
 public class ChatLineDto {
     private Long chatLineId;
     private Long chatLineParentId;
     private String content;//
     private ChatStatus chatStatus;//
+
+    private ChatType chatType;
 
     private LocalDateTime sendAt;
     private Long userId;//
@@ -27,19 +30,12 @@ public class ChatLineDto {
     // Constructor rỗng
     public ChatLineDto() {}
 
-    // Constructor đầy đủ
-    public ChatLineDto(Long chatLineId, Long chatLineParentId, String content, ChatStatus chatStatus,
-                       LocalDateTime sendAt, Long userId, Long conId,
-                       List<FileChatLine> fileChatLines, List<Seen> seens) {
-        this.chatLineId = chatLineId;
-        this.chatLineParentId = chatLineParentId;
-        this.content = content;
-        this.chatStatus = chatStatus;
-        this.sendAt = sendAt;
-        this.userId = userId;
-        this.conId = conId;
-        this.fileChatLines = fileChatLines;
-        this.seens = seens;
+    public ChatType getChatType() {
+        return chatType;
+    }
+
+    public void setChatType(ChatType chatType) {
+        this.chatType = chatType;
     }
 
     // Getter và Setter

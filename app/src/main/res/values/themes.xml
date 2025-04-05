@@ -5,15 +5,23 @@
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="elevationOverlayEnabled">false</item>
     </style>
+
     <style name="MyTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorSecondary">@color/colorSecondary</item>
     </style>
-    <style name="ChipTheme" parent="Widget.MaterialComponents.Chip.Filter">
-    </style>
+
+    <style name="ChipTheme" parent="Widget.MaterialComponents.Chip.Filter"></style>
+
     <style name="TransparentBottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="android:background">@android:color/transparent</item>
         <item name="elevation">0dp</item>
         <item name="android:elevation">0dp</item>
     </style>
+
     <style name="Theme.ProjectWebsiteBanTaiLieu" parent="Base.Theme.ProjectWebsiteBanTaiLieu" />
+
+    <style name="ThemeOverlay.ProjectWebsiteBanTaiLieu.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
+    </style>
 </resources>

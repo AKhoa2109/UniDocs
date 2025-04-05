@@ -50,6 +50,9 @@ dependencies {
     implementation(libs.rxjava)
     implementation(libs.rxandroid)
     implementation(libs.protolite.well.known.types)
+    implementation(libs.flexbox)
+    implementation(libs.photoView)
+
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)
