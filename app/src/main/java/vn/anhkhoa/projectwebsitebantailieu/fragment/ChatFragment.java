@@ -21,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -266,41 +267,26 @@ public class ChatFragment extends Fragment {
         View bottomInputLayout = binding.bottomInputLayout;
         View root = binding.getRoot();
 
-        // Kiểm tra null cho các view nếu cần thiết
-        if (rvMessages == null || bottomInputLayout == null) {
-            return root;
-        }
-
         // Lắng nghe sự thay đổi kích thước màn hình (bao gồm cả bàn phím)
         root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 Rect rect = new Rect();
                 root.getWindowVisibleDisplayFrame(rect);
-                int screenHeight = root.getHeight();
-                int keypadHeight = screenHeight - rect.bottom;
+                float screenHeight = root.getHeight();
+                float keypadHeight = screenHeight - rect.bottom;
 
-                // Nếu bàn phím đang hiển thị (keypadHeight > 0), di chuyển bottomInputLayout
-                if (keypadHeight > 0) {
-                    // Đẩy bottomInputLayout lên trên bàn phím
-                    bottomInputLayout.setTranslationY(-keypadHeight);
-
-                    // Tính toán chiều cao mới cho RecyclerView
-                    int newRvHeight = screenHeight - keypadHeight - bottomInputLayout.getHeight();
-
-                    // Chỉ thay đổi layout params nếu có sự thay đổi chiều cao
-                    if (rvMessages.getLayoutParams().height != newRvHeight) {
-                        ViewGroup.LayoutParams lp = rvMessages.getLayoutParams();
-                        lp.height = newRvHeight;
-                        rvMessages.setLayoutParams(lp);
-                    }
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) rvMessages.getLayoutParams();
+                // Nếu bàn phím đang hiển thị
+                if (keypadHeight > screenHeight * 0.15) {
+                    lp.weight = 0; // Hủy thuộc tính weight để height có thể tự do điều chỉnh
+                    //tru layoutTop , bottomlayout*2(de noi len), keypadHeight
+                    lp.height = (int) (screenHeight - keypadHeight - 2*bottomInputLayout.getHeight() - binding.layoutTopChat.getHeight());
+                    rvMessages.setLayoutParams(lp);
                 } else {
-                    // Nếu bàn phím không hiển thị, đảm bảo bottomInputLayout ở đáy màn hình
-                    bottomInputLayout.setTranslationY(0);
-
-                    // Đặt lại chiều cao của RecyclerView khi bàn phím ẩn
-                    ViewGroup.LayoutParams lp = rvMessages.getLayoutParams();
-                    lp.height = screenHeight - bottomInputLayout.getHeight();
+                    // Khôi phục thuộc tính weight cho RecyclerView để layout hoạt động đúng
+                    lp.weight = 1;
+                    lp.height = 0;  // toàn bộ không gian còn lại
                     rvMessages.setLayoutParams(lp);
                 }
             }
