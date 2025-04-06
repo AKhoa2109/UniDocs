@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.protolite.well.known.types)
     implementation(libs.flexbox)
     implementation(libs.photoView)
+    implementation(libs.core)
 
     testImplementation(libs.junit)
 

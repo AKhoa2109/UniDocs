@@ -1,5 +1,8 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.app.DownloadManager;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,15 +12,21 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentChatBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentImageFullscreenBinding;
+import vn.anhkhoa.projectwebsitebantailieu.utils.DownloadUtils;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,6 +88,62 @@ public class ImageFullscreenFragment extends Fragment {
         String url = getArguments().getString(ARG_URL);
         Glide.with(this).load(url).into(binding.photoView);
 
+        // Lắng nghe sự kiện cho các nút
+        binding.btnBack.setOnClickListener(v -> onBackPressed());
+        binding.btnDownload.setOnClickListener(v -> downloadImage());
+        binding.btnMore.setOnClickListener(v -> onMoreClicked(v));
 
+    }
+
+    private void onBackPressed() {
+        requireActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    // Tải ảnh từ URL về bộ nhớ
+    private void downloadImage() {
+        String url = getArguments().getString(ARG_URL);
+        String fileName = "img_" + System.currentTimeMillis() + ".jpg";
+        DownloadUtils.downloadAndSaveImage(requireContext(), url,  fileName);
+    }
+
+    // Nút More
+    private void onMoreClicked(View view) {
+        PopupMenu popupMenu = new PopupMenu(getContext(), view);
+        popupMenu.inflate(R.menu.menu_image_more);
+
+        popupMenu.setOnMenuItemClickListener(item ->{
+            if (item.getItemId() == R.id.item_view_original) {
+                // Xử lý "Xem tin nhắn gốc"
+                showOriginalMessage();
+                return true;
+            } else if (item.getItemId() == R.id.item_edit_image) {
+                // Xử lý "Chỉnh sửa ảnh"
+                editImage();
+                return true;
+            } else if (item.getItemId() == R.id.item_save_image) {
+                downloadImage();
+                return true;
+            } else if (item.getItemId() == R.id.item_share) {
+                // Xử lý "Chia sẻ"
+                shareImage();
+                return true;
+            } else {
+                return false;
+            }
+        });
+        popupMenu.show();
+
+    }
+
+    private void showOriginalMessage() {
+        ToastUtils.show(getContext(), "show original message");
+    }
+
+    private void editImage() {
+        ToastUtils.show(requireContext(),"Chỉnh sửa ảnh");
+    }
+
+    private void shareImage() {
+        ToastUtils.show(requireContext(), "ShareImage");
     }
 }
