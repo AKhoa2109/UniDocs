@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_view_original"
+        android:title="Xem tin nhắn gốc"/>
+    <item
+        android:id="@+id/item_edit_image"
+        android:title="Chỉnh sửa ảnh"/>
+    <item
+        android:id="@+id/item_save_image"
+        android:title="Lưu về máy"/>
+    <item
+        android:id="@+id/item_share"
+        android:title="Chia sẻ"/>
+</menu>

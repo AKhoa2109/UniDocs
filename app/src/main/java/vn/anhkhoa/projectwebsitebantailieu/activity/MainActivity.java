@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.io.Serializable;
@@ -54,47 +55,94 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+//        // Thêm fragment mặc định
+//        getSupportFragmentManager().beginTransaction()
+//                .add(R.id.frame_layout, conversationListFragment)
+//                .commit();
+//        binding.bottomNavigationView.setOnItemSelectedListener(item->{
+//            int id = item.getItemId();
+//
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            // Ẩn tất cả các fragment trước khi hiển thị fragment được chọn
+//            if (homeFragment.isAdded()) transaction.hide(homeFragment);
+//            if (shopFragment.isAdded()) transaction.hide(shopFragment);
+//            if (accountFragment.isAdded()) transaction.hide(accountFragment);
+//            if (conversationListFragment.isAdded()) transaction.hide(conversationListFragment);
+//
+//            if (id == R.id.home) {
+//                if (!homeFragment.isAdded()) {
+//                    transaction.add(R.id.frame_layout, homeFragment);
+//                }
+//                transaction.show(homeFragment);
+//            } else if (id == R.id.shop) {
+//                if (!shopFragment.isAdded()) {
+//                    transaction.add(R.id.frame_layout, shopFragment);
+//                }
+//                transaction.show(shopFragment);
+//            } else if (id == R.id.chat) {
+//                if (!conversationListFragment.isAdded()) {
+//                    transaction.add(R.id.frame_layout, conversationListFragment);
+//                }
+//                transaction.show(conversationListFragment);
+//            }else if (id == R.id.account) {
+//                if (!accountFragment.isAdded()) {
+//                    transaction.add(R.id.frame_layout, accountFragment);
+//                }
+//                transaction.show(accountFragment);
+//            }
+//            transaction.commit();
+//            return true;
+//        });
+
         // Thêm fragment mặc định
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.frame_layout, homeFragment)
-                .commit();
-        binding.bottomNavigationView.setOnItemSelectedListener(item->{
+        showFragment(conversationListFragment, "chat");
+
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            // Ẩn tất cả các fragment trước khi hiển thị fragment được chọn
-            if (homeFragment.isAdded()) transaction.hide(homeFragment);
-            if (shopFragment.isAdded()) transaction.hide(shopFragment);
-            if (accountFragment.isAdded()) transaction.hide(accountFragment);
-            if (conversationListFragment.isAdded()) transaction.hide(conversationListFragment);
-
+            // Gọi hàm showFragment thay vì xử lý từng Fragment trực tiếp
             if (id == R.id.home) {
-                if (!homeFragment.isAdded()) {
-                    transaction.add(R.id.frame_layout, homeFragment);
-                }
-                transaction.show(homeFragment);
+                showFragment(homeFragment, "home");
             } else if (id == R.id.shop) {
-                if (!shopFragment.isAdded()) {
-                    transaction.add(R.id.frame_layout, shopFragment);
-                }
-                transaction.show(shopFragment);
+                showFragment(shopFragment, "shop");
             } else if (id == R.id.chat) {
-                if (!conversationListFragment.isAdded()) {
-                    transaction.add(R.id.frame_layout, conversationListFragment);
-                }
-                transaction.show(conversationListFragment);
-            }else if (id == R.id.account) {
-                if (!accountFragment.isAdded()) {
-                    transaction.add(R.id.frame_layout, accountFragment);
-                }
-                transaction.show(accountFragment);
+                showFragment(conversationListFragment, "chat");
+            } else if (id == R.id.account) {
+                showFragment(accountFragment, "account");
             }
-            transaction.commit();
+
             return true;
         });
 
         setupBackPressedCallback();
     }
+
+    //goi ham nay khi can show fragmen
+    public void showFragment(Fragment fragment, String tag) {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        // 1) Ẩn tất cả các fragment đã thêm
+        for (Fragment f : fm.getFragments()) {
+            if (f.isAdded()) {
+                ft.hide(f);
+            }
+        }
+
+        // 2) Thay thế fragment nếu chưa add hoặc thay thế fragment hiện tại
+        if (!fragment.isAdded()) {
+            ft.replace(R.id.frame_layout, fragment, tag);  // Sử dụng replace thay vì add
+        } else {
+            ft.show(fragment);  // Chỉ hiển thị nếu fragment đã tồn tại
+        }
+
+        // 3) Thêm vào back stack nếu cần
+        ft.addToBackStack(tag);  // Thêm vào back stack để có thể quay lại fragment trước đó
+
+        // 4) Commit
+        ft.commit();
+    }
+
 
     private void setupBackPressedCallback() {
         onBackPressedCallback = new OnBackPressedCallback(true) {

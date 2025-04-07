@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Nền xám trong suốt -->
+    <solid android:color="#80000000"/>
+    <!-- Bo góc -->
+    <corners android:radius="16dp"/>
+    <!-- Padding xung quanh nội dung Toast -->
+    <padding android:left="16dp" android:top="12dp" android:right="16dp" android:bottom="12dp"/>
+</shape>

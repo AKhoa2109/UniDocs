@@ -33,11 +33,14 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 @RequiresApi(api = Build.VERSION_CODES.O)
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
+    //sua IP
+    public static String ipAddress = "10.0.2.2:8080";
+    String baseUrl = "http://" + ipAddress + "/api/";
      Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.12:8080/api/")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);

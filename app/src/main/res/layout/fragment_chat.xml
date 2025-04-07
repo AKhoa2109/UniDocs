@@ -6,7 +6,6 @@
     android:id="@+id/fragment_chat_layout"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:fitsSystemWindows="true"
     android:background="@color/white">
 
     <!-- Thanh trên (header) -->
@@ -97,6 +96,7 @@
         android:padding="8dp" />
 
     <LinearLayout
+        android:id="@+id/bottomInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -105,9 +105,16 @@
         android:padding="8dp">
 
         <ImageView
+            android:id="@+id/ivPicture"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_picture" />
+
+        <ImageView
             android:id="@+id/ivAttachment"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@drawable/ic_attach_file" />
 
         <!-- Ô nhập nội dung -->
@@ -120,6 +127,8 @@
             android:layout_weight="1"
             android:background="@null"
             android:hint="Tin nhắn"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:inputType="textMultiLine|textCapSentences" />
 
         <!-- Nút gửi -->

@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -80,6 +82,7 @@ public class ChatFragment extends Fragment {
     public ChatFragment() {
         // Required empty public constructor
     }
+
     public static ChatFragment newInstance(String param1, String param2) {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
@@ -124,8 +127,8 @@ public class ChatFragment extends Fragment {
         //load ành , ten
         Glide.with(requireContext())
                 .load(conversationOverviewDto.getAvatarUrl())
-                        .placeholder(R.drawable.ic_person)
-                                .into(binding.ivAvatar);
+                .placeholder(R.drawable.ic_person)
+                .into(binding.ivAvatar);
         binding.tvConName.setText(conversationOverviewDto.getDisplayName());
 
         //btnBack
@@ -148,7 +151,7 @@ public class ChatFragment extends Fragment {
         connectSocket();
 
 
-       // rvMessages.getItemAnimator().setChangeDuration(false);
+        // rvMessages.getItemAnimator().setChangeDuration(false);
         RecyclerView.ItemAnimator animator = binding.rvMessages.getItemAnimator();
         if (animator instanceof SimpleItemAnimator) {
             ((SimpleItemAnimator) animator).setSupportsChangeAnimations(false); // Tắt animation thay đổi
@@ -168,11 +171,11 @@ public class ChatFragment extends Fragment {
         ApiService.apiService.getChatMessages(conversationOverviewDto.getConversationId()).enqueue(new Callback<ResponseData<List<ChatLineDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<ChatLineDto>>> call, Response<ResponseData<List<ChatLineDto>>> response) {
-                if(response.isSuccessful() && response.body() != null){
+                if (response.isSuccessful() && response.body() != null) {
                     ResponseData<List<ChatLineDto>> data = response.body();
-                   // chatLineDtoList.clear();
+                    // chatLineDtoList.clear();
                     List<ChatLineDto> newLines = data.getData();
-                   //Log.d("aaaa", newLines.get(0).toString());
+                    //Log.d("aaaa", newLines.get(0).toString());
                     chatLineDtoList.addAll(newLines);
                     chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
                     //cuon den tn cuoi
@@ -189,9 +192,10 @@ public class ChatFragment extends Fragment {
         //rvMessages.post(() -> rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
 
     }
-    public void connectSocket(){
+
+    public void connectSocket() {
         // Khởi tạo STOMP client với endpoint (chú ý: endpoint của SockJS có thể cần /websocket)
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://192.168.1.12:8080/ws/websocket");
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://" + ApiService.ipAddress + "/ws/websocket");
         mStompClient.connect();
 
         // Đăng ký subscribe topic nhận tin nhắn từ server
@@ -210,7 +214,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void sendMessage() {
-       // Toast.makeText(getContext(), "da nhan gui", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getContext(), "da nhan gui", Toast.LENGTH_SHORT).show();
         String content = binding.etMessage.getText().toString().trim();
         if (!content.isEmpty()) {
             ChatLineDto message = new ChatLineDto();
@@ -257,6 +261,53 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentChatBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+
+        RecyclerView rvMessages = binding.rvMessages;
+        View bottomInputLayout = binding.bottomInputLayout;
+        View root = binding.getRoot();
+
+        // Kiểm tra null cho các view nếu cần thiết
+        if (rvMessages == null || bottomInputLayout == null) {
+            return root;
+        }
+
+        // Lắng nghe sự thay đổi kích thước màn hình (bao gồm cả bàn phím)
+        root.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                root.getWindowVisibleDisplayFrame(rect);
+                int screenHeight = root.getHeight();
+                int keypadHeight = screenHeight - rect.bottom;
+
+                // Nếu bàn phím đang hiển thị (keypadHeight > 0), di chuyển bottomInputLayout
+                if (keypadHeight > 0) {
+                    // Đẩy bottomInputLayout lên trên bàn phím
+                    bottomInputLayout.setTranslationY(-keypadHeight);
+
+                    // Tính toán chiều cao mới cho RecyclerView
+                    int newRvHeight = screenHeight - keypadHeight - bottomInputLayout.getHeight();
+
+                    // Chỉ thay đổi layout params nếu có sự thay đổi chiều cao
+                    if (rvMessages.getLayoutParams().height != newRvHeight) {
+                        ViewGroup.LayoutParams lp = rvMessages.getLayoutParams();
+                        lp.height = newRvHeight;
+                        rvMessages.setLayoutParams(lp);
+                    }
+                } else {
+                    // Nếu bàn phím không hiển thị, đảm bảo bottomInputLayout ở đáy màn hình
+                    bottomInputLayout.setTranslationY(0);
+
+                    // Đặt lại chiều cao của RecyclerView khi bàn phím ẩn
+                    ViewGroup.LayoutParams lp = rvMessages.getLayoutParams();
+                    lp.height = screenHeight - bottomInputLayout.getHeight();
+                    rvMessages.setLayoutParams(lp);
+                }
+            }
+        });
+
+        return root;
     }
+
+
 }
