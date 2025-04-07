@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -21,8 +22,11 @@ import retrofit2.http.Query;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.UserInfoDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserResponse;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 
@@ -33,16 +37,20 @@ public interface ApiService {
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
     ApiService apiService = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.172:8080/api/")
+            .baseUrl("http://192.168.1.12:8080/api/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);
-
-    @GET("document/list")
-    Call<ResponseData<List<DocumentDto>>> getListDocument();
-
+    //category
     @GET("category/list")
     Call<ResponseData<List<CategoryDto>>> getListCategory();
+
+    @GET("category/{id}")
+    Call<ResponseData<CategoryDto>> getDocumentById(@Path("id") Long id);
+
+    //document
+    @GET("document/list")
+    Call<ResponseData<List<DocumentDto>>> getListDocument();
 
     @GET("document/search-document")
     Call<ResponseData<List<DocumentDto>>> searchDocument(@Query("keyword") String keyword);
@@ -54,6 +62,16 @@ public interface ApiService {
                                                          @Query("minPrice") Double minPrice,
                                                          @Query("maxPrice") Double maxPrice,
                                                          @Query("ratings") Integer[] ratings);
+    @GET("document/document-detail")
+    Call<ResponseData<DocumentDto>> getDocumentDetail(@Query("id") Long id);
+
+    @GET("document/images/{id}")
+    Call<ResponseData<List<DocumentImageDto>>> getAllImageByDocumentId(@Path("id") Long id);
+
+    @GET("document/relevance")
+    Call<ResponseData<List<DocumentDto>>> getRelevanceDocument(@Query("type") String type,
+                                                               @Query("id") Long id,
+                                                               @Query("docId") Long docId);
 
     //chat
     @GET("conversations/{conversationId}/messages")
@@ -63,7 +81,17 @@ public interface ApiService {
     @POST("user/login")
     Call<ResponseData<UserResponse>> login(@Body LoginRequest request);
 
+    @GET("user/shop-detail/{id}")
+    Call<ResponseData<UserInfoDto>> getShopDetail(@Path("id") Long id);
+
     //conversation
     @GET("conversation/{userId}")
     Call<ResponseData<List<ConversationOverviewDto>>> findConversationsOverview(@Path("userId") Long userId);
+
+    //review
+    @GET("review/by-document/{docId}")
+    Call<ResponseData<List<ReviewDto>>> getReviewsByDocumentId(@Path("docId") Long docId);
+
+    @GET("review/rate-report/{docId}")
+    Call<ResponseData<Map<Integer, Long>>> getRateReportByDocumentId(@Path("docId") Long docId);
 }

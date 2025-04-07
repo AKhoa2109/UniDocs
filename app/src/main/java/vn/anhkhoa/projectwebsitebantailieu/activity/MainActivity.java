@@ -19,8 +19,10 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ChatFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
+import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 
 public class MainActivity extends AppCompatActivity {
@@ -100,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
                 // Nếu đang ở ChatFragment, xử lý tùy chỉnh
-                if (currentFragment instanceof ChatFragment) {
+                if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
                 } else {
@@ -129,6 +131,20 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, chatFragment)
                 .addToBackStack("chat")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openProductDetailFragment(DocumentDto document){
+        DocumentDetailFragment documentDetailFragment = new DocumentDetailFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("document", document);
+        documentDetailFragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, documentDetailFragment)
+                .addToBackStack("productDetail")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

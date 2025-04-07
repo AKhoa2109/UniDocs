@@ -147,7 +147,7 @@ public class HomeFragment extends Fragment {
                 }
                 documentDtos.clear();
                 documentDtos= data.getData();
-                DocumentAdapter documentAdapter = new DocumentAdapter(documentDtos);
+                DocumentAdapter documentAdapter = new DocumentAdapter(getContext(),documentDtos);
                 rcvDocument.setAdapter(documentAdapter);
             }
 
@@ -189,6 +189,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initBannerImages() {
+        bannerImages.clear();
         // Thêm dữ liệu ảnh mẫu (thay thế bằng dữ liệu thực tế)
         bannerImages.add("https://as2.ftcdn.net/jpg/04/32/48/41/1000_F_432484133_WnmdDXCWu7i2tR90K7flMtnJ4zOOfnM2.jpg");
         bannerImages.add("https://static.vecteezy.com/system/resources/previews/023/107/446/non_2x/promo-sale-banner-with-reading-stack-of-books-wooden-letter-tiles-school-books-pile-world-book-day-bookstore-bookshop-library-book-lover-bibliophile-education-a4-for-poster-cover-vector.jpg");

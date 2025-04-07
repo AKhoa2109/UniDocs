@@ -1,31 +1,30 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
-
-import static androidx.core.content.ContentProviderCompat.requireContext;
-import static java.security.AccessController.getContext;
-
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-
 import java.util.List;
-
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 
 public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHolder> {
 
     private List<DocumentDto> documents;
 
-    public DocumentAdapter(List<DocumentDto> documents) {
+    private Context context;
+
+    public DocumentAdapter(Context context, List<DocumentDto> documents) {
+        this.context = context;
         this.documents = documents;
     }
+
 
     @NonNull
     @Override
@@ -44,7 +43,17 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
                 .load(documentDto.getDoc_image_url())
                         .into(holder.imgDocument);
         holder.tvDocName.setText(documentDto.getDoc_name());
-        holder.tvSellPrice.setText(String.valueOf(documentDto.getSell_price()));
+        holder.tvSellPrice.setText(CurrentFormatter.format(documentDto.getSell_price()));
+        String totalSold = String.valueOf(documentDto.getTotalSold())+" lượt xem";
+        holder.tvTotalSold.setText(totalSold);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (context instanceof MainActivity) {
+                    ((MainActivity) context).openProductDetailFragment(documentDto);
+                }
+            }
+        });
     }
 
     @Override
@@ -56,7 +65,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private ImageView imgDocument;
-        private TextView tvDocName, tvSellPrice;
+        private TextView tvDocName, tvSellPrice, tvTotalSold;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,6 +73,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
             imgDocument = itemView.findViewById(R.id.img_document);
             tvDocName = itemView.findViewById(R.id.tv_doc_name);
             tvSellPrice = itemView.findViewById(R.id.tv_sell_price);
+            tvTotalSold = itemView.findViewById(R.id.tvNumSold);
         }
     }
 }
