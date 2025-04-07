@@ -106,13 +106,13 @@
         android:padding="8dp">
 
         <ImageView
-            android:id="@+id/ivPicture"
+            android:id="@+id/ivSendPicture"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_picture" />
 
         <ImageView
-            android:id="@+id/ivAttachment"
+            android:id="@+id/ivSendFile"
             android:layout_marginStart="10dp"
             android:layout_width="30dp"
             android:layout_height="30dp"

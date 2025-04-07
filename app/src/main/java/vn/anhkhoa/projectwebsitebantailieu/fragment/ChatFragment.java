@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -149,6 +151,31 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        binding.etMessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                //neu nguoi dung nhap noi dung
+                if(charSequence.length() >0){
+                    binding.ivSendPicture.setVisibility(View.GONE);
+                    binding.ivSendFile.setVisibility(View.GONE);
+                }
+                else{
+                    binding.ivSendPicture.setVisibility(View.VISIBLE);
+                    binding.ivSendFile.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
         connectSocket();
 
 
@@ -258,6 +285,7 @@ public class ChatFragment extends Fragment {
         super.onDestroy();
     }
 
+    //thay doi kich thuoc rc chat khi ban phim xuat hien
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
