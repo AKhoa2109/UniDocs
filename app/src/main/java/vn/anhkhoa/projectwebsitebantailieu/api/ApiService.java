@@ -34,7 +34,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "10.0.2.2:8080";
+    public static String ipAddress = "192.168.1.12:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
      Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
