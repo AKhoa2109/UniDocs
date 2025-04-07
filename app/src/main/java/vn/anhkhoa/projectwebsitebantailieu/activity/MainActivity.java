@@ -20,14 +20,18 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ChatFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
+import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     private HomeFragment homeFragment;
     private ShopFragment shopFragment;
+    private PostFragment postFragment;
     private AccountFragment accountFragment;
     private ConversationListFragment conversationListFragment;
 
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         // Khởi tạo các fragment
         homeFragment = new HomeFragment();
         shopFragment = new ShopFragment();
+        postFragment = new PostFragment();
         accountFragment = new AccountFragment();
         conversationListFragment = new ConversationListFragment();
 
@@ -93,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         // Thêm fragment mặc định
-        showFragment(conversationListFragment, "chat");
+        showFragment(homeFragment, "home");
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -103,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
                 showFragment(homeFragment, "home");
             } else if (id == R.id.shop) {
                 showFragment(shopFragment, "shop");
+            } else if (id == R.id.post){
+                showFragment(postFragment, "post");
             } else if (id == R.id.chat) {
                 showFragment(conversationListFragment, "chat");
             } else if (id == R.id.account) {
@@ -129,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 2) Thay thế fragment nếu chưa add hoặc thay thế fragment hiện tại
         if (!fragment.isAdded()) {
-            ft.replace(R.id.frame_layout, fragment, tag);  // Sử dụng replace thay vì add
+            ft.add(R.id.frame_layout, fragment, tag);  // Sử dụng replace thay vì add
         } else {
             ft.show(fragment);  // Chỉ hiển thị nếu fragment đã tồn tại
         }
@@ -148,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
                 // Nếu đang ở ChatFragment, xử lý tùy chỉnh
-                if (currentFragment instanceof ChatFragment) {
+                if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
                 } else {
@@ -177,6 +184,20 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, chatFragment)
                 .addToBackStack("chat")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openProductDetailFragment(DocumentDto document){
+        DocumentDetailFragment documentDetailFragment = new DocumentDetailFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("document", document);
+        documentDetailFragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, documentDetailFragment)
+                .addToBackStack("productDetail")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

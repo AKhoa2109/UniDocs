@@ -53,7 +53,7 @@ dependencies {
     implementation(libs.flexbox)
     implementation(libs.photoView)
     implementation(libs.core)
-
+	implementation(libs.multilibrary)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)

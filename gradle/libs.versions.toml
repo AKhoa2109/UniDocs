@@ -21,7 +21,7 @@ protoliteWellKnownTypes = "18.0.1"
 flexbox = "3.0.0"
 photoView="2.3.0"
 core = "1.9.0"
-
+multilibrary = "6.0"
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -52,8 +52,8 @@ flexbox = {group= "com.google.android.flexbox", name = "flexbox", version.ref ="
 #PhotoView
 photoView = {group= "com.github.chrisbanes", name = "PhotoView", version.ref ="photoView"}
 core = { group = "androidx.core", name = "core", version.ref = "core" }
-
-
+# slider view
+multilibrary = { group = "com.github.ictfoysal", name = "multilibrary", version.ref = "multilibrary" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

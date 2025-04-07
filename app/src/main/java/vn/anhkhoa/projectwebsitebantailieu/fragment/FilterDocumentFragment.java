@@ -19,6 +19,7 @@
     import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
     import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentFilterDocumentBinding;
     import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+    import vn.anhkhoa.projectwebsitebantailieu.utils.LoadingDialog;
     import vn.anhkhoa.projectwebsitebantailieu.utils.ShareViewModel;
 
     /**
@@ -89,7 +90,7 @@
 
         private void initViews(){
             documents = new ArrayList<>();
-            documentAdapter = new DocumentAdapter(documents);
+            documentAdapter = new DocumentAdapter(getContext(),documents);
             binding.rvFilterDocument.setAdapter(documentAdapter);
             binding.rvFilterDocument.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         }

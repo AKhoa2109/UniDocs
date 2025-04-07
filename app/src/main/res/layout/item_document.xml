@@ -36,6 +36,7 @@
             android:textColor="@android:color/holo_red_light"
             android:textSize="12sp"
             android:textStyle="bold"
+            android:background="@color/custom_gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -72,7 +73,7 @@
 
         <!-- Số lượng bán -->
         <TextView
-            android:id="@+id/tv_num_sell"
+            android:id="@+id/tvNumSold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

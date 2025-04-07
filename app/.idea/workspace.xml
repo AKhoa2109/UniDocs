@@ -5,15 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f8a530db-75b9-4eb9-b4db-261556c7a413" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/ViewPagerAdapter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/FilterDocumentFragment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/res/layout/fragment_filter_document.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/SliderAdapter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/enums/DocumentType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/DocumentDetailFragment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/utils/LoadingDialog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/drawable/download_icon.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/drawable/edt_background.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/drawable/eye_icon.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/drawable/star_icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/layout/dialog_loading.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/res/layout/fragment_document_detail.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/SearchActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/SearchActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/activity/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/BannerAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/BannerAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/DocumentAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/adapter/DocumentAdapter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/api/ApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/api/ApiService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/ChatFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/ChatFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/FilterDocumentFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/FilterDocumentFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/HomeFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/HomeFragment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/SearchDocumentFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/fragment/SearchDocumentFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/res/layout/activity_search.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/layout/activity_search.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/res/layout/fragment_search_document.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/layout/fragment_search_document.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/model/DocumentDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/vn/anhkhoa/projectwebsitebantailieu/model/DocumentDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/res/drawable/button_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/drawable/button_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/res/layout/item_banner.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/res/layout/item_banner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../gradle/libs.versions.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,17 +47,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Nam3HK2/LapTrinhDiDong/Project/APIUniDocs",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Nam3HK2/LapTrinhDiDong/Project/APIUniDocs&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -60,6 +76,8 @@
       <updated>1743247430496</updated>
       <workItem from="1743247432672" duration="7000" />
       <workItem from="1743309801683" duration="77000" />
+      <workItem from="1743726682402" duration="7000" />
+      <workItem from="1743753152068" duration="131000" />
     </task>
     <servers />
   </component>

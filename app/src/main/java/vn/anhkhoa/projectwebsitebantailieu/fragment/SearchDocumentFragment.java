@@ -21,6 +21,7 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ViewPagerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentSearchDocumentBinding;
+import vn.anhkhoa.projectwebsitebantailieu.utils.LoadingDialog;
 
 /**
  * A simple {@link Fragment} subclass.
