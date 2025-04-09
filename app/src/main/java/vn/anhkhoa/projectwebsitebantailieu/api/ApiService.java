@@ -11,12 +11,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
@@ -34,7 +38,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.12:8080";
+    public static String ipAddress = "10.0.2.2:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
      Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -79,6 +83,13 @@ public interface ApiService {
     //chat
     @GET("conversations/{conversationId}/messages")
     Call<ResponseData<List<ChatLineDto>>> getChatMessages(@Path("conversationId") Long conversationId);
+
+    @Multipart
+    @POST("send-chat-picture")
+    Call<ChatLineDto> sendChatPicture(
+            @Part MultipartBody.Part message,
+            @Part List<MultipartBody.Part> files
+    );
 
     //user
     @POST("user/login")
