@@ -13,6 +13,7 @@ import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -90,6 +91,10 @@ public interface ApiService {
             @Part MultipartBody.Part message,
             @Part List<MultipartBody.Part> files
     );
+
+    //lay file
+    @GET("get-file-by-id/{fileId}")
+    Call<ResponseBody> getFileById(@Path("fileId") Long fileId);
 
     //user
     @POST("user/login")

@@ -1,6 +1,7 @@
 package vn.anhkhoa.projectwebsitebantailieu.utils;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,12 +10,23 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.loader.content.CursorLoader;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class RealPathUtil {//Lấy đường dẫn thật /storage/emulated/... từ Uri dựa trên phiên bản Android, vì mỗi phiên bản có cách quản lý file khác nhau.
 
     public static String getRealPath(Context context, Uri fileUri) {
+        if (fileUri == null) {
+            Log.e("RealPathUtil", "URI is null");
+            return null;
+        }
+
         String realPath;
         // SDK < API11
         if (Build.VERSION.SDK_INT < 11) {
@@ -117,6 +129,22 @@ public class RealPathUtil {//Lấy đường dẫn thật /storage/emulated/... 
                     contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
                 } else if ("audio".equals(type)) {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }else if ("document".equals(type)) {
+                    // Handle generic document
+                    try {
+                        ContentResolver resolver = context.getContentResolver();
+                        // Truy vấn metadata của document
+                        Cursor cursor = resolver.query(uri, null, null, null, null);
+                        if (cursor != null && cursor.moveToFirst()) {
+                            String displayName = cursor.getString(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME));
+                            cursor.close();
+                            // Nếu cần đường dẫn, thử lấy từ uri hoặc sao chép tệp vào bộ nhớ tạm
+                            return copyFileFromUri(context, uri, displayName); // Hàm tự định nghĩa để sao chép tệp
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return null; // Trả về null nếu không xử lý được
                 }
 
                 final String selection = "_id=?";
@@ -142,6 +170,30 @@ public class RealPathUtil {//Lấy đường dẫn thật /storage/emulated/... 
         }
 
         return null;
+    }
+
+    //sao chép nội dung của document từ Uri vào một tệp tạm và trả về đường dẫn của tệp tạm
+    private static String copyFileFromUri(Context context, Uri uri, String displayName) throws IOException {
+        ContentResolver resolver = context.getContentResolver();
+        InputStream inputStream = resolver.openInputStream(uri);
+        if (inputStream == null) {
+            return null;
+        }
+
+        // Tạo tệp tạm trong thư mục cache
+        File tempFile = new File(context.getCacheDir(), displayName);
+        FileOutputStream outputStream = new FileOutputStream(tempFile);
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+
+        inputStream.close();
+        outputStream.close();
+
+        return tempFile.getAbsolutePath(); // Trả về đường dẫn tệp tạm
     }
 
     /**

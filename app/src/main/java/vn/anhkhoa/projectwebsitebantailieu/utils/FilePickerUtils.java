@@ -31,12 +31,12 @@ public class FilePickerUtils {
     public static final int PICKER_TYPE_MULTIPLE = 3;
 
     public interface FilePickerCallback {
-        void onFilesPicked(List<File> files);
+        void onFilesPicked(List<File> files, int currentPickerType);
     }
 
     private final Fragment fragment;
     private final FilePickerCallback callback;
-    private int pickerType;
+    private int pickerType = -1;
     private ActivityResultLauncher<Intent> launcher;
     private ActivityResultLauncher<String[]> permissionLauncher;
 
@@ -138,19 +138,28 @@ public class FilePickerUtils {
 
     private void handleActivityResult(Intent data) {
         List<File> files = new ArrayList<>();
-        if (data.getClipData() != null) {
-            ClipData clipData = data.getClipData();
-            for (int i = 0; i < clipData.getItemCount(); i++) {
-                Uri uri = clipData.getItemAt(i).getUri();
+        if (data != null) { // Kiểm data không null
+            if (data.getClipData() != null) {
+                ClipData clipData = data.getClipData();
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    ClipData.Item item = clipData.getItemAt(i);
+                    Uri uri = item.getUri();
+                    if (uri != null) { // Thêm kiểm tra uri != null
+                        String path = RealPathUtil.getRealPath(fragment.requireContext(), uri);
+                        if (path != null) {
+                            files.add(new File(path));
+                        }
+                    }
+                }
+            } else if (data.getData() != null) {
+                Uri uri = data.getData();
                 String path = RealPathUtil.getRealPath(fragment.requireContext(), uri);
-                if (path != null) files.add(new File(path));
+                if (path != null) {
+                    files.add(new File(path));
+                }
             }
-        } else if (data.getData() != null) {
-            Uri uri = data.getData();
-            String path = RealPathUtil.getRealPath(fragment.requireContext(), uri);
-            if (path != null) files.add(new File(path));
         }
 
-        if (callback != null) callback.onFilesPicked(files);
+        if (callback != null) callback.onFilesPicked(files, pickerType);
     }
 }

@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
@@ -56,6 +57,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.FilePickerUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
+import android.net.Uri;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -76,12 +78,8 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
     private List<ChatLineDto> chatLineDtoList;
     private ChatAdapter chatAdapter;
 
-    // Giả sử conId của cuộc trò chuyện là "123"
     private ConversationOverviewDto conversationOverviewDto;
     SessionManager sessionManager;
-    private final Long conversationId = 3L;
-    private final Long userId = 2L;
-
     private StompClient mStompClient;
     private Disposable topicSubscription;
     private Gson gson;
@@ -188,6 +186,7 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
         binding.ivSendPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //chon anh va gui
                 filePickerUtils.checkPermissionAndPick(FilePickerUtils.PICKER_TYPE_IMAGE);
                 //ToastUtils.show(requireContext(), "gui anh");
             }
@@ -197,7 +196,8 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
         binding.ivSendFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendFile();
+                //chọn file va gui
+                filePickerUtils.checkPermissionAndPick(FilePickerUtils.PICKER_TYPE_MULTIPLE);
             }
         });
         connectSocket();
@@ -210,7 +210,7 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
 
         chatLineDtoList = new ArrayList<>();
         //adapter
-        chatAdapter = new ChatAdapter(sessionManager.getUser().getUserId());
+        chatAdapter = new ChatAdapter(sessionManager.getUser().getUserId(), getContext());
         binding.rvMessages.setAdapter(chatAdapter);
         //layout manager từ dưới lên
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -240,20 +240,23 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
                 t.printStackTrace();
             }
         });
-        //cuộn den phan tu cuoi
     }
 
-    private void sendFile() {
-    }
-
-    //gui anh
-    private void sendPicture(List<File> files) {
+    //gui anh va file
+    private void sendPictureAndFile(List<File> files, int currentPickerType) {
         //tao tin nhan
         ChatLineDto message = new ChatLineDto();
         message.setConversationId(conversationOverviewDto.getConversationId());
         message.setUserId(sessionManager.getUser().getUserId());
         message.setContent("");
-        message.setChatType(ChatType.IMAGES);
+        //type
+        if(currentPickerType == FilePickerUtils.PICKER_TYPE_IMAGE){
+            message.setChatType(ChatType.IMAGES);
+        }
+        else if (currentPickerType == FilePickerUtils.PICKER_TYPE_MULTIPLE){
+            message.setChatType(ChatType.FILE);
+        }
+
         message.setSendAt(LocalDateTime.now());
 
         message.setChatStatus(ChatStatus.SENT);
@@ -263,14 +266,29 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
         MultipartBody.Part messagePart = MultipartBody.Part.createFormData("message", "message.json", messageBody);
 
         List<MultipartBody.Part> fileParts = new ArrayList<>();
+        ContentResolver contentResolver = requireContext().getContentResolver();
         for (File file : files) {
-            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+            Uri uri = Uri.fromFile(file);
+            String mimeType = contentResolver.getType(uri);
+            // Nếu không xác định được MIME type, sử dụng application/octet-stream làm mặc định
+            if (mimeType == null || mimeType.isEmpty()) {
+                mimeType = "application/octet-stream";
+            }
+            RequestBody requestFile = null;
+
+            if(currentPickerType == FilePickerUtils.PICKER_TYPE_IMAGE){
+                requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+            }
+            else{
+                requestFile = RequestBody.create(MediaType.parse(mimeType), file);
+            }
+
             MultipartBody.Part body = MultipartBody.Part.createFormData("files", file.getName(), requestFile);
             fileParts.add(body);
         }
 
         //api gui hinh anh
-        ToastUtils.show(requireContext(), "Hình ảnh đang được gửi");
+        ToastUtils.show(requireContext(), "Hình ảnh/file đang được gửi");
         ApiService.apiService.sendChatPicture(messagePart, fileParts).enqueue(new Callback<ChatLineDto>() {
             @Override
             public void onResponse(Call<ChatLineDto> call, Response<ChatLineDto> response) {
@@ -301,9 +319,10 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
         });
     }
 
+    //khi chon xong file
     @Override
-    public void onFilesPicked(List<File> files) {
-        sendPicture(files);
+    public void onFilesPicked(List<File> files,int currentPickerType) {
+        sendPictureAndFile(files, currentPickerType);
     }
 
     //gui tin nhan thuong
