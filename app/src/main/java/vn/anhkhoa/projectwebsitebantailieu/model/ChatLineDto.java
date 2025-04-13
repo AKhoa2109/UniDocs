@@ -21,11 +21,18 @@ public class ChatLineDto {
 
     private LocalDateTime sendAt;
     private Long userId;//
-    @SerializedName("conversationId")
-    private Long conId;//
+    private Long conversationId;//
     @Nullable
     private List<FileChatLine> fileChatLines;
     private List<Seen> seens;
+
+    public Long getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(Long conversationId) {
+        this.conversationId = conversationId;
+    }
 
     // Constructor rỗng
     public ChatLineDto() {}
@@ -87,13 +94,6 @@ public class ChatLineDto {
         this.userId = userId;
     }
 
-    public Long getConId() {
-        return conId;
-    }
-
-    public void setConId(Long conId) {
-        this.conId = conId;
-    }
 
     public List<FileChatLine> getFileChatLines() {
         return fileChatLines;

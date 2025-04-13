@@ -1,51 +1,42 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
-import com.github.chrisbanes.photoview.PhotoView;
-import com.google.android.flexbox.AlignItems;
-import com.google.android.flexbox.FlexDirection;
-import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayout;
-import com.google.android.flexbox.JustifyContent;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
+import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemChatMultiImageReceivedBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemChatMultiImageSentBinding;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemMessageFileReceivedBinding;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemMessageFileSentBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemMessageReceivedBinding;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemMessageSentBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.ChatType;
@@ -53,6 +44,22 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.ImageFullscreenFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.FileChatLine;
 import vn.anhkhoa.projectwebsitebantailieu.utils.DateTimeUtils;
+
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
+import android.widget.Toast;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_SENT = 1;
@@ -69,9 +76,11 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
     //tinh toan chieu rong tin nhan
     static int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     static int maxWidth = (int) (screenWidth * 0.75f);
+    private Context context;
 
-    public ChatAdapter(long currentUserId) {
+    public ChatAdapter(long currentUserId, Context context) {
         super(DIFF_CALLBACK);
+        this.context = context;
         this.currentUserId = currentUserId;
         mDiffer = new AsyncListDiffer<>(this, DIFF_CALLBACK);
     }
@@ -104,24 +113,31 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        if (viewType == VIEW_TYPE_SENT) {
-            ItemMessageSentBinding sentBinding = ItemMessageSentBinding.inflate(inflater, parent,false);
-            return new SentMessageViewHolder(sentBinding);
-        }
-        else if(viewType == VIEW_TYPE_RECEIVED)
-        {
-            ItemMessageReceivedBinding receivedBinding = ItemMessageReceivedBinding.inflate(inflater, parent,false);
-            return new ReceivedMessageViewHolder(receivedBinding);
-        }
-        else if(viewType == VIEW_TYPE_IMAGE_SENT)
-        {
-            ItemChatMultiImageSentBinding binding = ItemChatMultiImageSentBinding.inflate(inflater, parent,false);
-            return new SentMultiImageViewHolder(binding);
-        }
-        else
-        {
-            ItemChatMultiImageReceivedBinding binding = ItemChatMultiImageReceivedBinding.inflate(inflater, parent,false);
-            return new ReceivedMultiImageViewHolder(binding);
+        switch (viewType) {
+            case VIEW_TYPE_SENT:
+                ItemMessageSentBinding sentBinding = ItemMessageSentBinding.inflate(inflater, parent, false);
+                return new SentMessageViewHolder(sentBinding);
+
+            case VIEW_TYPE_RECEIVED:
+                ItemMessageReceivedBinding receivedBinding = ItemMessageReceivedBinding.inflate(inflater, parent, false);
+                return new ReceivedMessageViewHolder(receivedBinding);
+
+            case VIEW_TYPE_IMAGE_SENT:
+                ItemChatMultiImageSentBinding imageSentBinding = ItemChatMultiImageSentBinding.inflate(inflater, parent, false);
+                return new SentMultiImageViewHolder(imageSentBinding);
+
+            case VIEW_TYPE_IMAGE_RECEIVED:
+                ItemChatMultiImageReceivedBinding imageReceivedBinding = ItemChatMultiImageReceivedBinding.inflate(inflater, parent, false);
+                return new ReceivedMultiImageViewHolder(imageReceivedBinding);
+            case VIEW_TYPE_FILE_SENT:
+                ItemMessageFileSentBinding itemMessageFileSentBinding = ItemMessageFileSentBinding.inflate(inflater, parent, false);
+                return new SentFileViewHolder(itemMessageFileSentBinding);
+            case VIEW_TYPE_FILE_RECEIVED:
+                ItemMessageFileReceivedBinding itemMessageFileReceivedBinding = ItemMessageFileReceivedBinding.inflate(inflater, parent, false);
+                return new ReceivedFileViewHolder(itemMessageFileReceivedBinding);
+            default:
+                ItemMessageSentBinding sentBindingDefault = ItemMessageSentBinding.inflate(inflater, parent, false);
+                return new SentMessageViewHolder(sentBindingDefault);
         }
     }
 
@@ -143,6 +159,12 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
         }
         else if (holder instanceof ReceivedMultiImageViewHolder) {
             ((ReceivedMultiImageViewHolder) holder).bind(message, isLastMessageByUser);
+        }
+        else if (holder instanceof SentFileViewHolder) {
+            ((SentFileViewHolder) holder).bind(message, isLastMessageByUser);
+        }
+        else if (holder instanceof ReceivedFileViewHolder) {
+            ((ReceivedFileViewHolder) holder).bind(message, isLastMessageByUser);
         }
     }
 
@@ -264,6 +286,176 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
         }
     }
 
+    //View holder received file
+    public class ReceivedFileViewHolder extends RecyclerView.ViewHolder{
+        ItemMessageFileReceivedBinding binding;
+
+        public ReceivedFileViewHolder(@NonNull ItemMessageFileReceivedBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.tvFileName.setMaxWidth(maxWidth);
+        }
+
+        public void bind(ChatLineDto message, boolean showTime) {
+            //gan noi dung
+            //receivedBinding.tvMessage.setText(message.getContent());
+            binding.tvFileName.setText(message.getFileChatLines().get(0).getName());
+            binding.tvFileSize.setText(String.valueOf( message.getFileChatLines().get(0).getSize()));
+            //  binding.tvFileSize.setText(message.getFileChatLines().get(0));
+
+            //kiem tra hien thoi gian
+            if (showTime) {
+                binding.tvTime.setText(DateTimeUtils.formatTime(message.getSendAt()));
+                binding.tvTime.setVisibility(View.VISIBLE);
+            } else {
+                binding.tvTime.setVisibility(View.GONE);
+            }
+
+            //để tải file ve va hien thi
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Long fileId = message.getFileChatLines().get(0).getFileId();
+                    String fileName = message.getFileChatLines().get(0).getName();
+
+                    handleFileClick(fileId, fileName);
+                }
+            });
+        }
+    }
+
+    //View holder sent file
+    public class SentFileViewHolder extends RecyclerView.ViewHolder{
+        ItemMessageFileSentBinding binding;
+
+        public SentFileViewHolder(@NonNull ItemMessageFileSentBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            binding.tvFileName.setMaxWidth(maxWidth);
+        }
+
+        public void bind(ChatLineDto message, boolean showTime) {
+            //gan noi dung
+            //receivedBinding.tvMessage.setText(message.getContent());
+            binding.tvFileName.setText(message.getFileChatLines().get(0).getName());
+            binding.tvFileSize.setText(String.valueOf( message.getFileChatLines().get(0).getSize()));
+            //kiem tra hien thoi gian
+            if (showTime) {
+                binding.tvTime.setText(DateTimeUtils.formatTime(message.getSendAt()));
+                binding.tvTime.setVisibility(View.VISIBLE);
+            } else {
+                binding.tvTime.setVisibility(View.GONE);
+            }
+
+            //để tải file ve va hien thi
+            binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Long fileId = message.getFileChatLines().get(0).getFileId();
+                    String fileName = message.getFileChatLines().get(0).getName();
+
+                    handleFileClick(fileId, fileName);
+                }
+            });
+        }
+    }
+
+    private void handleFileClick(Long fileId, final String fileName) {
+        // Sử dụng thư mục download trong app-specific storage
+        File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName);
+
+        if (file.exists()) {
+            // Nếu file đã tồn tại, mở file
+            openFile(file);
+        } else {
+            // Nếu file chưa tồn tại, tải file về
+            ApiService.apiService.getFileById(fileId).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        try {
+                            // Lưu file vào bộ nhớ
+                            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName);
+                            // Đảm bảo thư mục cha đã được tạo
+                            File parent = file.getParentFile();
+                            if (!parent.exists()){
+                                parent.mkdirs();
+                            }
+
+                            InputStream inputStream = response.body().byteStream();
+                            FileOutputStream outputStream = new FileOutputStream(file);
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, bytesRead);
+                            }
+                            outputStream.flush();
+                            outputStream.close();
+                            inputStream.close();
+
+                            Log.d("ChatAdapter", "File downloaded, saved at: " + file.getAbsolutePath());
+                            // Sau khi tải file thành công, mở file
+                            openFile(file);
+                        } catch (Exception e) {
+                            Log.e("ChatAdapter", "Error saving file", e);
+                        }
+                    } else {
+                        Log.e("ChatAdapter", "API response error: " + response.code());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.e("ChatAdapter", "API call failed", t);
+                }
+            });
+        }
+    }
+
+    private void openFile(File file) {
+        // Lấy URI từ file thông qua FileProvider
+        Uri uri = FileProvider.getUriForFile(
+                context,
+                context.getPackageName() + ".fileprovider",
+                file);
+
+        // Xác định mime type dựa vào phần mở rộng file
+        String mimeType = "application/octet-stream"; // Mặc định
+        String fileName = file.getName().toLowerCase();
+
+        if (fileName.endsWith(".pdf")) {
+            mimeType = "application/pdf";
+        } else if (fileName.endsWith(".doc") || fileName.endsWith(".docx")) {
+            mimeType = "application/msword";
+        } else if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+            mimeType = "application/vnd.ms-excel";
+        } else if (fileName.endsWith(".ppt") || fileName.endsWith(".pptx")) {
+            mimeType = "application/vnd.ms-powerpoint";
+        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            mimeType = "image/jpeg";
+        } else if (fileName.endsWith(".png")) {
+            mimeType = "image/png";
+        } else if (fileName.endsWith(".gif")) {
+            mimeType = "image/gif";
+        } else if (fileName.endsWith(".bmp")) {
+            mimeType = "image/bmp";
+        } else if (fileName.endsWith(".webp")) {
+            mimeType = "image/webp";
+        }
+        // Thêm các định dạng khác nếu cần
+        //tim cac ung dung view
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, mimeType);
+        //cung cap quyen doc
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        try {
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(context, "No application found to open this file", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     //so sanh de cap nhat
     private static final DiffUtil.ItemCallback<ChatLineDto> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<ChatLineDto>() {
@@ -324,55 +516,4 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
             }
         }
     }
-
-//    private static void displayImagesInFlexbox(Activity activity,
-//                                               FlexboxLayout flexboxLayout, List<FileChatLine> imageUrls) {
-//        flexboxLayout.removeAllViews();
-//        Context context = activity; // chắc chắn là Activity
-//
-//        int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
-//        int thumbnailSize = (screenWidth / 2) - dpToPx(activity, 16);
-//
-//        for (FileChatLine file : imageUrls) {
-//            ImageView thumb = new ImageView(activity);
-//            FlexboxLayout.LayoutParams lp = new FlexboxLayout.LayoutParams(
-//                    thumbnailSize, thumbnailSize);
-//            lp.setMargins(dpToPx(activity, 8), dpToPx(activity, 8),
-//                    dpToPx(activity, 8), dpToPx(activity, 8));
-//            thumb.setLayoutParams(lp);
-//            thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//
-//            Glide.with(activity)
-//                    .load(file.getFileUrl())
-//                    .override(thumbnailSize, thumbnailSize)
-//                    .into(thumb);
-//
-//            thumb.setOnClickListener(v -> {
-//                showFullScreenImage(activity, file.getFileUrl());
-//            });
-//
-//            flexboxLayout.addView(thumb);
-//        }
-//    }
-
-
-//    private static void showFullScreenImage(Activity activity, String url) {
-//        // Inflate layout
-//        View dialogView = activity.getLayoutInflater()
-//                .inflate(R.layout.dialog_image_fullscreen, null, false);
-//        PhotoView photoView = dialogView.findViewById(R.id.photo_view);
-//
-//        // Load ảnh full-size
-//        Glide.with(activity)
-//                .load(url)
-//                .into(photoView);
-//
-//        // Tạo AlertDialog
-//        AlertDialog dialog = new AlertDialog.Builder(activity,
-//                android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-//                .setView(dialogView)
-//                .create();
-//        dialog.show();
-//    }
-
 }

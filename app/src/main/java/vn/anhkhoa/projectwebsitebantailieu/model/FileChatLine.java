@@ -8,16 +8,29 @@ public class FileChatLine {
     private FileType fileType;
     private Long chatLineId;
 
+    private Long size;
+
+    private String name="File không có tên";
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
     // Constructor rỗng
     public FileChatLine() {}
 
-    // Constructor đầy đủ
-    public FileChatLine(Long fileId, String fileUrl, FileType fileType, Long chatLineId) {
-        this.fileId = fileId;
-        this.fileUrl = fileUrl;
-        this.fileType = fileType;
-        this.chatLineId = chatLineId;
-    }
 
     // Getter và Setter
     public Long getFileId() {

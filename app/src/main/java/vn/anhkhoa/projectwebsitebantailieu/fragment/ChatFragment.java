@@ -1,10 +1,13 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,22 +23,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.disposables.Disposable;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,18 +50,21 @@ import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentChatBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.ChatStatus;
+import vn.anhkhoa.projectwebsitebantailieu.enums.ChatType;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
-import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.FilePickerUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
+import android.net.Uri;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ChatFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment  implements FilePickerUtils.FilePickerCallback{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -72,15 +78,12 @@ public class ChatFragment extends Fragment {
     private List<ChatLineDto> chatLineDtoList;
     private ChatAdapter chatAdapter;
 
-    // Giả sử conId của cuộc trò chuyện là "123"
     private ConversationOverviewDto conversationOverviewDto;
     SessionManager sessionManager;
-    private final Long conversationId = 3L;
-    private final Long userId = 2L;
-
     private StompClient mStompClient;
     private Disposable topicSubscription;
     private Gson gson;
+    private FilePickerUtils filePickerUtils;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -121,6 +124,8 @@ public class ChatFragment extends Fragment {
             gson = null;
         }
         sessionManager = SessionManager.getInstance(requireContext());
+        // Khởi tạo filePickerUtils với Activity chứa Fragment và callback là chính fragment này
+        filePickerUtils = new FilePickerUtils(this, this);
 
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -151,6 +156,7 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        //khi co noi dung nhap thi an button gui anh va file
         binding.etMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -175,9 +181,26 @@ public class ChatFragment extends Fragment {
 
             }
         });
-
+        
+        //btn gui anh
+        binding.ivSendPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //chon anh va gui
+                filePickerUtils.checkPermissionAndPick(FilePickerUtils.PICKER_TYPE_IMAGE);
+                //ToastUtils.show(requireContext(), "gui anh");
+            }
+        });
+        
+        //btn gui file
+        binding.ivSendFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //chọn file va gui
+                filePickerUtils.checkPermissionAndPick(FilePickerUtils.PICKER_TYPE_MULTIPLE);
+            }
+        });
         connectSocket();
-
 
         // rvMessages.getItemAnimator().setChangeDuration(false);
         RecyclerView.ItemAnimator animator = binding.rvMessages.getItemAnimator();
@@ -187,7 +210,7 @@ public class ChatFragment extends Fragment {
 
         chatLineDtoList = new ArrayList<>();
         //adapter
-        chatAdapter = new ChatAdapter(sessionManager.getUser().getUserId());
+        chatAdapter = new ChatAdapter(sessionManager.getUser().getUserId(), getContext());
         binding.rvMessages.setAdapter(chatAdapter);
         //layout manager từ dưới lên
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
@@ -196,6 +219,7 @@ public class ChatFragment extends Fragment {
 
         chatAdapter.submitList(chatLineDtoList);
 
+        //lay tin nhan cu
         ApiService.apiService.getChatMessages(conversationOverviewDto.getConversationId()).enqueue(new Callback<ResponseData<List<ChatLineDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<ChatLineDto>>> call, Response<ResponseData<List<ChatLineDto>>> response) {
@@ -203,7 +227,7 @@ public class ChatFragment extends Fragment {
                     ResponseData<List<ChatLineDto>> data = response.body();
                     // chatLineDtoList.clear();
                     List<ChatLineDto> newLines = data.getData();
-                    //Log.d("aaaa", newLines.get(0).toString());
+
                     chatLineDtoList.addAll(newLines);
                     chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
                     //cuon den tn cuoi
@@ -216,44 +240,104 @@ public class ChatFragment extends Fragment {
                 t.printStackTrace();
             }
         });
-        //cuộn den phan tu cuoi
-        //rvMessages.post(() -> rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
-
     }
 
-    public void connectSocket() {
-        // Khởi tạo STOMP client với endpoint (chú ý: endpoint của SockJS có thể cần /websocket)
-        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://" + ApiService.ipAddress + "/ws/websocket");
-        mStompClient.connect();
+    //gui anh va file
+    private void sendPictureAndFile(List<File> files, int currentPickerType) {
+        //tao tin nhan
+        ChatLineDto message = new ChatLineDto();
+        message.setConversationId(conversationOverviewDto.getConversationId());
+        message.setUserId(sessionManager.getUser().getUserId());
+        message.setContent("");
+        //type
+        if(currentPickerType == FilePickerUtils.PICKER_TYPE_IMAGE){
+            message.setChatType(ChatType.IMAGES);
+        }
+        else if (currentPickerType == FilePickerUtils.PICKER_TYPE_MULTIPLE){
+            message.setChatType(ChatType.FILE);
+        }
 
-        // Đăng ký subscribe topic nhận tin nhắn từ server
-        topicSubscription = mStompClient.topic("/topic/conversation/" + conversationOverviewDto.getConversationId())
-                .subscribe(topicMessage -> {
-                    // Lấy payload (JSON) và deserialize thành ChatLine
-                    ChatLineDto chatLineDto = gson.fromJson(topicMessage.getPayload(), ChatLineDto.class);
+        message.setSendAt(LocalDateTime.now());
 
-                    // Cập nhật giao diện ở UI thread
-                    chatLineDtoList.add(chatLineDto);
-                    chatAdapter.submitList(new ArrayList<>(chatLineDtoList));
-                }, throwable -> {
-                    // Xử lý lỗi khi subscribes
-                    throwable.printStackTrace();
-                });
+        message.setChatStatus(ChatStatus.SENT);
+        //chuyen sang gson
+        String jsonMessage = gson.toJson(message);
+        RequestBody messageBody = RequestBody.create(MediaType.parse("application/json"), jsonMessage);
+        MultipartBody.Part messagePart = MultipartBody.Part.createFormData("message", "message.json", messageBody);
+
+        List<MultipartBody.Part> fileParts = new ArrayList<>();
+        ContentResolver contentResolver = requireContext().getContentResolver();
+        for (File file : files) {
+            Uri uri = Uri.fromFile(file);
+            String mimeType = contentResolver.getType(uri);
+            // Nếu không xác định được MIME type, sử dụng application/octet-stream làm mặc định
+            if (mimeType == null || mimeType.isEmpty()) {
+                mimeType = "application/octet-stream";
+            }
+            RequestBody requestFile = null;
+
+            if(currentPickerType == FilePickerUtils.PICKER_TYPE_IMAGE){
+                requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+            }
+            else{
+                requestFile = RequestBody.create(MediaType.parse(mimeType), file);
+            }
+
+            MultipartBody.Part body = MultipartBody.Part.createFormData("files", file.getName(), requestFile);
+            fileParts.add(body);
+        }
+
+        //api gui hinh anh
+        ToastUtils.show(requireContext(), "Hình ảnh/file đang được gửi");
+        ApiService.apiService.sendChatPicture(messagePart, fileParts).enqueue(new Callback<ChatLineDto>() {
+            @Override
+            public void onResponse(Call<ChatLineDto> call, Response<ChatLineDto> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    ToastUtils.show(requireContext(), "gui file thanh cong");
+                    Log.d("TAG", "Message sent successfully: ");
+                }
+                else {
+//                    Log.e("TAG", "Error sending message: " + response.message());
+                    String errorMessage = "Error sending message: " + response.message();
+                    // Nếu errorBody không null, in thêm thông tin lỗi chi tiết
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage += "\n" + response.errorBody().string();
+                        } catch (IOException e) {
+                            errorMessage += "\nLỗi khi đọc error body: " + e.getMessage();
+                        }
+                    }
+                    Log.e("TAG", errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ChatLineDto> call, Throwable t) {
+                Log.e("TAG", "Failed to send message: " + t.getMessage());
+                ToastUtils.show(requireContext(),"onFailure");
+            }
+        });
     }
 
+    //khi chon xong file
+    @Override
+    public void onFilesPicked(List<File> files,int currentPickerType) {
+        sendPictureAndFile(files, currentPickerType);
+    }
+
+    //gui tin nhan thuong
     private void sendMessage() {
         // Toast.makeText(getContext(), "da nhan gui", Toast.LENGTH_SHORT).show();
         String content = binding.etMessage.getText().toString().trim();
         if (!content.isEmpty()) {
             ChatLineDto message = new ChatLineDto();
-
             // thuoc tinh
-            message.setConId(conversationOverviewDto.getConversationId());
+            message.setConversationId(conversationOverviewDto.getConversationId());
             message.setUserId(sessionManager.getUser().getUserId());
             message.setContent(content);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                message.setSendAt(LocalDateTime.now());
-            }
+            message.setChatType(ChatType.MESS);
+            message.setSendAt(LocalDateTime.now());
+
             message.setChatStatus(ChatStatus.SENT);
 
             // Cập nhật giao diện ngay lập tức (thêm tin nhắn của người gửi)
@@ -272,17 +356,6 @@ public class ChatFragment extends Fragment {
             //cuon den cuoi
             binding.rvMessages.post(() -> binding.rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1));
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        if (topicSubscription != null && !topicSubscription.isDisposed()) {
-            topicSubscription.dispose();
-        }
-        if (mStompClient != null) {
-            mStompClient.disconnect();
-        }
-        super.onDestroy();
     }
 
     //thay doi kich thuoc rc chat khi ban phim xuat hien
@@ -323,5 +396,57 @@ public class ChatFragment extends Fragment {
         return root;
     }
 
+    public void connectSocket() {
+        // Khởi tạo STOMP client với endpoint
+        mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://" + ApiService.ipAddress + "/ws/websocket");
+        mStompClient.connect();
 
+        // Đăng ký subscribe topic nhận tin nhắn từ server
+        topicSubscription = mStompClient.topic("/topic/conversation/" + conversationOverviewDto.getConversationId())
+                .subscribe(topicMessage -> {
+                    // Lấy payload (JSON) và deserialize thành ChatLine
+                    ChatLineDto chatLineDto = gson.fromJson(topicMessage.getPayload(), ChatLineDto.class);
+
+                    // Cập nhật giao diện ở UI thread
+                    chatLineDtoList.add(chatLineDto);
+                    chatAdapter.submitList(new ArrayList<>(chatLineDtoList), ()->{
+                        if (isAtBottom()) {
+                            // Nếu đang ở cuối -> cuộn xuống
+                            binding.rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1);
+                        } else {
+                            // Nếu không ở cuối -> hiện Toast
+                            requireActivity().runOnUiThread(() ->
+                                    ToastUtils.show(requireContext(), "Có tin nhắn mới", "#2ab857")
+                            );
+                        }
+                    });
+
+                    //
+                }, throwable -> {
+                    // Xử lý lỗi khi subscribes
+                    throwable.printStackTrace();
+                });
+    }
+
+    @Override
+    public void onDestroy() {
+        if (topicSubscription != null && !topicSubscription.isDisposed()) {
+            topicSubscription.dispose();
+        }
+        if (mStompClient != null) {
+            mStompClient.disconnect();
+        }
+        super.onDestroy();
+    }
+
+    //kiem tra nguoi dung co o duoi
+    private boolean isAtBottom() {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) binding.rvMessages.getLayoutManager();
+        if (layoutManager == null) return false;
+
+        int lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition();
+        int totalItemCount = chatAdapter.getItemCount();
+
+        return lastVisiblePosition == totalItemCount - 1;
+    }
 }

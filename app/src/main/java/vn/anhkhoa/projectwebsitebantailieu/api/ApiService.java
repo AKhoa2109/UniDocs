@@ -11,13 +11,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
@@ -37,7 +42,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.19:8080";
+    public static String ipAddress = "10.0.2.2:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -84,6 +89,17 @@ public interface ApiService {
     //chat
     @GET("conversations/{conversationId}/messages")
     Call<ResponseData<List<ChatLineDto>>> getChatMessages(@Path("conversationId") Long conversationId);
+
+    @Multipart
+    @POST("send-chat-picture")
+    Call<ChatLineDto> sendChatPicture(
+            @Part MultipartBody.Part message,
+            @Part List<MultipartBody.Part> files
+    );
+
+    //lay file
+    @GET("get-file-by-id/{fileId}")
+    Call<ResponseBody> getFileById(@Path("fileId") Long fileId);
 
     //user
     @POST("user/login")
