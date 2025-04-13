@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -9,12 +10,21 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
 import com.library.foysaltech.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
@@ -32,12 +42,19 @@ import vn.anhkhoa.projectwebsitebantailieu.adapter.DetailPagerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.SliderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.database.CartDao;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentDocumentDetailBinding;
+import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.AnimUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
+import vn.anhkhoa.projectwebsitebantailieu.utils.NetworkUtil;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NumberFormatter;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SyncManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,9 +70,10 @@ public class DocumentDetailFragment extends Fragment {
 
     private FragmentDocumentDetailBinding binding;
     private DocumentDto documentDto;
-
+    private CartDao cartDao;
     private SliderAdapter sliderAdapter;
     private List<DocumentImageDto> images;
+    private SessionManager sessionManager;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -114,12 +132,13 @@ public class DocumentDetailFragment extends Fragment {
         if (bundle != null) {
             documentDto = (DocumentDto) bundle.getSerializable("document");
         }
-
+        cartDao = new CartDao(getContext());
+        sessionManager = SessionManager.getInstance(requireContext());
         images = new ArrayList<>();
-
+        handlerCartCount(sessionManager.getUser().getUserId());
         getApiImageByDocumentId(documentDto.getDoc_id());
         getApiDocumentDetail(documentDto.getDoc_id());
-
+        handlerAddToCart();
     }
 
     private void getApiDocumentDetail(Long id){
@@ -131,6 +150,7 @@ public class DocumentDetailFragment extends Fragment {
                     ResponseData<DocumentDto> data = response.body();
                     documentDto = data.getData();
                     bindDataToView(documentDto);
+                    handlerQuantity(documentDto);
                 }
             }
 
@@ -197,4 +217,135 @@ public class DocumentDetailFragment extends Fragment {
         binding.imageSlider.startAutoCycle();
         binding.imageSlider.setScrollTimeInSec(5);
     }
+
+    private void handlerQuantity(DocumentDto documentDto){
+        int maxQuantity = documentDto.getMaxQuantity();
+        binding.btnIncrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String quantity = binding.edtQuantity.getText().toString();
+                Integer quantityInt = Integer.parseInt(quantity);
+                if(quantityInt>=maxQuantity){
+                    binding.edtQuantity.setText(String.valueOf(maxQuantity));
+                    ToastUtils.show(getContext(),"Đã vượt quá số lượng tối đa");
+                }
+                else{
+                    int newQuantity = Integer.parseInt(quantity) + 1;
+                    binding.edtQuantity.setText(String.valueOf(newQuantity));
+                }
+
+            }
+        });
+        binding.btnDecrease.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String quantity = binding.edtQuantity.getText().toString();
+                Integer quantityInt = Integer.parseInt(quantity);
+                if(quantityInt<=0){
+                    binding.edtQuantity.setText("0");
+                }
+                else{
+                    int newQuantity = quantityInt - 1;
+                    binding.edtQuantity.setText(String.valueOf(newQuantity));
+                }
+            }
+        });
+    }
+
+    private void handlerAddToCart(){
+        binding.btnAddToCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                handlerAnimation(documentDto.getDoc_image_url());
+                String quantityStr = binding.edtQuantity.getText().toString();
+                int quantity = Integer.parseInt(quantityStr);
+                if (quantity <= 0) {
+                    Toast.makeText(getContext(), "Số lượng phải lớn hơn 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                boolean isOnline = NetworkUtil.isNetworkAvailable(getContext());
+                Long userId = sessionManager.getUser().getUserId();
+                Long docId = documentDto.getDoc_id();
+
+                Log.d("TEST",""+cartDao.existsInCart(userId,docId));
+
+                if(cartDao.existsInCart(userId,docId)){
+                    CartDto existingCart = cartDao.getCartByUserAndDocId(userId,docId);
+                    if (isOnline) {
+                        CartDto toSync = new CartDto(
+                                existingCart.getCartId(),quantity, userId, docId, null, existingCart.getSellPrice(), existingCart.getDocImageUrl(), false, "UPDATE", 0);
+                        ApiService.apiService.addOrUpdate(toSync).enqueue(new Callback<ResponseData<CartDto>>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseData<CartDto>> call,
+                                                           Response<ResponseData<CartDto>> response) {
+                                        if (response.isSuccessful() && response.body() != null) {
+                                            CartDto updated = response.body().getData();
+                                            existingCart.setQuantity(updated.getQuantity());
+                                            existingCart.setSyncStatus(1);
+                                            cartDao.updateCartItem(existingCart);
+                                            handlerCartCount(userId);
+                                            Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<ResponseData<CartDto>> call, Throwable t) {
+                                        Toast.makeText(getContext(), "Lỗi khi thêm vào giỏ: " + t.getMessage(),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                    else{
+                        existingCart.setQuantity(existingCart.getQuantity()+quantity);
+                        existingCart.setAction("UPDATE");
+                        existingCart.setSyncStatus(0);
+                        Log.d("TEST",""+existingCart.getSyncStatus());
+                        cartDao.updateCartItem(existingCart);
+                        handlerCartCount(userId);
+                        Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+                else{
+                    CartDto newCart = new CartDto(null,quantity,userId,docId,documentDto.getDoc_name(),documentDto.getSell_price(),
+                            documentDto.getDoc_image_url(),false,"INSERT",0);
+                    cartDao.addToCart(newCart);
+                    handlerCartCount(userId);
+                    if (isOnline)
+                        new SyncManager().syncCarts(getContext());
+                    Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
+
+    private void handlerCartCount(Long userId){
+        requireActivity().runOnUiThread(() -> {
+            int cartCount = cartDao.getCountCart(userId);
+            binding.tvCartBadge.setText(String.valueOf(cartCount));
+        });
+    }
+
+    private void handlerAnimation(String image){
+        AnimUtils.translateAnimation(binding.viewAnim, binding.btnAddToCart, binding.imgViewCart, new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                Log.d("Animation", "Started");
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                Log.d("Animation", "Ended");
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        },image);
+    }
+
+
 }

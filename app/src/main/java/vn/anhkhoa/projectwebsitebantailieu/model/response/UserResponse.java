@@ -1,6 +1,8 @@
 package vn.anhkhoa.projectwebsitebantailieu.model.response;
 
-public class UserResponse {
+import java.io.Serializable;
+
+public class UserResponse implements Serializable {
     private long userId;
     private String name;
     private String email;

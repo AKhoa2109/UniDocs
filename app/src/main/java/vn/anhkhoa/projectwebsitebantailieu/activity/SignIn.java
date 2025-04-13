@@ -99,6 +99,7 @@ public class SignIn extends AppCompatActivity {
                         session.saveUser(userResponse);
 
                         Intent intent = new Intent(SignIn.this, MainActivity.class);
+                        intent.putExtra("user", userResponse);
                         startActivity(intent);
                     } else {
                         Log.e("Login", "Response data is null or empty.");

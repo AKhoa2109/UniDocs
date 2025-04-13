@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "app_database.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "database.db";
+    private static final int DATABASE_VERSION = 2;
     private static DatabaseHandler instance;
 
     // constructor
@@ -31,11 +31,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(HistorySearchDao.CREATE_TABLE);
+        db.execSQL(CartDao.CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Xử lý nâng cấp database
+        db.execSQL("DROP TABLE IF EXISTS Cart");
+        db.execSQL("DROP TABLE IF EXISTS HistorySearch");
     }
 
     //region CRUD Operations

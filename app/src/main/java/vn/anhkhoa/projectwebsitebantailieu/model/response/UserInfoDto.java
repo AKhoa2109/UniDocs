@@ -1,6 +1,8 @@
 package vn.anhkhoa.projectwebsitebantailieu.model.response;
 
-public class UserInfoDto {
+import java.io.Serializable;
+
+public class UserInfoDto implements Serializable {
     private Long userId;
     private String name;
     private String address;

@@ -8,7 +8,14 @@
     android:orientation="vertical"
     android:fitsSystemWindows="true"
     tools:context=".fragment.DocumentDetailFragment">
-
+    <ImageView
+        android:id="@+id/viewAnim"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:elevation="999dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"/>
     <!-- TODO: Update blank fragment layout -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/topAppBar"
@@ -238,7 +245,7 @@
             app:backgroundTint="@null" />
 
         <Button
-            android:id="@+id/btnBuyNow"
+            android:id="@+id/btnAddToCart"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"

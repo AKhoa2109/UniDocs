@@ -15,12 +15,15 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
@@ -34,8 +37,9 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.12:8080";
+    public static String ipAddress = "192.168.1.19:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
+    /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
             .create();
@@ -75,7 +79,8 @@ public interface ApiService {
     Call<ResponseData<List<DocumentDto>>> getRelevanceDocument(@Query("type") String type,
                                                                @Query("id") Long id,
                                                                @Query("docId") Long docId);
-
+    @GET("document/discount-document/{docId}")
+    Call<ResponseData<DocumentDto>> getDiscountDocument(@Path("docId") Long docId);
     //chat
     @GET("conversations/{conversationId}/messages")
     Call<ResponseData<List<ChatLineDto>>> getChatMessages(@Path("conversationId") Long conversationId);
@@ -97,4 +102,24 @@ public interface ApiService {
 
     @GET("review/rate-report/{docId}")
     Call<ResponseData<Map<Integer, Long>>> getRateReportByDocumentId(@Path("docId") Long docId);
+
+    //cart
+    @GET("cart/user/{userId}")
+    Call<ResponseData<List<CartDto>>> getCartByUserId(@Path("userId") Long userId);
+
+    @DELETE("cart/remove/{cartId}")
+    Call<ResponseData<Void>> deleteCartItem(@Path("cartId") Long cartId);
+
+    @DELETE("cart/remove/all/{userId}")
+    Call<ResponseData<Void>> deleteAllCart(@Path("userId") Long userId);
+
+    @POST("cart/add-update")
+    Call<ResponseData<CartDto>> addOrUpdate(@Body CartDto cart);
+
+    // discount
+    @GET("discount/scope")
+    Call<ResponseData<List<DiscountDto>>> getDiscountByScope(@Query("userIds") List<Long> userIds,
+                                                             @Query("categoryIds") List<Long> categoryIds,
+                                                             @Query("documentIds") List<Long> documentIds);
+
 }

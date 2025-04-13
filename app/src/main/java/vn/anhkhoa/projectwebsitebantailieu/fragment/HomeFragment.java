@@ -3,6 +3,10 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -29,15 +33,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.activity.SearchActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.BannerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.CategoryAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.database.CartDao;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentHomeBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,17 +52,12 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
-    private ViewPager2 viewPager;
-
-    WormDotsIndicator dotsIndicator;
+    private FragmentHomeBinding binding;
+    private CartDao cartDao;
+    private SessionManager sessionManager;
     private Handler sliderHandler = new Handler();
     private List<String> bannerImages = new ArrayList<>();
     private Runnable sliderRunnable;
-
-    private EditText edtSearch;
-    RecyclerView rcvDocument;
-    RecyclerView rcvCate;
-
     List<DocumentDto> documentDtos = new ArrayList<>();
     List<CategoryDto> categoryDtos = new ArrayList<>();
 
@@ -103,14 +105,21 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        rcvCate = view.findViewById(R.id.rcvCategory);
-        rcvDocument = view.findViewById(R.id.rcvDocument);
-        viewPager = view.findViewById(R.id.viewPager);
-        dotsIndicator = view.findViewById(R.id.dotsIndicator);
-        edtSearch = view.findViewById(R.id.edtSearch);
+        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
-        edtSearch.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        View mainView = binding.getRoot();
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        binding.edtSearch.setHint("Tìm kiếm tài liệu...");
+        binding.edtSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(requireContext(), SearchActivity.class);
@@ -118,20 +127,22 @@ public class HomeFragment extends Fragment {
                 requireActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             }
         });
+        cartDao = new CartDao(getContext());
+        sessionManager = SessionManager.getInstance(requireContext());
+        int cartCount = cartDao.getCountCart(sessionManager.getUser().getUserId());
+        binding.tvCartBadge.setText(String.valueOf(cartCount));
         initBannerImages();
         setupViewPager();
-
         GridLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
-        rcvDocument.setLayoutManager(linearLayoutManager);
+        binding.rcvDocument.setLayoutManager(linearLayoutManager);
 
         LinearLayoutManager  linearLayoutCateManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL,false);
-        rcvCate.setLayoutManager(linearLayoutCateManager);
+        binding.rcvCategory.setLayoutManager(linearLayoutCateManager);
 
         documentDtos = new ArrayList<>();
         callApiGetListDocument();
         callApiGetListCategory();
-
-        return view;
+        handlderImgCartClick();
     }
 
     private void callApiGetListDocument(){
@@ -148,7 +159,7 @@ public class HomeFragment extends Fragment {
                 documentDtos.clear();
                 documentDtos= data.getData();
                 DocumentAdapter documentAdapter = new DocumentAdapter(getContext(),documentDtos);
-                rcvDocument.setAdapter(documentAdapter);
+                binding.rcvDocument.setAdapter(documentAdapter);
             }
 
             @Override
@@ -174,7 +185,7 @@ public class HomeFragment extends Fragment {
                     categoryDtos.clear();
                     categoryDtos= data.getData();
                     CategoryAdapter categoryAdapter = new CategoryAdapter(categoryDtos);
-                    rcvCate.setAdapter(categoryAdapter);
+                    binding.rcvCategory.setAdapter(categoryAdapter);
                 }
             }
 
@@ -199,13 +210,13 @@ public class HomeFragment extends Fragment {
     private void setupViewPager() {
         // Khởi tạo Adapter
         BannerAdapter bannerAdapter = new BannerAdapter(bannerImages);
-        viewPager.setAdapter(bannerAdapter);
+        binding.viewPager.setAdapter(bannerAdapter);
 
         // Kết nối WormDotsIndicator với ViewPager2
-        dotsIndicator.attachTo(viewPager);
+        binding.dotsIndicator.attachTo(binding.viewPager);
 
         // Tự động chuyển slide
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
@@ -217,11 +228,11 @@ public class HomeFragment extends Fragment {
         sliderRunnable = new Runnable() {
             @Override
             public void run() {
-                int currentPosition = viewPager.getCurrentItem();
+                int currentPosition = binding.viewPager.getCurrentItem();
                 if (currentPosition == bannerImages.size() - 1) {
-                    viewPager.setCurrentItem(0);
+                    binding.viewPager.setCurrentItem(0);
                 } else {
-                    viewPager.setCurrentItem(currentPosition + 1);
+                    binding.viewPager.setCurrentItem(currentPosition + 1);
                 }
             }
         };
@@ -237,6 +248,17 @@ public class HomeFragment extends Fragment {
     public void onPause() {
         super.onPause();
         sliderHandler.removeCallbacks(sliderRunnable);
+    }
+
+    private void handlderImgCartClick(){
+        binding.imgViewCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getContext() instanceof MainActivity){
+                    ((MainActivity) getContext()).openCartFragment();
+                }
+            }
+        });
     }
 
 }

@@ -1,8 +1,8 @@
 package vn.anhkhoa.projectwebsitebantailieu.activity;
-
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,18 +14,24 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.io.Serializable;
+import java.util.List;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.CartFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ChatFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.VoucherFragment;
+import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
@@ -34,9 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private PostFragment postFragment;
     private AccountFragment accountFragment;
     private ConversationListFragment conversationListFragment;
-
     private OnBackPressedCallback onBackPressedCallback;
-
+    private NetworkChangeReceiver networkReceiver;
+    private DatabaseHandler databaseHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        databaseHandler = DatabaseHandler.getInstance(this);
+        /*networkReceiver = new NetworkChangeReceiver();
+        registerNetworkReceiver();*/
         // Khởi tạo các fragment
         homeFragment = new HomeFragment();
         shopFragment = new ShopFragment();
@@ -155,7 +163,8 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
                 // Nếu đang ở ChatFragment, xử lý tùy chỉnh
-                if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment) {
+                if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment
+                    || currentFragment instanceof CartFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
                 } else {
@@ -203,6 +212,30 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setVisibility(View.GONE);
     }
 
+    public void openCartFragment(){
+        CartFragment cartFragment = new CartFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, cartFragment)
+                .addToBackStack("cart")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openVoucherFragment(List<CartDto> carts){
+        VoucherFragment voucherFragment = new VoucherFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("cart", (Serializable) carts);
+        voucherFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, voucherFragment)
+                .addToBackStack("voucher")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
     // Hủy callback khi Activity bị hủy
     @Override
     protected void onDestroy() {
@@ -210,5 +243,12 @@ public class MainActivity extends AppCompatActivity {
         if (onBackPressedCallback != null) {
             onBackPressedCallback.remove();
         }
+        /*unregisterReceiver(networkReceiver);*/
     }
+
+    /*private void registerNetworkReceiver() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkReceiver, filter);
+    }*/
+
 }
