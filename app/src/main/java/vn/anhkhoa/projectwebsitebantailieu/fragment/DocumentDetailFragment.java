@@ -27,7 +27,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
-import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DetailPagerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.SliderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
@@ -35,7 +34,6 @@ import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentDocumentDetailBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
-import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NumberFormatter;
 
@@ -117,8 +115,8 @@ public class DocumentDetailFragment extends Fragment {
 
         images = new ArrayList<>();
 
-        getApiImageByDocumentId(documentDto.getDoc_id());
-        getApiDocumentDetail(documentDto.getDoc_id());
+        getApiImageByDocumentId(documentDto.getDocId());
+        getApiDocumentDetail(documentDto.getDocId());
 
     }
 
@@ -162,10 +160,10 @@ public class DocumentDetailFragment extends Fragment {
     }
 
     private void bindDataToView(DocumentDto documentDto){
-        String sellPrice = CurrentFormatter.format(documentDto.getSell_price());
+        String sellPrice = CurrentFormatter.format(documentDto.getSellPrice());
         String originalPrice = CurrentFormatter.format(documentDto.getOriginalPrice()) ;
         String sold = NumberFormatter.formatterNum(documentDto.getTotalSold()) + " lượt mua";
-        binding.tvProductName.setText(documentDto.getDoc_name());
+        binding.tvProductName.setText(documentDto.getDocName());
         binding.tvSellPrice.setText(sellPrice);
         binding.tvOriginalPrice.setText(originalPrice);
         binding.tvNummBuy.setText(sold);

@@ -26,7 +26,6 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.RangeSlider;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,7 +33,6 @@ import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
-import vn.anhkhoa.projectwebsitebantailieu.fragment.FilterDocumentFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchDocumentFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
@@ -200,8 +198,8 @@ public class SearchActivity extends AppCompatActivity {
                         chip.setLayoutParams(layoutParams);
                         chip.setCheckable(true);
                         chip.setClickable(true);
-                        chip.setId(category.getCate_id().intValue());
-                        chip.setText(category.getCate_name());
+                        chip.setId(category.getCateId().intValue());
+                        chip.setText(category.getCateName());
                         cgCategory.addView(chip);
                     }
                 } else {

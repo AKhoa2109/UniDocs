@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,9 +76,9 @@ public class ReviewFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = FragmentReviewBinding.inflate(inflater, container, false);
         reviews = new ArrayList<>();
-        getApiReviewById(documentDto.getDoc_id());
+        getApiReviewById(documentDto.getDocId());
         setBindDataView();
-        getApiRateCount(documentDto.getDoc_id());
+        getApiRateCount(documentDto.getDocId());
         return binding.getRoot();
     }
 

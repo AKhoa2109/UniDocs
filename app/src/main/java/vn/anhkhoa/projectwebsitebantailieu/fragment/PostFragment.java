@@ -2,13 +2,34 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
-import vn.anhkhoa.projectwebsitebantailieu.R;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
+import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentPostBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.DocumentType;
+import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +68,12 @@ public class PostFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    private FragmentPostBinding binding;
+    private SessionManager sessionManager;
+    private List<CategoryDto> categoryDtoList;
+    private ArrayAdapter categoryAdapter;
+    //danh muc duoc chon
+    private Long selectedCateId = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +88,192 @@ public class PostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_post, container, false);
+        binding = FragmentPostBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        View mainView = binding.fragmentPost;
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        sessionManager = SessionManager.getInstance(requireContext());
+
+        //lay id category khi duoc chon
+        binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                CategoryDto selectedCategory = categoryDtoList.get(i);
+                selectedCateId = selectedCategory.getCateId();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        //load category
+        categoryDtoList = new ArrayList<>();
+        categoryAdapter = new ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item , categoryDtoList);
+        binding.spinnerCategory.setAdapter(categoryAdapter);
+        ApiService.apiService.getListCategory().enqueue(new Callback<ResponseData<List<CategoryDto>>>() {
+            @Override
+            public void onResponse(Call<ResponseData<List<CategoryDto>>> call, Response<ResponseData<List<CategoryDto>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ResponseData<List<CategoryDto>> responseData = response.body();
+                    if (responseData.getStatus() == 200) {
+                        List<CategoryDto> categories = responseData.getData();
+                        categoryDtoList.clear();
+                        categoryDtoList.addAll(categories);
+
+                        categoryAdapter.notifyDataSetChanged(); // Cập nhật giao diện Spinner
+                    } else {
+                        ToastUtils.show(binding.getRoot().getContext(), "Co loi xay ra API tai category");
+                    }
+                } else {
+                    ToastUtils.show(binding.getRoot().getContext(), "Co loi xay ra API tai category");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<List<CategoryDto>>> call, Throwable t) {
+                ToastUtils.show(binding.getRoot().getContext(), "Loi ket noi internet!");
+            }
+        });
+
+        binding.buttonUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DocumentDto documentDto = getFormData();
+                if(documentDto == null) return;
+                ApiService.apiService.pushDocument(documentDto).enqueue(new Callback<ResponseData<DocumentDto>>() {
+                    @Override
+                    public void onResponse(Call<ResponseData<DocumentDto>> call, Response<ResponseData<DocumentDto>> response) {
+                        if(response.isSuccessful() && response.body() != null){
+                            ResponseData<DocumentDto> responseData = response.body();
+                            if (responseData.getStatus() == 200){
+                                ToastUtils.show(binding.getRoot().getContext(), "Tai len thanh cong: " + responseData.getData().getDocName());
+                            }else {
+                                ToastUtils.show(binding.getRoot().getContext(), "Loi API");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseData<DocumentDto>> call, Throwable t) {
+                        ToastUtils.show(binding.getRoot().getContext(), "Loi ket noi internet!");
+                    }
+                });
+            }
+        });
+    }
+
+    public DocumentDto getFormData(){
+        DocumentDto documentDto = new DocumentDto();
+
+        String docName = binding.editTextDocName.getText().toString().trim();
+        String sellPriceStr = binding.editTextSellPrice.getText().toString().trim();
+        String originalPriceStr = binding.editTextOriginalPrice.getText().toString().trim();
+        String docPageStr = binding.editTextDocPage.getText().toString().trim();
+        String docDesc = binding.editTextDocDescription.getText().toString().trim();
+
+
+        if (docName.isEmpty()) {
+            ToastUtils.show(requireContext(),"Vui lòng nhập tên tài liệu");
+            return null;
+        }
+        documentDto.setDocName(docName);
+
+        if (sellPriceStr.isEmpty()) {
+            ToastUtils.show(requireContext(),"Giá bán không hợp lệ");
+            return null;
+        }
+        try {
+            documentDto.setSellPrice(Double.valueOf(sellPriceStr));
+        } catch (NumberFormatException e) {
+            ToastUtils.show(requireContext(),"Giá bán không hợp lệ");
+
+            return null;
+        }
+
+        if (originalPriceStr.isEmpty()) {
+            ToastUtils.show(requireContext(),"Giá ban đầu không hợp lệ");
+            return null;
+        }
+        try {
+            documentDto.setOriginalPrice(Double.valueOf(originalPriceStr));
+        } catch (NumberFormatException e) {
+            ToastUtils.show(requireContext(),"Giá ban đầu không hợp lệ");
+            return null;
+        }
+
+        if (docPageStr.isEmpty()) {
+            ToastUtils.show(requireContext(),"Số trang không hợp lệ");
+            return null;
+        }
+        try {
+            documentDto.setDocPage(Integer.valueOf(docPageStr));
+        } catch (NumberFormatException e) {
+            ToastUtils.show(requireContext(),"Số trang không hợp lệ");
+            return null;
+        }
+        documentDto.setDocPage(Integer.valueOf(docPageStr));
+
+        documentDto.setDocDesc(docDesc);
+
+        //type doc
+        int checkedRadioButtonId = binding.radioGroupDocType.getCheckedRadioButtonId();
+        if(checkedRadioButtonId == binding.radioButtonPhysical.getId()){
+            documentDto.setType(DocumentType.PHYSICAL);
+        }else if (checkedRadioButtonId == binding.radioButtonDigital.getId()){
+            documentDto.setType(DocumentType.DIGITAL);
+        }else if (checkedRadioButtonId == binding.radioButtonBoth.getId()){
+            documentDto.setType(DocumentType.BOTH);
+        } else {
+            ToastUtils.show(requireContext(),"lòng chọn loại tài liệu");
+            return null;
+        }
+        //documentDto.setMaxQuantity(binding.);
+        //file, anh
+        documentDto.setDocImageUrl("day la link");
+        //bo not null
+        documentDto.setMaxQuantity(10);
+
+        documentDto.setUserId(sessionManager.getUser().getUserId());
+        documentDto.setCateId(selectedCateId);
+
+        return documentDto;
+    }
+
+//    public DocumentDto getFormData(){
+//        DocumentDto documentDto = new DocumentDto();
+//        documentDto.setDocName(binding.editTextDocName.getText().toString());
+//        //documentDto.setDocImageUrl(documentDto.getDocImageUrl());
+//        //file
+//        documentDto.setSellPrice(Double.valueOf(binding.editTextSellPrice.getText().toString()));
+//        documentDto.setOriginalPrice(Double.valueOf(binding.editTextOriginalPrice.getText().toString()));
+//        documentDto.setDocPage(Integer.valueOf(binding.editTextDocPage.getText().toString()));
+//
+//        documentDto.setDocDesc(binding.editTextDocDescription.getText().toString());
+//
+//        //type doc
+//        int checkedRadioButtonId = binding.radioGroupDocType.getCheckedRadioButtonId();
+//        if(checkedRadioButtonId == binding.radioButtonPhysical.getId()){
+//            documentDto.setType(DocumentType.PHYSICAL);
+//        }else if (checkedRadioButtonId == binding.radioButtonDigital.getId()){
+//            documentDto.setType(DocumentType.DIGITAL);
+//        }else{
+//            documentDto.setType(DocumentType.BOTH);
+//        }
+//        //documentDto.setMaxQuantity(binding.);
+//
+//        documentDto.setUserId(sessionManager.getUser().getUserId());
+//
+//        return documentDto;
+//    }
 }

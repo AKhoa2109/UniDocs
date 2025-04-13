@@ -38,9 +38,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             return;
 //        holder.imgDocument.setImageResource(R.drawable.facebook_icon);
         Glide.with(holder.itemView.getContext())
-                .load(categoryDto.getCate_icon())
+                .load(categoryDto.getCateIcon())
                 .into(holder.ivCategoryIcon);
-        holder.tvCategoryName.setText(categoryDto.getCate_name());
+        holder.tvCategoryName.setText(categoryDto.getCateName());
     }
 
     @Override

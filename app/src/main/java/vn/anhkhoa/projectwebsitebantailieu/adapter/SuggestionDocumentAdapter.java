@@ -37,9 +37,9 @@ public class SuggestionDocumentAdapter extends RecyclerView.Adapter<SuggestionDo
             return;
 //        holder.imgDocument.setImageResource(R.drawable.facebook_icon);
         Glide.with(holder.itemView.getContext())
-                .load(documentDto.getDoc_image_url())
+                .load(documentDto.getDocImageUrl())
                 .into(holder.imgDocument);
-        holder.tvDocName.setText(documentDto.getDoc_name());
+        holder.tvDocName.setText(documentDto.getDocName());
     }
 
     @Override

@@ -40,10 +40,10 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
             return;
 //        holder.imgDocument.setImageResource(R.drawable.facebook_icon);
         Glide.with(holder.itemView.getContext())
-                .load(documentDto.getDoc_image_url())
+                .load(documentDto.getDocImageUrl())
                         .into(holder.imgDocument);
-        holder.tvDocName.setText(documentDto.getDoc_name());
-        holder.tvSellPrice.setText(CurrentFormatter.format(documentDto.getSell_price()));
+        holder.tvDocName.setText(documentDto.getDocName());
+        holder.tvSellPrice.setText(CurrentFormatter.format(documentDto.getSellPrice()));
         String totalSold = String.valueOf(documentDto.getTotalSold())+" lượt xem";
         holder.tvTotalSold.setText(totalSold);
         holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -3,13 +3,10 @@ package vn.anhkhoa.projectwebsitebantailieu.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -36,7 +33,7 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
         if (documentDto == null)
             return;
 
-        holder.txtNameDoc.setText(documentDto.getDoc_name());
+        holder.txtNameDoc.setText(documentDto.getDocName());
     }
 
     @Override

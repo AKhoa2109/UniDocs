@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         // Thêm fragment mặc định
-        showFragment(homeFragment, "home");
+        showFragment(postFragment, "post");
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -122,7 +122,17 @@ public class MainActivity extends AppCompatActivity {
         setupBackPressedCallback();
     }
 
-    //goi ham nay khi can show fragmen
+    //phuong thuc goi fragment co an navBar
+    public void showFragment(Fragment fragment, String tag, Boolean hideNavBar){
+        showFragment(fragment, tag);
+        if(hideNavBar){
+            binding.bottomNavigationView.setVisibility(View.GONE);
+        }else {
+            binding.bottomNavigationView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    //goi ham nay khi can show fragment
     public void showFragment(Fragment fragment, String tag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();

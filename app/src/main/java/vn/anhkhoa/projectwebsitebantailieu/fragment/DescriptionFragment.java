@@ -90,7 +90,7 @@ public class DescriptionFragment extends Fragment {
             public void onResponse(Call<ResponseData<CategoryDto>> call, Response<ResponseData<CategoryDto>> response) {
                 if(response.isSuccessful() && response.body() != null){
                     categoryDto = response.body().getData();
-                    binding.tvCategory.setText("Loại: "+categoryDto.getCate_name());
+                    binding.tvCategory.setText("Loại: "+categoryDto.getCateName());
                 }
 
             }

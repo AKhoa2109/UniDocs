@@ -81,6 +81,10 @@ public interface ApiService {
                                                                @Query("id") Long id,
                                                                @Query("docId") Long docId);
 
+    //push document
+    @POST("document/push")
+    Call<ResponseData<DocumentDto>> pushDocument(@Body DocumentDto documentDto);
+
     //chat
     @GET("conversations/{conversationId}/messages")
     Call<ResponseData<List<ChatLineDto>>> getChatMessages(@Path("conversationId") Long conversationId);

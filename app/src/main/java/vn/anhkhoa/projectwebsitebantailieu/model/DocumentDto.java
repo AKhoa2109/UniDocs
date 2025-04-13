@@ -78,36 +78,35 @@ public class DocumentDto implements Serializable {
         this.totalReview = totalReview;
     }
 
-
-    public Long getDoc_id() {
+    public Long getDocId() {
         return docId;
     }
 
-    public void setDoc_id(Long doc_id) {
+    public void setDocId(Long doc_id) {
         this.docId = doc_id;
     }
 
-    public String getDoc_name() {
+    public String getDocName() {
         return docName;
     }
 
-    public void setDoc_name(String doc_name) {
+    public void setDocName(String doc_name) {
         this.docName = doc_name;
     }
 
-    public String getDoc_image_url() {
+    public String getDocImageUrl() {
         return docImageUrl;
     }
 
-    public void setDoc_image_url(String doc_image_url) {
+    public void setDocImageUrl(String doc_image_url) {
         this.docImageUrl = doc_image_url;
     }
 
-    public Double getSell_price() {
+    public Double getSellPrice() {
         return sellPrice;
     }
 
-    public void setSell_price(Double sell_price) {
+    public void setSellPrice(Double sell_price) {
         this.sellPrice = sell_price;
     }
 
