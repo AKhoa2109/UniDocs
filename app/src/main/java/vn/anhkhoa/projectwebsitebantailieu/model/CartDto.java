@@ -1,6 +1,7 @@
 package vn.anhkhoa.projectwebsitebantailieu.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class CartDto implements Serializable {
     private Long cartId;
@@ -115,5 +116,18 @@ public class CartDto implements Serializable {
 
     public void setSyncStatus(int syncStatus) {
         this.syncStatus = syncStatus;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CartDto cartDto = (CartDto) o;
+        return Objects.equals(cartId, cartDto.cartId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cartId);
     }
 }

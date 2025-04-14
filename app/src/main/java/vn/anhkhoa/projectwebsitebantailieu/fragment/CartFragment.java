@@ -1,6 +1,10 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,7 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,11 +27,15 @@ import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.database.CartDao;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentCartBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.DiscountType;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.CartViewModel;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NetworkUtil;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SyncManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,7 +49,7 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     private List<CartDto> carts;
     private SessionManager sessionManager;
     private List<CartDto> cartItems;
-
+    private CartViewModel viewModel;
     private List<CartDto> selectedCartItem;
     DatabaseHandler databaseHandler;
     private double totalPrice = 0;
@@ -87,23 +99,32 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding =  FragmentCartBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         sessionManager = SessionManager.getInstance(requireContext());
         databaseHandler = DatabaseHandler.getInstance(getContext());
         cartDao = new CartDao(getContext());
+        viewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
         initView();
         Long userId = sessionManager.getUser().getUserId();
         if (userId == null) {
             Log.d("CartFragment", "userId is null");
         }
-        getApiCartByUserId(userId);
+        setupObservers();
         setupSelectAll();
+        getApiCartByUserId(userId);
         handlerRemoveAll(userId);
         handlerVoucher();
-        return binding.getRoot();
+        getVoucherBackData();
     }
 
     private void initView(){
         binding.ibRemoveAll.setVisibility(View.INVISIBLE);
+        selectedCartItem = new ArrayList<>();
         carts = new ArrayList<>();
         cartItems = new ArrayList<>();
         cartAdapter = new CartAdapter(cartItems, this);
@@ -111,12 +132,49 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
         binding.rcCartItem.setAdapter(cartAdapter);
     }
 
+    private void setupObservers() {
+        viewModel.getSelectedCartItems().observe(getViewLifecycleOwner(), selectedItems -> {
+            if (selectedItems == null) return;
+
+            // Cập nhật trạng thái isSelected cho cartItems
+            Set<Long> selectedIds = selectedItems.stream()
+                    .map(CartDto::getCartId)
+                    .collect(Collectors.toSet());
+            for (CartDto item : cartItems) {
+                item.setSelected(selectedIds.contains(item.getCartId()));
+            }
+            cartAdapter.notifyDataSetChanged();
+            calculateTotalAmount(); // Cập nhật tổng tiền nếu cần
+        });
+    }
+
+    private void restoreCartState() {
+        List<CartDto> selectedItems = viewModel.getSelectedCartItems().getValue();
+        if (selectedItems != null && !cartItems.isEmpty()) {
+            Set<Long> selectedIds = selectedItems.stream()
+                    .map(CartDto::getCartId)
+                    .collect(Collectors.toSet());
+            for (CartDto item : cartItems) {
+                item.setSelected(selectedIds.contains(item.getCartId()));
+            }
+            cartAdapter.notifyDataSetChanged();
+        }
+    }
+
+
     private void handlerVoucher(){
         binding.imageButtonVoucher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(getContext() instanceof MainActivity){
-                    ((MainActivity) getContext()).openVoucherFragment(selectedCartItem);
+                selectedCartItem = viewModel.getSelectedCartItems().getValue();
+                if(selectedCartItem==null){
+                    ToastUtils.show(getContext(), "Cần chọn ít nhất 1 sản phẩm");
+                    return;
+                }
+                else{
+                    if(getContext() instanceof MainActivity){
+                        ((MainActivity) getContext()).openVoucherFragment(selectedCartItem);
+                    }
                 }
             }
         });
@@ -166,16 +224,40 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                 @Override
                 public void onResponse(Call<ResponseData<List<CartDto>>> call, Response<ResponseData<List<CartDto>>> response) {
                     if(response.isSuccessful() && response.body() != null){
-                        carts = response.body().getData();
+                        // Lấy danh sách selected từ ViewModel
+                        List<CartDto> selectedItems = viewModel.getSelectedCartItems().getValue();
+                        Set<Long> selectedIds = new HashSet<>();
+                        if (selectedItems != null) {
+                            for (CartDto item : selectedItems) {
+                                selectedIds.add(item.getCartId());
+                            }
+                        }
+
+                        // Làm mới cartItems
                         cartItems.clear();
                         cartDao.deleteAllForUser(userId);
-                        for(CartDto item : carts){
+                        carts = response.body().getData();
+                        for (CartDto item : carts) {
+                            boolean isSelected = selectedIds.contains(item.getCartId());
+                            item.setSelected(isSelected);
                             cartDao.addToCart(new CartDto(item.getCartId(),
-                                    item.getQuantity(),item.getUserId(),item.getDocId(), item.getDocName(),
-                                    item.getSellPrice(), item.getDocImageUrl(),false,"INSERT",isOnline ? 1 : 0));
+                                    item.getQuantity(), item.getUserId(), item.getDocId(), item.getDocName(),
+                                    item.getSellPrice(), item.getDocImageUrl(), isSelected, "INSERT", isOnline ? 1 : 0));
                             cartItems.add(item);
                         }
                         cartAdapter.notifyDataSetChanged();
+                        calculateTotalAmount();
+
+                        // Cập nhật lại selectedCartItems trong ViewModel
+                        List<CartDto> newSelected = new ArrayList<>();
+                        for (CartDto item : cartItems) {
+                            if (item.isSelected()) {
+                                newSelected.add(item);
+                            }
+                        }
+                        viewModel.setSelectedCartItems(newSelected);
+                        binding.ibRemoveAll.setVisibility(newSelected.isEmpty() ? View.INVISIBLE : View.VISIBLE);
+                        binding.cbSelect.setChecked(newSelected.size() == cartItems.size() && !cartItems.isEmpty());
                     }
                 }
 
@@ -185,11 +267,30 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                 }
             });
         }
-        else{
-            List<CartDto> localCarts = cartDao.getCartItemsByUser(userId);
+        else {
+            // OFFLINE: same idea
+            List<CartDto> local = cartDao.getCartItemsByUser(userId);
             cartItems.clear();
-            cartItems.addAll(localCarts);
+
+            List<CartDto> oldSelected = viewModel.getSelectedCartItems().getValue();
+            Set<Long> selIds = new HashSet<>();
+            for (CartDto s : oldSelected) selIds.add(s.getCartId());
+
+            for (CartDto item : local) {
+                boolean wasSel = selIds.contains(item.getCartId());
+                item.setSelected(wasSel);
+                cartItems.add(item);
+            }
             cartAdapter.notifyDataSetChanged();
+
+            List<CartDto> newSel = new ArrayList<>();
+            for (CartDto it : cartItems) {
+                if (it.isSelected()) newSel.add(it);
+            }
+            viewModel.setSelectedCartItems(newSel);
+            calculateTotalAmount();
+            binding.ibRemoveAll.setVisibility(newSel.isEmpty() ? View.INVISIBLE : View.VISIBLE);
+            binding.cbSelect.setChecked(newSel.size() == cartItems.size() && !cartItems.isEmpty());
         }
 
     }
@@ -217,19 +318,21 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     }
 
     private void setupSelectAll() {
+        if (getActivity() == null) return;
         binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(!isChecked){
-                binding.ibRemoveAll.setVisibility(View.INVISIBLE);
+            if (isChecked) {
                 cartAdapter.selectAllItems(isChecked);
-                calculateTotalAmount();
-            }
-            else{
+                viewModel.setSelectedCartItems(cartItems);
                 binding.ibRemoveAll.setVisibility(View.VISIBLE);
-                cartAdapter.selectAllItems(isChecked);
-                calculateTotalAmount();
+            } else {
+                cartAdapter.selectAllItems(false);
+                viewModel.clearSelectedCartItems();
+                binding.ibRemoveAll.setVisibility(View.INVISIBLE);
             }
+            calculateTotalAmount();
         });
     }
+
 
     private void calculateTotalAmount() {
         totalPrice = 0;
@@ -245,14 +348,12 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     public void onCheckboxClick(int position, boolean isChecked) {
         CartDto item = cartItems.get(position);
         item.setSelected(isChecked);
-        calculateTotalAmount();
         if (isChecked) {
-            if (!selectedCartItem.contains(item)) {
-                selectedCartItem.add(item);
-            }
+            viewModel.addSelectedCartItem(item);
         } else {
-            selectedCartItem.remove(item);
+            viewModel.removeSelectedCartItem(item);
         }
+        calculateTotalAmount();
     }
 
     @Override
@@ -265,21 +366,24 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     public void onRemoveItem(int position) {
         boolean isOnline = NetworkUtil.isNetworkAvailable(getContext());
         Long cartItemId = cartItems.get(position).getCartId();
+        CartDto removedItem = cartItems.get(position);
+
         if (isOnline) {
             deleteApiCartItem(cartItemId, position);
         } else {
-
             cartDao.deleteCartItem(cartItemId);
             cartItems.remove(position);
             cartAdapter.notifyItemRemoved(position);
             calculateTotalAmount();
             Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_SHORT).show();
         }
+        viewModel.removeSelectedCartItem(removedItem);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        restoreCartState();
         syncCartWhenOnline();
     }
 
@@ -291,6 +395,35 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                 getApiCartByUserId(userId);
             }
         }
+    }
+
+    private void getVoucherBackData(){
+        getParentFragmentManager().setFragmentResultListener("voucherResult", getViewLifecycleOwner(), (requestKey, result) -> {
+            DiscountDto selectedVoucher = (DiscountDto) result.getSerializable("selectedDiscount");
+
+            if (selectedVoucher != null) {
+                binding.tvVoucherName.setText(selectedVoucher.getDiscountName());
+                applyVoucher(selectedVoucher);
+                calculateTotalAmount();
+            }
+        });
+    }
+
+    private void applyVoucher(DiscountDto voucher) {
+
+        double discountValue = voucher.getDiscountValue();
+        double totalDiscountValue = totalPrice * discountValue / 100;
+        double finalTotal = 0;
+
+        if (voucher.getDiscountType() == DiscountType.PERCENT) {
+            binding.tvDiscount.setText(CurrentFormatter.format(totalDiscountValue));
+            finalTotal = totalPrice - totalDiscountValue;
+        } else {
+            binding.tvDiscount.setText(CurrentFormatter.format(discountValue));
+            finalTotal = totalPrice - discountValue;
+        }
+
+        binding.tvTotalPrice.setText(CurrentFormatter.format(Math.max(finalTotal, 0)));
     }
 
 }

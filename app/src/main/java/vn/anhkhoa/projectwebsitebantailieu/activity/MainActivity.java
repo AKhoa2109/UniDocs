@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
@@ -224,12 +225,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openVoucherFragment(List<CartDto> carts){
-        VoucherFragment voucherFragment = new VoucherFragment();
+        VoucherFragment fragment = VoucherFragment.newInstance();
         Bundle args = new Bundle();
-        args.putSerializable("cart", (Serializable) carts);
-        voucherFragment.setArguments(args);
+        args.putSerializable("cart", new ArrayList<>(carts));
+        fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, voucherFragment)
+                .replace(R.id.frame_layout, fragment)
                 .addToBackStack("voucher")
                 .commit();
 

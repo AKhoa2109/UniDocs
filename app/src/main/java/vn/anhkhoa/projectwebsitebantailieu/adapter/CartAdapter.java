@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
@@ -35,6 +38,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>{
         this.listener = listener;
     }
 
+    public void setCarts(List<CartDto> newCarts) {
+        this.carts = newCarts;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -45,7 +53,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CartDto item = carts.get(position);
-
+        holder.cbSelect.setOnCheckedChangeListener(null);
         holder.cbSelect.setChecked(item.isSelected());
         holder.tvProductName.setText(item.getDocName());
         holder.tvProductPrice.setText(String.format("%sđ", item.getSellPrice()));
@@ -91,12 +99,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>{
     }
 
     public void selectAllItems(boolean select) {
-        isSelectAll = select;
-        for(CartDto item : carts) {
+        for (CartDto item : carts) {
             item.setSelected(select);
         }
         notifyDataSetChanged();
     }
+
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private CheckBox cbSelect;

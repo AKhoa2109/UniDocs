@@ -6,6 +6,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import vn.anhkhoa.projectwebsitebantailieu.R;
@@ -16,6 +18,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.DiscountViewHolder>{
     private List<DiscountDto> discounts;
     private Listener listener;
+    private double totalCartPrice = 0.0;
     private int selectedPosition = -1;
 
     public interface Listener {
@@ -25,6 +28,9 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
     public DiscountAdapter(List<DiscountDto> discounts, Listener listener) {
         this.discounts = discounts;
         this.listener = listener;
+    }
+    public void setTotalCartPrice(double price) {
+        this.totalCartPrice = price;
     }
 
     @NonNull
@@ -51,29 +57,50 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
                 break;
         }
         holder.tvName.setText(v.getDiscountName());
-        holder.tvConditions.setText(
-                v.getMinPrice() != null && v.getMinPrice() > 0
-                        ? "Áp dụng cho đơn tối thiểu " + CurrentFormatter.format(v.getMinPrice())
-                        : "Không yêu cầu giá tối thiểu"
-        );
+        StringBuilder conditionText = new StringBuilder("Áp dụng cho đơn từ ");
+        if (v.getMinPrice() != null && v.getMinPrice() > 0) {
+            conditionText.append(CurrentFormatter.format(v.getMinPrice()));
+        } else {
+            conditionText.append("0đ");
+        }
+
+        if (v.getMaxPrice() != null && v.getMaxPrice() > 0) {
+            conditionText.append(" đến ").append(CurrentFormatter.format(v.getMaxPrice()));
+        }
+
+        holder.tvConditions.setText(conditionText.toString());
         holder.tvExpiry.setText("Hạn dùng: " + v.getEndAt().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         Integer remainingQuantity = v.getUsageLimit() - v.getUsedCount();
         holder.tvRemainingQuantity.setText("x" +remainingQuantity);
 
+        boolean isValidStatus = v.getStatus() != null &&
+                v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.DISABLED &&
+                v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.EXPIRED;
+
+        boolean isWithinPriceRange = (v.getMinPrice() == null || totalCartPrice >= v.getMinPrice()) &&
+                (v.getMaxPrice() == null || totalCartPrice <= v.getMaxPrice());
+
+        boolean isSelectable = isValidStatus && isWithinPriceRange;
+
+        holder.rbSelect.setEnabled(isSelectable);
         holder.rbSelect.setChecked(position == selectedPosition);
 
         holder.rbSelect.setOnClickListener(view -> {
-            int prev = selectedPosition;
             int current = holder.getAdapterPosition();
-            if (current == RecyclerView.NO_POSITION) return;
-            if (current == prev) return;
+            if (current == RecyclerView.NO_POSITION || !isSelectable) return;
 
-            selectedPosition = current;
-
-            notifyItemChanged(prev);
-            notifyItemChanged(selectedPosition);
-
-            listener.onVoucherSelected(discounts.get(current));
+            if (selectedPosition == current) {
+                int prev = selectedPosition;
+                selectedPosition = -1;
+                notifyItemChanged(prev);
+                listener.onVoucherSelected(null);
+            } else {
+                int prev = selectedPosition;
+                selectedPosition = current;
+                notifyItemChanged(prev);
+                notifyItemChanged(selectedPosition);
+                listener.onVoucherSelected(discounts.get(current));
+            }
         });
 
         holder.itemView.setClickable(false);

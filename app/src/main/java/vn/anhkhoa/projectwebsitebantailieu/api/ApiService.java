@@ -42,7 +42,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "10.0.2.2:8080";
+    public static String ipAddress = "196.169.4.193:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -84,8 +84,8 @@ public interface ApiService {
     Call<ResponseData<List<DocumentDto>>> getRelevanceDocument(@Query("type") String type,
                                                                @Query("id") Long id,
                                                                @Query("docId") Long docId);
-    @GET("document/discount-document/{docId}")
-    Call<ResponseData<DocumentDto>> getDiscountDocument(@Path("docId") Long docId);
+    @POST("document/discount-document")
+    Call<ResponseData<List<DocumentDto>>> getDiscountDocument(@Body List<Long> docIds);
     //chat
     @GET("conversations/{conversationId}/messages")
     Call<ResponseData<List<ChatLineDto>>> getChatMessages(@Path("conversationId") Long conversationId);

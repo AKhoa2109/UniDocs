@@ -3,10 +3,13 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.CartAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DiscountAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
@@ -28,7 +32,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
  * Use the {@link VoucherFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class VoucherFragment extends Fragment {
+public class VoucherFragment extends Fragment implements DiscountAdapter.Listener{
     private FragmentVoucherBinding binding;
     private List<DiscountDto> discountDtos;
     private DocumentDto documentDto;
@@ -37,6 +41,8 @@ public class VoucherFragment extends Fragment {
     private List<Long> categoryIds;
     private List<CartDto> cartDtos;
     private DiscountAdapter discountAdapter;
+
+    private DiscountDto selectedDiscount;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -48,20 +54,10 @@ public class VoucherFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment VoucherFragment.
-     */
     // TODO: Rename and change types and number of parameters
-    public static VoucherFragment newInstance(String param1, String param2) {
+    public static VoucherFragment newInstance() {
         VoucherFragment fragment = new VoucherFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,8 +66,7 @@ public class VoucherFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
     }
 
@@ -79,58 +74,102 @@ public class VoucherFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-         binding = FragmentVoucherBinding.inflate(inflater, container, false);
-
+        binding = FragmentVoucherBinding.inflate(inflater, container, false);
+        initView();
         Bundle bundle = getArguments();
         if (bundle != null) {
            cartDtos  = (List<CartDto>) bundle.getSerializable("cart");
         }
+        handlerGetIdDocumnet(cartDtos, documentIds, categoryIds, userIds);
+        double totalPrice = calculateTotalPrice(cartDtos);
+        discountAdapter.setTotalCartPrice(totalPrice);
+        handlerApplyVoucher();
+        return binding.getRoot();
+    }
+
+    private void initView(){
         discountDtos = new ArrayList<>();
-        handlerGetIdDocumnet(cartDtos);
-         return binding.getRoot();
+        documentIds = new ArrayList<>();
+        userIds = new ArrayList<>();
+        categoryIds = new ArrayList<>();
+        discountAdapter = new DiscountAdapter(discountDtos, this);
+        binding.rcVoucher.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        binding.rcVoucher.setAdapter(discountAdapter);
     }
 
-    private DocumentDto getApiDocumentInfo(Long docId){
-        ApiService.apiService.getDiscountDocument(docId).enqueue(new Callback<ResponseData<DocumentDto>>() {
-            @Override
-            public void onResponse(Call<ResponseData<DocumentDto>> call, Response<ResponseData<DocumentDto>> response) {
-                if(response.isSuccessful() && response.body()!=null){
-                    documentDto = response.body().getData();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ResponseData<DocumentDto>> call, Throwable t) {
-
-            }
-        });
-        return documentDto;
-    }
-
-    public void getApiDiscountByScope(){
+    public void getApiDiscountByScope(List<Long> userIds, List<Long> categoryIds, List<Long> documentIds){
         ApiService.apiService.getDiscountByScope(userIds,categoryIds,documentIds).enqueue(new Callback<ResponseData<List<DiscountDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DiscountDto>>> call, Response<ResponseData<List<DiscountDto>>> response) {
                 if(response.isSuccessful() && response.body()!=null){
-                    discountDtos = response.body().getData();
-                    discountAdapter = new DiscountAdapter(discountDtos);
-                    binding.rvDiscount.setAdapter(discountAdapter);
+                    discountDtos.clear();
+                    discountDtos.addAll(response.body().getData());
+                    discountAdapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseData<List<DiscountDto>>> call, Throwable t) {
-
+                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void handlerGetIdDocumnet(List<CartDto> cartDto){
-        for(CartDto c : cartDto){
-            DocumentDto docDto = getApiDocumentInfo(c.getDocId());
-            documentIds.add(docDto.getDoc_id());
-            categoryIds.add(docDto.getCateId());
-            userIds.add(docDto.getUserId());
+    private void handlerGetIdDocumnet(List<CartDto> cartDto, List<Long> documentIds, List<Long> categoryIds, List<Long> userIds){
+        List<Long> docIds = new ArrayList<>();
+        for (CartDto c : cartDto) {
+            docIds.add(c.getDocId());
         }
+
+        ApiService.apiService.getDiscountDocument(docIds).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
+            @Override
+            public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<DocumentDto> documentList = response.body().getData();
+                    for (DocumentDto doc : documentList) {
+                        documentIds.add(doc.getDoc_id());
+                        categoryIds.add(doc.getCateId());
+                        userIds.add(doc.getUserId());
+                    }
+                    getApiDiscountByScope(userIds, categoryIds, documentIds);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi lấy document", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onVoucherSelected(DiscountDto voucher) {
+        selectedDiscount = voucher;
+    }
+
+    private void handlerApplyVoucher() {
+        binding.btnConfirmDiscount.setOnClickListener(v -> {
+            if (selectedDiscount == null) {
+                Toast.makeText(getContext(), "Vui lòng chọn voucher", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Gửi kết quả về CartFragment
+            Bundle result = new Bundle();
+            result.putSerializable("selectedDiscount", selectedDiscount);
+            getParentFragmentManager().setFragmentResult("voucherResult", result);
+
+            // Quay về CartFragment chỉ với 1 lần pop
+            getParentFragmentManager().popBackStack();
+        });
+    }
+
+    private double calculateTotalPrice(List<CartDto> cartDtos) {
+        double total = 0;
+        for (CartDto c : cartDtos) {
+            total += c.getSellPrice()*c.getQuantity();
+        }
+        return total;
     }
 }

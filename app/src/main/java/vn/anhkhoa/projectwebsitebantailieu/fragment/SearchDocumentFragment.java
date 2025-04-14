@@ -107,8 +107,6 @@ public class SearchDocumentFragment extends Fragment {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
-
             }
 
             @Override
