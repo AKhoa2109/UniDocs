@@ -14,6 +14,7 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.enums.Scope;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
+import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 
 public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.DiscountViewHolder>{
     private List<DiscountDto> discounts;
@@ -73,6 +74,10 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         Integer remainingQuantity = v.getUsageLimit() - v.getUsedCount();
         holder.tvRemainingQuantity.setText("x" +remainingQuantity);
 
+        boolean isExpired = v.getEndAt().isAfter(LocalDateTime.now());
+
+        boolean isReamining = remainingQuantity >= 0;
+
         boolean isValidStatus = v.getStatus() != null &&
                 v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.DISABLED &&
                 v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.EXPIRED;
@@ -80,7 +85,7 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         boolean isWithinPriceRange = (v.getMinPrice() == null || totalCartPrice >= v.getMinPrice()) &&
                 (v.getMaxPrice() == null || totalCartPrice <= v.getMaxPrice());
 
-        boolean isSelectable = isValidStatus && isWithinPriceRange;
+        boolean isSelectable = isValidStatus && isWithinPriceRange && isReamining && isExpired;
 
         holder.rbSelect.setEnabled(isSelectable);
         holder.rbSelect.setChecked(position == selectedPosition);

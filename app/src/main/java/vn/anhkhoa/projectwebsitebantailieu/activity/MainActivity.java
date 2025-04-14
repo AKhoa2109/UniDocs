@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         // Thêm fragment mặc định
-        showFragment(postFragment, "post");
+        showFragment(homeFragment, "home");
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -225,7 +225,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void openCartFragment(){
         CartFragment cartFragment = new CartFragment();
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, cartFragment)
                 .addToBackStack("cart")

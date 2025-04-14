@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentVoucherBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.CartViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,7 +44,7 @@ public class VoucherFragment extends Fragment implements DiscountAdapter.Listene
     private List<Long> categoryIds;
     private List<CartDto> cartDtos;
     private DiscountAdapter discountAdapter;
-
+    private CartViewModel cartViewModel;
     private DiscountDto selectedDiscount;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -65,9 +68,7 @@ public class VoucherFragment extends Fragment implements DiscountAdapter.Listene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
+        cartViewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
     }
 
     @Override
@@ -78,7 +79,7 @@ public class VoucherFragment extends Fragment implements DiscountAdapter.Listene
         initView();
         Bundle bundle = getArguments();
         if (bundle != null) {
-           cartDtos  = (List<CartDto>) bundle.getSerializable("cart");
+            cartDtos  = (List<CartDto>) bundle.getSerializable("cart");
         }
         handlerGetIdDocumnet(cartDtos, documentIds, categoryIds, userIds);
         double totalPrice = calculateTotalPrice(cartDtos);
@@ -128,7 +129,7 @@ public class VoucherFragment extends Fragment implements DiscountAdapter.Listene
                 if (response.isSuccessful() && response.body() != null) {
                     List<DocumentDto> documentList = response.body().getData();
                     for (DocumentDto doc : documentList) {
-                        documentIds.add(doc.getDoc_id());
+                        documentIds.add(doc.getDocId());
                         categoryIds.add(doc.getCateId());
                         userIds.add(doc.getUserId());
                     }
@@ -158,6 +159,7 @@ public class VoucherFragment extends Fragment implements DiscountAdapter.Listene
             // Gửi kết quả về CartFragment
             Bundle result = new Bundle();
             result.putSerializable("selectedDiscount", selectedDiscount);
+            result.putSerializable("selectedCartItems", (Serializable) cartDtos);
             getParentFragmentManager().setFragmentResult("voucherResult", result);
 
             // Quay về CartFragment chỉ với 1 lần pop

@@ -254,7 +254,7 @@ public class DocumentDetailFragment extends Fragment {
         binding.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handlerAnimation(documentDto.getDoc_image_url());
+                handlerAnimation(documentDto.getDocImageUrl());
                 String quantityStr = binding.edtQuantity.getText().toString();
                 int quantity = Integer.parseInt(quantityStr);
                 if (quantity <= 0) {
@@ -264,7 +264,7 @@ public class DocumentDetailFragment extends Fragment {
 
                 boolean isOnline = NetworkUtil.isNetworkAvailable(getContext());
                 Long userId = sessionManager.getUser().getUserId();
-                Long docId = documentDto.getDoc_id();
+                Long docId = documentDto.getDocId();
 
                 Log.d("TEST",""+cartDao.existsInCart(userId,docId));
 
@@ -306,8 +306,8 @@ public class DocumentDetailFragment extends Fragment {
 
                 }
                 else{
-                    CartDto newCart = new CartDto(null,quantity,userId,docId,documentDto.getDoc_name(),documentDto.getSell_price(),
-                            documentDto.getDoc_image_url(),false,"INSERT",0);
+                    CartDto newCart = new CartDto(null,quantity,userId,docId,documentDto.getDocName(),documentDto.getSellPrice(),
+                            documentDto.getDocImageUrl(),false,"INSERT",0);
                     cartDao.addToCart(newCart);
                     handlerCartCount(userId);
                     if (isOnline)
