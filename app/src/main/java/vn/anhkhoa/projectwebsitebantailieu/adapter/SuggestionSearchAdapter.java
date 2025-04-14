@@ -33,7 +33,7 @@ public class SuggestionSearchAdapter extends RecyclerView.Adapter<SuggestionSear
         if (documentDto == null)
             return;
 
-        holder.txtNameDoc.setText(documentDto.getDoc_name());
+        holder.txtNameDoc.setText(documentDto.getDocName());
     }
 
     @Override

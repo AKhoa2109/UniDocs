@@ -13,35 +13,40 @@ public class CategoryDto {
         this.cateIcon = cate_icon;
     }
 
-    public Long getCate_id() {
+    @Override
+    public String toString() {
+        return this.cateName;
+    }
+
+    public Long getCateId() {
         return cateId;
     }
 
-    public void setCate_id(Long cate_id) {
+    public void setCateId(Long cate_id) {
         this.cateId = cate_id;
     }
 
-    public String getCate_name() {
+    public String getCateName() {
         return cateName;
     }
 
-    public void setCate_name(String cate_name) {
+    public void setCateName(String cate_name) {
         this.cateName = cate_name;
     }
 
-    public String getCate_desc() {
+    public String getCateDesc() {
         return cateDesc;
     }
 
-    public void setCate_desc(String cate_desc) {
+    public void setCateDesc(String cate_desc) {
         this.cateDesc = cate_desc;
     }
 
-    public String getCate_icon() {
+    public String getCateIcon() {
         return cateIcon;
     }
 
-    public void setCate_icon(String cate_icon) {
+    public void setCateIcon(String cate_icon) {
         this.cateIcon = cate_icon;
     }
 }

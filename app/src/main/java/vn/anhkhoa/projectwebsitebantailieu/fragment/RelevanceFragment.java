@@ -3,8 +3,6 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.view.LayoutInflater;
@@ -17,7 +15,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
@@ -78,8 +75,8 @@ public class RelevanceFragment extends Fragment {
 
         binding.rvRelevanceDocument.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         binding.rvShopProducts.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        getApiRelevance("cate",documentDto.getCateId(),documentDto.getDoc_id());
-        getApiShopRelevance("user",documentDto.getUserId(),documentDto.getDoc_id());
+        getApiRelevance("cate",documentDto.getCateId(),documentDto.getDocId());
+        getApiShopRelevance("user",documentDto.getUserId(),documentDto.getDocId());
         return binding.getRoot();
     }
 

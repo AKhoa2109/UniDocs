@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -15,12 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import vn.anhkhoa.projectwebsitebantailieu.DiscountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.activity.SignIn;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ConversationAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentAccountBinding;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -87,6 +90,20 @@ public class AccountFragment extends Fragment {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 requireActivity().finish();
+            }
+        });
+
+        //mo fragment discount khi nhan btnDiscount
+        binding.btnDiscount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context ctx = view.getContext();
+                ToastUtils.show(ctx, "btnDiscount");
+                if (ctx instanceof MainActivity) {
+                    MainActivity main = (MainActivity) ctx;
+                    DiscountFragment discountFragment = new DiscountFragment();
+                    main.showFragment(discountFragment, "discountFragment");
+                }
             }
         });
     }

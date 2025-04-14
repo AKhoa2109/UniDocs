@@ -238,7 +238,7 @@ public class SearchFragment extends Fragment {
     public void handlerDisplaySuggestionDocument(){
         ArrayList<DocumentDto> allHistory = historySearchDao.getAllHistory();
         for(DocumentDto doc : allHistory){
-            callApiSuggestionDoc(doc.getDoc_name());
+            callApiSuggestionDoc(doc.getDocName());
         }
     }
 
