@@ -10,9 +10,10 @@ import com.google.gson.GsonBuilder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -33,7 +34,9 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.OtpRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserInfoDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserResponse;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
@@ -42,7 +45,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.131:8080";
+    public static String ipAddress = "192.168.1.16:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -50,6 +53,10 @@ public interface ApiService {
             .create();
     ApiService apiService = new Retrofit.Builder()
             .baseUrl(baseUrl)
+            .client(new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .build())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);
@@ -111,6 +118,15 @@ public interface ApiService {
 
     @GET("user/shop-detail/{id}")
     Call<ResponseData<UserInfoDto>> getShopDetail(@Path("id") Long id);
+
+    @POST("user/register")
+    Call<ResponseData<OtpRequest>> register(@Body UserRegisterRequest registerRequest);
+
+    @GET("user/check-email")
+    Call<ResponseData<Boolean>> checkEmail(@Query("email") String email);
+
+    @POST("user/verify-otp-for-activation")
+    Call<ResponseData<String>> verifyOtpForActivation(@Body OtpRequest otpRequest);
 
     //conversation
     @GET("conversation/{userId}")

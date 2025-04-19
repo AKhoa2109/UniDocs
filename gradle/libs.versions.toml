@@ -22,6 +22,8 @@ flexbox = "3.0.0"
 photoView="2.3.0"
 core = "1.9.0"
 multilibrary = "6.0"
+play-services-auth = "20.4.0"
+pinview = "1.4.4"
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -54,6 +56,10 @@ photoView = {group= "com.github.chrisbanes", name = "PhotoView", version.ref ="p
 core = { group = "androidx.core", name = "core", version.ref = "core" }
 # slider view
 multilibrary = { group = "com.github.ictfoysal", name = "multilibrary", version.ref = "multilibrary" }
+# Google Auth
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
+# PinView
+pinview= { group = "io.github.chaosleung", name = "pinview", version.ref = "pinview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

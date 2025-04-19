@@ -18,6 +18,10 @@
         <item name="android:elevation">0dp</item>
     </style>
 
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="pinViewStyle">@style/PinWidget.PinView</item>
+    </style>
+
     <style name="Theme.ProjectWebsiteBanTaiLieu" parent="Base.Theme.ProjectWebsiteBanTaiLieu" />
 
     <style name="ThemeOverlay.ProjectWebsiteBanTaiLieu.FullscreenContainer" parent="">

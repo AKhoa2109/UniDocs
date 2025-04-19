@@ -38,9 +38,8 @@
                 android:textColor="@color/colorSecondary"
                 android:textSize="30sp"
                 android:textStyle="bold" />
-
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edtEmail"
+                android:id="@+id/tilEmail"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -50,6 +49,7 @@
                 app:startIconDrawable="@drawable/user_icon">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
@@ -58,7 +58,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edtPassword"
+                android:id="@+id/tilPassword"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -69,6 +69,7 @@
                 app:startIconDrawable="@drawable/password_icon">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -78,7 +79,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edtConfirmPassword"
+                android:id="@+id/tilConfirmPassword"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -89,6 +90,7 @@
                 app:startIconDrawable="@drawable/password_icon">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"

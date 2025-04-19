@@ -24,7 +24,7 @@ public class LocalDateTimeAdapter implements JsonSerializer<LocalDateTime>, Json
     private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
             .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
             .optionalStart()
-            .appendFraction(ChronoField.MICRO_OF_SECOND, 1, 6, true)
+            .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
             .optionalEnd()
             .toFormatter();
 

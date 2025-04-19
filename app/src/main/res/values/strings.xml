@@ -13,4 +13,14 @@
     </array>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="error_invalid_email">Email không hợp lệ</string>
+    <string name="error_exist_email">Email đã tồn tại</string>
+    <string name="error_invalid_password">Mật khẩu phải dài hơn 6 ký tự</string>
+    <string name="error_invalid_confirm_password">Mẩu khẩu không khớp</string>
+    <string name="user_not_found">User is not found</string>
+    <string name="no_otp">No OTP generated for this user</string>
+    <string name="otp_expired">OTP expired</string>
+    <string name="otp_invalid">Invalid otp</string>
+    <string name="otp_invalid_lenght">"Vui lòng nhập đủ 6 ký tự"</string>
+    <string name="activate_successfull">User activated successfully!</string>
 </resources>
