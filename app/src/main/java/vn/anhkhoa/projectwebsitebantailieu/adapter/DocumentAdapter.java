@@ -62,6 +62,12 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
             return documents.size();
         return 0;
     }
+    public void updateList(List<DocumentDto> newList) {
+        documents.clear();
+        documents.addAll(newList);
+        notifyDataSetChanged();
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private ImageView imgDocument;

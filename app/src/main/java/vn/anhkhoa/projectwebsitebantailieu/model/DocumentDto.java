@@ -62,6 +62,15 @@ public class DocumentDto implements Serializable {
         this.totalSold = totalSold;
     }
 
+    public DocumentDto(Long docId, String docName, String docImageUrl, Long userId, Long totalSold, Double avgRate) {
+        this.docId = docId;
+        this.docName = docName;
+        this.docImageUrl = docImageUrl;
+        this.userId = userId;
+        this.totalSold = totalSold;
+        this.avgRate = avgRate;
+    }
+
     public DocumentDto(Long doc_id, String doc_name, String doc_image_url, Double sell_price,
                        Double originalPrice, Integer docPage, Integer view, Integer maxQuantity,Integer download,
                        String docDesc, DocumentType type, LocalDateTime createdAt, Long totalSold, Double avgRate, Long userId, Long cateId, Long totalReview) {

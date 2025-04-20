@@ -1,16 +1,26 @@
 package vn.anhkhoa.projectwebsitebantailieu.model;
 
+import java.util.List;
+
 public class CategoryDto {
     private Long cateId;
     private String cateName;
     private String cateDesc;
     private String cateIcon;
+    private List<DocumentDto> docs;
 
-    public CategoryDto(Long cate_id, String cate_name, String cate_desc, String cate_icon) {
-        this.cateId = cate_id;
-        this.cateName = cate_name;
-        this.cateDesc = cate_desc;
-        this.cateIcon = cate_icon;
+    public CategoryDto(Long cateId, String cateName, String cateDesc, String cateIcon) {
+        this.cateId = cateId;
+        this.cateName = cateName;
+        this.cateDesc = cateDesc;
+        this.cateIcon = cateIcon;
+    }
+
+    public CategoryDto(Long cateId, String cateName, String cateIcon, List<DocumentDto> docs){
+        this.cateId = cateId;
+        this.cateName = cateName;
+        this.cateIcon = cateIcon;
+        this.docs = docs;
     }
 
     @Override
@@ -48,5 +58,13 @@ public class CategoryDto {
 
     public void setCateIcon(String cate_icon) {
         this.cateIcon = cate_icon;
+    }
+
+    public List<DocumentDto> getDocs() {
+        return docs;
+    }
+
+    public void setDocs(List<DocumentDto> docs) {
+        this.docs = docs;
     }
 }

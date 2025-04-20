@@ -28,7 +28,7 @@
             android:name=".activity.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.SignIn"
+            android:name=".activity.SignUp"
             android:exported="true" >
 
         </activity>
@@ -42,7 +42,7 @@
             android:name=".activity.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.SignUp"
+            android:name=".activity.SignIn"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

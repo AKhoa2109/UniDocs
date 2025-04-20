@@ -27,6 +27,7 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.VoucherFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
@@ -244,6 +245,15 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openSearchShopFragment(){
+        SearchShopFragment fragment = new SearchShopFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("search_shop")
+                .commit();
     }
 
     // Hủy callback khi Activity bị hủy
