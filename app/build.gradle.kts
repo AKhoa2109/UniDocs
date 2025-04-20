@@ -54,6 +54,8 @@ dependencies {
     implementation(libs.photoView)
     implementation(libs.core)
 	implementation(libs.multilibrary)
+    implementation(libs.play.services.auth)
+    implementation(libs.pinview)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)
