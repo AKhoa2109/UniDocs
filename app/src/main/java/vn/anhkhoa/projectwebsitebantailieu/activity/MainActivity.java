@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.anhkhoa.projectwebsitebantailieu.DiscountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
@@ -204,6 +205,16 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, chatFragment)
                 .addToBackStack("chat")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openDiscountFragment(){
+        DiscountFragment discountFragment = new DiscountFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, discountFragment)
+                .addToBackStack("discountFragment")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

@@ -97,12 +97,16 @@ public class AccountFragment extends Fragment {
         binding.btnDiscount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Context ctx = view.getContext();
-                ToastUtils.show(ctx, "btnDiscount");
-                if (ctx instanceof MainActivity) {
-                    MainActivity main = (MainActivity) ctx;
-                    DiscountFragment discountFragment = new DiscountFragment();
-                    main.showFragment(discountFragment, "discountFragment");
+//                Context ctx = view.getContext();
+//                ToastUtils.show(ctx, "btnDiscount");
+//                if (ctx instanceof MainActivity) {
+//                    MainActivity main = (MainActivity) ctx;
+//                    DiscountFragment discountFragment = new DiscountFragment();
+//                    main.showFragment(discountFragment, "discountFragment");
+//                }
+
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).openDiscountFragment();
                 }
             }
         });
