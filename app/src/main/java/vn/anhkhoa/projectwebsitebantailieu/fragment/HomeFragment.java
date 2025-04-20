@@ -22,10 +22,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.faltenreich.skeletonlayout.SkeletonLayoutUtils;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
-
+import com.faltenreich.skeletonlayout.Skeleton;
+import com.faltenreich.skeletonlayout.SkeletonConfig;
+import com.faltenreich.skeletonlayout.SkeletonLayoutUtils;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +63,8 @@ public class HomeFragment extends Fragment {
     private Runnable sliderRunnable;
     List<DocumentDto> documentDtos = new ArrayList<>();
     List<CategoryDto> categoryDtos = new ArrayList<>();
+    private Skeleton skeleton;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -140,6 +145,7 @@ public class HomeFragment extends Fragment {
         binding.rcvCategory.setLayoutManager(linearLayoutCateManager);
 
         documentDtos = new ArrayList<>();
+        showSkeletonDocument();
         callApiGetListDocument();
         callApiGetListCategory();
         handlderImgCartClick();
@@ -149,6 +155,7 @@ public class HomeFragment extends Fragment {
         ApiService.apiService.getListDocument().enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
+                skeleton.showOriginal();
                 ResponseData<List<DocumentDto>> data = response.body();
 
                 if(data == null)
@@ -164,6 +171,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
+                skeleton.showOriginal();
                 if (isAdded() && getContext() != null) {
                     Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
                 }
@@ -175,6 +183,7 @@ public class HomeFragment extends Fragment {
         ApiService.apiService.getListCategory().enqueue(new Callback<ResponseData<List<CategoryDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<CategoryDto>>> call, Response<ResponseData<List<CategoryDto>>> response) {
+                skeleton.showOriginal();
                 if(response.isSuccessful()){
                     ResponseData<List<CategoryDto>> data = response.body();
                     if(data == null)
@@ -191,6 +200,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<CategoryDto>>> call, Throwable t) {
+                skeleton.showOriginal();
                 if (isAdded() && getContext() != null) {
                     Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
                 }
@@ -259,6 +269,17 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+
+    private void showSkeletonDocument() {
+        // Apply skeleton using item_document layout as mask, showing 6 placeholder items
+        skeleton = SkeletonLayoutUtils.applySkeleton(
+                binding.rcvDocument,
+                R.layout.item_document,
+                6
+        );
+        skeleton.showSkeleton();
     }
 
 }

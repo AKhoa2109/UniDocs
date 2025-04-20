@@ -9,6 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.faltenreich.skeletonlayout.Skeleton;
+import com.faltenreich.skeletonlayout.SkeletonConfig;
+import com.faltenreich.skeletonlayout.SkeletonLayoutUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +40,7 @@ public class ShopDocumentChildFragment extends Fragment {
     private DocumentAdapter documentAdapter;
     private String sortType;
     private SessionManager sessionManager;
+    private Skeleton skeleton;
 
     public ShopDocumentChildFragment() {
         // Required empty public constructor
@@ -64,6 +69,7 @@ public class ShopDocumentChildFragment extends Fragment {
         binding =  FragmentShopDocumentChildBinding.inflate(inflater, container, false);
         sessionManager = SessionManager.getInstance(requireContext());
         bindView();
+        showSkeleton();
         loadData();
         return binding.getRoot();
     }
@@ -75,10 +81,21 @@ public class ShopDocumentChildFragment extends Fragment {
         binding.rvDocumentFilter.setAdapter(documentAdapter);
     }
 
+    private void showSkeleton() {
+        // Apply skeleton using item_document layout as mask, showing 6 placeholder items
+        skeleton = SkeletonLayoutUtils.applySkeleton(
+                binding.rvDocumentFilter,
+                R.layout.item_document,
+                6
+        );
+        skeleton.showSkeleton();
+    }
+
     private void loadData(){
         ApiService.apiService.getAllDocumentByUserIdAndSortType(sortType,sessionManager.getUser().getUserId()).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
+                skeleton.showOriginal();
                 if(response.isSuccessful() && response.body() != null){
                     documentDtos.clear();
                     documentDtos.addAll(response.body().getData());
@@ -91,8 +108,11 @@ public class ShopDocumentChildFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseData<List<DocumentDto>>> call, Throwable t) {
+                skeleton.showOriginal();
                 ToastUtils.show(getContext(), "Lỗi kết nối","#FF0000");
             }
         });
     }
+
+
 }
