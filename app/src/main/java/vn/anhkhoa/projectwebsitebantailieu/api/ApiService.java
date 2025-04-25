@@ -32,6 +32,8 @@ import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
@@ -45,7 +47,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.16:8080";
+    public static String ipAddress = "192.168.1.21:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -170,5 +172,12 @@ public interface ApiService {
     Call<ResponseData<List<DiscountDto>>> getDiscountByScope(@Query("userIds") List<Long> userIds,
                                                              @Query("categoryIds") List<Long> categoryIds,
                                                              @Query("documentIds") List<Long> documentIds);
+    @GET("notifications/grouped")
+    Call<ResponseData<List<NotificationGroup>>> getNotificationsGrouped(@Query("userId") Long userId);
 
+    @POST("notifications/sync")
+    Call<ResponseData<List<NotificationDto>>> syncNotification(@Body List<NotificationDto> notification);
+
+    @POST("notifications/push/local")
+    Call<ResponseData<Void>> pushLocalNotification(@Body NotificationDto notification);
 }

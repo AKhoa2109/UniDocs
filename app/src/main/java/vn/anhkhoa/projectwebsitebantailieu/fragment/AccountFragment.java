@@ -9,18 +9,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import vn.anhkhoa.projectwebsitebantailieu.DiscountFragment;
-import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.activity.SignIn;
-import vn.anhkhoa.projectwebsitebantailieu.adapter.ConversationAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentAccountBinding;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;

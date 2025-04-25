@@ -149,6 +149,7 @@ public class HomeFragment extends Fragment {
         callApiGetListDocument();
         callApiGetListCategory();
         handlderImgCartClick();
+        handlerImgNotificationClick();
     }
 
     private void callApiGetListDocument(){
@@ -266,6 +267,17 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 if(getContext() instanceof MainActivity){
                     ((MainActivity) getContext()).openCartFragment();
+                }
+            }
+        });
+    }
+
+    private void handlerImgNotificationClick(){
+        binding.imgViewNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getContext() instanceof MainActivity){
+                    ((MainActivity) getContext()).openNotificationFragment();
                 }
             }
         });

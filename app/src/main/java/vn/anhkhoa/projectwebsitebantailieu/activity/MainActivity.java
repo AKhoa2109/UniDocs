@@ -20,18 +20,22 @@ import java.util.List;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.NotificationType;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.CartFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ChatFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationChildFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.VoucherFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
 
@@ -176,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
                 // Nếu đang ở ChatFragment, xử lý tùy chỉnh
                 if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment
-                    || currentFragment instanceof CartFragment) {
+                    || currentFragment instanceof CartFragment || currentFragment instanceof NotificationFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
                 } else {
@@ -255,6 +259,31 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack("search_shop")
                 .commit();
     }
+    public void openNotificationChildFragment(List<NotificationDto> notificationDtos, NotificationType type){
+        NotificationChildFragment fragment = NotificationChildFragment.newInstance();
+        Bundle args = new Bundle();
+        args.putSerializable("notifications", new ArrayList<>(notificationDtos));
+        args.putSerializable("type", type);
+        fragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("notification_child")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openNotificationFragment(){
+        NotificationFragment fragment = new NotificationFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("notification")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
 
     // Hủy callback khi Activity bị hủy
     @Override
