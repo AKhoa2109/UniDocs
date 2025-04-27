@@ -1,6 +1,4 @@
 package vn.anhkhoa.projectwebsitebantailieu.activity;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import androidx.activity.EdgeToEdge;
@@ -13,11 +11,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import vn.anhkhoa.projectwebsitebantailieu.DiscountFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.DiscountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
@@ -108,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         // Thêm fragment mặc định
-        showFragment(homeFragment, "home");
+        showFragment(accountFragment, "account");
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
