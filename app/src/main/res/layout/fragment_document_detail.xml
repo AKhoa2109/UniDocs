@@ -197,7 +197,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:textAlignment="center"
-                            android:background="@drawable/edt_background"
+                            android:background="@drawable/edt_quantity_bg"
                             android:textColor="@color/colorSecondary"
                             android:text="1"/>
                         <Button

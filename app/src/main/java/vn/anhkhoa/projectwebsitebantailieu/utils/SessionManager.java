@@ -11,6 +11,7 @@ public class SessionManager {
     private static final String KEY_ID = "user_id";
     private static final String KEY_NAME = "user_name";
     private static final String KEY_EMAIL = "user_email";
+    private static final String KEY_AVATAR = "user_avatar";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
 
     private static SessionManager instance;
@@ -46,7 +47,8 @@ public class SessionManager {
             cachedUserResponse = new UserResponse(
                     sharedPreferences.getLong(KEY_ID, 0),
                     sharedPreferences.getString(KEY_NAME, null),
-                    sharedPreferences.getString(KEY_EMAIL, null)
+                    sharedPreferences.getString(KEY_EMAIL, null),
+                    sharedPreferences.getString(KEY_AVATAR, null)
             );
         }
     }
@@ -61,6 +63,7 @@ public class SessionManager {
         editor.putLong(KEY_ID, userResponse.getUserId());
         editor.putString(KEY_NAME, userResponse.getName());
         editor.putString(KEY_EMAIL, userResponse.getEmail());
+        editor.putString(KEY_AVATAR, userResponse.getAvatar());
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
     }

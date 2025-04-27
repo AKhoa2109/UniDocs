@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/containerShopDetail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:context=".fragment.ShopDetailFragment">
+
+    <TextView
+        android:id="@+id/tvTitleTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TOP 3 SẢN PHẨM BÁN CHẠY"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTopDocument"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvTitleAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TOÀN BỘ SẢN PHẨM"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAllDocument"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="false"
+        android:paddingBottom="1dp"/>
+</LinearLayout>

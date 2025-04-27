@@ -56,6 +56,7 @@ dependencies {
 	implementation(libs.multilibrary)
     implementation(libs.play.services.auth)
     implementation(libs.pinview)
+    implementation(libs.skeletonlayout)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)

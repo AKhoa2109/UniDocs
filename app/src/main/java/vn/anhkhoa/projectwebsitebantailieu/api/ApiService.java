@@ -67,6 +67,9 @@ public interface ApiService {
     @GET("category/{id}")
     Call<ResponseData<CategoryDto>> getDocumentById(@Path("id") Long id);
 
+    @GET("category/by-user/{userId}")
+    Call<ResponseData<List<CategoryDto>>> getCategoryByUserId(@Path("userId") Long userId);
+
     //document
     @GET("document/list")
     Call<ResponseData<List<DocumentDto>>> getListDocument();
@@ -93,6 +96,16 @@ public interface ApiService {
                                                                @Query("docId") Long docId);
     @POST("document/discount-document")
     Call<ResponseData<List<DocumentDto>>> getDiscountDocument(@Body List<Long> docIds);
+
+    @GET("document/top-document/{userId}/{num}")
+    Call<ResponseData<List<DocumentDto>>> getTopDocument(@Path("userId") Long userId,
+                                                         @Path("num") Integer num);
+
+    @GET("document/shop-detail/all-by/{userId}")
+    Call<ResponseData<List<DocumentDto>>> getAllDocumentByUserId(@Path("userId") Long userId);
+
+    @GET("document/filter-shop/{sortType}/{userId}")
+    Call<ResponseData<List<DocumentDto>>> getAllDocumentByUserIdAndSortType(@Path("sortType") String sortType, @Path("userId") Long userId);
     //push document
     @POST("document/push")
     Call<ResponseData<DocumentDto>> pushDocument(@Body DocumentDto documentDto);

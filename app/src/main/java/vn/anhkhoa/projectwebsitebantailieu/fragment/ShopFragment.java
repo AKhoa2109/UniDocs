@@ -8,7 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import vn.anhkhoa.projectwebsitebantailieu.R;
+import com.bumptech.glide.Glide;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopPagerAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
+import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopBinding;
+import vn.anhkhoa.projectwebsitebantailieu.model.response.UserInfoDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +28,11 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
  * create an instance of this fragment.
  */
 public class ShopFragment extends Fragment {
+
+    FragmentShopBinding binding;
+    private ShopPagerAdapter shopPagerAdapter;
+    private SessionManager sessionManager;
+    private UserInfoDto userInfoDto;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,9 +75,61 @@ public class ShopFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_shop, container, false);
+        binding =  FragmentShopBinding.inflate(inflater, container, false);
+        sessionManager = SessionManager.getInstance(requireContext());
+        shopPagerAdapter = new ShopPagerAdapter(requireActivity());
+        binding.viewPager2.setAdapter(shopPagerAdapter);
+        getApiLoadShopInfo(sessionManager.getUser().getUserId());
+        new TabLayoutMediator(binding.tabLayout, binding.viewPager2,
+                (tab, position) -> {
+                    switch (position) {
+                        case 0:
+                            tab.setText("Shop");
+                            break;
+                        case 1:
+                            tab.setText("Sản phẩm");
+                            break;
+                        case 2:
+                            tab.setText("Danh mục");
+                            break;
+                    }
+                }).attach();
+        binding.searchView.setFocusable(false);
+        binding.searchView.setOnClickListener(v -> openSearchShopFragment());
+        return binding.getRoot();
+
+    }
+
+    private void getApiLoadShopInfo(Long userId){
+        ApiService.apiService.getShopDetail(userId).enqueue(new Callback<ResponseData<UserInfoDto>>() {
+            @Override
+            public void onResponse(Call<ResponseData<UserInfoDto>> call, Response<ResponseData<UserInfoDto>> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    userInfoDto = response.body().getData();
+                    bindView(userInfoDto);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<UserInfoDto>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void bindView(UserInfoDto userInfoDto){
+        Glide.with(getContext()).load(userInfoDto.getAvatar()).into(binding.shopAvatar);
+        binding.shopName.setText(userInfoDto.getName());
+        binding.tvTotalProduct.setText(userInfoDto.getTotalProduct()+"");
+        binding.tvTotalSellProduct.setText(userInfoDto.getTotalProductSale()+"");
+        binding.tvReview.setText(userInfoDto.getTotalReview()+"");
+    }
+
+    private void openSearchShopFragment(){
+        if(getContext() instanceof MainActivity){
+            ((MainActivity) getContext()).openSearchShopFragment();
+        }
     }
 }

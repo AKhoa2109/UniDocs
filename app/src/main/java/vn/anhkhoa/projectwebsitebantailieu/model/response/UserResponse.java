@@ -14,6 +14,13 @@ public class UserResponse implements Serializable {
         this.email = email;
     }
 
+    public UserResponse(long userId, String name, String email, String avatar) {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.avatar = avatar;
+    }
+
     public String getAvatar() {
         return avatar;
     }
