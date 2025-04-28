@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/main"
-    android:background="#ecf2f3">
+>
 
     <LinearLayout
         android:layout_marginStart="8dp"
@@ -57,6 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Shop"
+                android:checked="true"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
             <RadioButton
@@ -76,6 +77,22 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </RadioGroup>
 
+        <!-- Spinner cho Category -->
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:visibility="gone"/>
+
+        <!-- Spinner cho Document -->
+        <Spinner
+            android:id="@+id/spinnerDocument"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:visibility="gone"/>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutScopeId"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -89,21 +106,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputLayoutDiscountValue"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Giá trị giảm giá"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextDiscountValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -126,6 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Phần trăm"
+                android:checked="true"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
             <RadioButton
@@ -136,6 +139,23 @@
                 android:text="Số tiền cố định"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutDiscountValue"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Giá trị giảm giá"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextDiscountValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutUsageLimit"
@@ -172,7 +192,7 @@
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Giá trị giảm tối đa (tùy chọn)"
+            android:hint="Giá trị giảm tối đa"
             android:layout_marginBottom="12dp">
 
             <com.google.android.material.textfield.TextInputEditText

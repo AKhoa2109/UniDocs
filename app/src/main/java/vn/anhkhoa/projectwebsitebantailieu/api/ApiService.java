@@ -171,4 +171,6 @@ public interface ApiService {
                                                              @Query("categoryIds") List<Long> categoryIds,
                                                              @Query("documentIds") List<Long> documentIds);
 
+    @POST("discount/{userId}/addDiscount")
+    Call<ResponseData<Long>> addDiscount(@Path("userId") Long userId,@Body DiscountDto discountDto);
 }
