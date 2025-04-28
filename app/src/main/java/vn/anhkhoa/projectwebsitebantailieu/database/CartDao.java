@@ -10,17 +10,17 @@ import java.util.List;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 
 public class CartDao extends BaseDao{
-    private static final String TABLE_NAME = "Cart";
-    private static final String COLUMN_ID = "Id";
-    private static final String COLUMN_QUANTITY = "Quantity";
-    private static final String COLUMN_DOCUMENT_ID = "DocumentId";
-    private static final String COLUMN_DOCUMENT_NAME = "DocumentName";
-    private static final String COLUMN_DOCUMENT_PRICE = "DocumentPrice";
-    private static final String COLUMN_DOCUMENT_IMAGE = "DocumentImage";
-    private static final String COLUMN_USER_ID = "UserId";
-    private static final String COLUMN_IS_SELECTED = "IsSelected";
-    private static final String COLUMN_ACTION = "ActionS";
-    private static final String COLUMN_SYNC_STATUS    = "SyncStatus";
+    public static final String TABLE_NAME = "Cart";
+    public static final String COLUMN_ID = "Id";
+    public static final String COLUMN_QUANTITY = "Quantity";
+    public static final String COLUMN_DOCUMENT_ID = "DocumentId";
+    public static final String COLUMN_DOCUMENT_NAME = "DocumentName";
+    public static final String COLUMN_DOCUMENT_PRICE = "DocumentPrice";
+    public static final String COLUMN_DOCUMENT_IMAGE = "DocumentImage";
+    public static final String COLUMN_USER_ID = "UserId";
+    public static final String COLUMN_IS_SELECTED = "IsSelected";
+    public static final String COLUMN_ACTION = "ActionS";
+    public static final String COLUMN_SYNC_STATUS    = "SyncStatus";
 
     public static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(" +
@@ -219,5 +219,6 @@ public class CartDao extends BaseDao{
         c.close();
         return count;
     }
+
 
 }

@@ -16,6 +16,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import android.widget.Toast;
 import com.faltenreich.skeletonlayout.SkeletonLayoutUtils;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.google.gson.Gson;
 import com.tbuonomo.viewpagerdotsindicator.WormDotsIndicator;
 import com.faltenreich.skeletonlayout.Skeleton;
 import com.faltenreich.skeletonlayout.SkeletonConfig;
@@ -32,9 +34,15 @@ import com.faltenreich.skeletonlayout.SkeletonLayoutUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompClient;
+import ua.naiksoftware.stomp.dto.LifecycleEvent;
+import ua.naiksoftware.stomp.dto.StompMessage;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.activity.SearchActivity;
@@ -44,10 +52,14 @@ import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.database.CartDao;
+import vn.anhkhoa.projectwebsitebantailieu.database.NotificationDao;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentHomeBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.NotificationHelper;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.StompManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,6 +76,10 @@ public class HomeFragment extends Fragment {
     List<DocumentDto> documentDtos = new ArrayList<>();
     List<CategoryDto> categoryDtos = new ArrayList<>();
     private Skeleton skeleton;
+    private StompClient stompClient;
+    private Disposable notifSub;
+    private NotificationDao notificationDao;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -123,6 +139,7 @@ public class HomeFragment extends Fragment {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        sessionManager = SessionManager.getInstance(requireContext());
         binding.edtSearch.setHint("Tìm kiếm tài liệu...");
         binding.edtSearch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,22 +150,23 @@ public class HomeFragment extends Fragment {
             }
         });
         cartDao = new CartDao(getContext());
-        sessionManager = SessionManager.getInstance(requireContext());
+        notificationDao = new NotificationDao(requireContext());
+        connectWebSocket();
+        updateBadgeCount();
         int cartCount = cartDao.getCountCart(sessionManager.getUser().getUserId());
         binding.tvCartBadge.setText(String.valueOf(cartCount));
         initBannerImages();
         setupViewPager();
         GridLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
         binding.rcvDocument.setLayoutManager(linearLayoutManager);
-
         LinearLayoutManager  linearLayoutCateManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL,false);
         binding.rcvCategory.setLayoutManager(linearLayoutCateManager);
-
         documentDtos = new ArrayList<>();
         showSkeletonDocument();
         callApiGetListDocument();
         callApiGetListCategory();
         handlderImgCartClick();
+        handlerImgNotificationClick();
     }
 
     private void callApiGetListDocument(){
@@ -271,6 +289,17 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void handlerImgNotificationClick(){
+        binding.imgViewNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getContext() instanceof MainActivity){
+                    ((MainActivity) getContext()).openNotificationFragment();
+                }
+            }
+        });
+    }
+
 
     private void showSkeletonDocument() {
         // Apply skeleton using item_document layout as mask, showing 6 placeholder items
@@ -281,5 +310,75 @@ public class HomeFragment extends Fragment {
         );
         skeleton.showSkeleton();
     }
+
+    private void connectWebSocket() {
+        String WS_URL = "ws://"+ApiService.ipAddress+"/ws/websocket";
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_URL);
+
+        // Lifecycle – chỉ log để debug
+        Disposable lifecycleDisp = stompClient.lifecycle()
+                .subscribe(evt -> {
+                    if (evt.getType() == LifecycleEvent.Type.OPENED) {
+                        subscribeToNotifications();
+                    } else if (evt.getType() == LifecycleEvent.Type.ERROR) {
+                        Log.e("Stomp", "Connection error", evt.getException());
+                    }
+                });
+        compositeDisposable.add(lifecycleDisp);
+        stompClient.connect();
+    }
+
+    private void subscribeToNotifications() {
+        long userId = SessionManager.getInstance(requireContext()).getUser().getUserId();
+        String topic = "/queue/notifications/" + userId;
+        notifSub = stompClient.topic(topic)
+                .subscribe(this::onNewNotification, throwable ->
+                        Log.e("Stomp", "Subscribe error", throwable)
+                );
+    }
+
+    private void onNewNotification(StompMessage topicMessage) {
+        // 1. Parse payload
+        NotificationDto dto = new Gson().fromJson(topicMessage.getPayload(), NotificationDto.class);
+
+        // 2. Lưu vào SQLite
+        //    - chuyển từ model của WebSocket (nếu cần map lại) sang model NotificationDto của local
+        NotificationDto local = new NotificationDto(null,dto.getUserId(),dto.getTitle(),dto.getContent(),dto.getType(),dto.getCreatedAt(),false);
+        notificationDao.addNotification(local);
+
+        // 3. Cập nhật badge UI
+        updateBadgeCount();
+    }
+
+    private void updateBadgeCount() {
+        // Lấy tổng số chưa đọc
+        int countUnread = notificationDao.getNotifications(sessionManager.getUser().getUserId())
+                .stream()
+                .filter(n -> !n.isRead())
+                .mapToInt(n -> 1)
+                .sum();
+
+        // Cập nhật badge (chạy trên UI thread)
+        requireActivity().runOnUiThread(() -> {
+            if (countUnread > 0) {
+                binding.tvNotificationBadge.setVisibility(View.VISIBLE);
+                binding.tvNotificationBadge.setText(String.valueOf(countUnread));
+            } else {
+                binding.tvNotificationBadge.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (notifSub != null && !notifSub.isDisposed()) {
+            notifSub.dispose();
+        }
+        if (stompClient != null) {
+            stompClient.disconnect();
+        }
+    }
+
 
 }

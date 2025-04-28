@@ -1,4 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.activity;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import androidx.activity.EdgeToEdge;
@@ -11,6 +13,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,18 +22,24 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.DiscountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.NotificationType;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.AccountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.CartFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ChatFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ConversationListFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationChildFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.PreviewFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.VoucherFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
 
@@ -106,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         // Thêm fragment mặc định
-        showFragment(accountFragment, "account");
+        showFragment(homeFragment, "home");
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -263,6 +273,45 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack("search_shop")
                 .commit();
     }
+    public void openNotificationChildFragment(List<NotificationDto> notificationDtos, NotificationType type){
+        NotificationChildFragment fragment = NotificationChildFragment.newInstance();
+        Bundle args = new Bundle();
+        args.putSerializable("notifications", new ArrayList<>(notificationDtos));
+        args.putSerializable("type", type);
+        fragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("notification_child")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openNotificationFragment(){
+        NotificationFragment fragment = new NotificationFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("notification")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openFileDocumentFragment(FileDocument fileDocument, DocumentDto documentDto){
+        PreviewFragment fragment = PreviewFragment.newInstance(fileDocument, documentDto);
+        Bundle args = new Bundle();
+        args.putSerializable("file", fileDocument);
+        args.putSerializable("document", documentDto);
+        fragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("file_document")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
 
     // Hủy callback khi Activity bị hủy
     @Override

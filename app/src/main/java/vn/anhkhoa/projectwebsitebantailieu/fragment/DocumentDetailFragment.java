@@ -30,6 +30,7 @@ import com.google.gson.Gson;
 import com.library.foysaltech.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.library.foysaltech.smarteist.autoimageslider.SliderView;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,13 +43,17 @@ import vn.anhkhoa.projectwebsitebantailieu.adapter.SliderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.database.CartDao;
+import vn.anhkhoa.projectwebsitebantailieu.database.NotificationDao;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentDocumentDetailBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.NotificationType;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.AnimUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NetworkUtil;
+import vn.anhkhoa.projectwebsitebantailieu.utils.NotificationHelper;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NumberFormatter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SyncManager;
@@ -72,6 +77,7 @@ public class DocumentDetailFragment extends Fragment {
     private SliderAdapter sliderAdapter;
     private List<DocumentImageDto> images;
     private SessionManager sessionManager;
+    private NotificationDao notificationDao;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -133,6 +139,9 @@ public class DocumentDetailFragment extends Fragment {
         cartDao = new CartDao(getContext());
         sessionManager = SessionManager.getInstance(requireContext());
         images = new ArrayList<>();
+        notificationDao = new NotificationDao(requireContext());
+        NotificationHelper.init(requireContext());
+
         handlerCartCount(sessionManager.getUser().getUserId());
         getApiImageByDocumentId(documentDto.getDocId());
         getApiDocumentDetail(documentDto.getDocId());
@@ -284,6 +293,7 @@ public class DocumentDetailFragment extends Fragment {
                                             cartDao.updateCartItem(existingCart);
                                             handlerCartCount(userId);
                                             Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                                            notifyCartChange(userId, toSync.getDocName(), toSync.getQuantity());
                                         }
                                     }
 
@@ -302,6 +312,7 @@ public class DocumentDetailFragment extends Fragment {
                         cartDao.updateCartItem(existingCart);
                         handlerCartCount(userId);
                         Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                        notifyCartChange(userId, existingCart.getDocName(), existingCart.getQuantity());
                     }
 
                 }
@@ -313,6 +324,7 @@ public class DocumentDetailFragment extends Fragment {
                     if (isOnline)
                         new SyncManager().syncCarts(getContext());
                     Toast.makeText(getContext(), "Đã thêm vào giỏ", Toast.LENGTH_SHORT).show();
+                    notifyCartChange(userId, newCart.getDocName(), newCart.getQuantity());
                 }
 
             }
@@ -345,5 +357,43 @@ public class DocumentDetailFragment extends Fragment {
         },image);
     }
 
+    private void sendServerNotification(Long userId, String title, String content){
+        NotificationDto dto = new NotificationDto(null, userId, title, content, NotificationType.CART, LocalDateTime.now(), false);
+        ApiService.apiService.pushLocalNotification(dto).enqueue(new Callback<ResponseData<Void>>() {
+            @Override
+            public void onResponse(Call<ResponseData<Void>> call, Response<ResponseData<Void>> response) {
+                ToastUtils.show(getContext(),"Gửi thông báo thành công");
+            }
 
+            @Override
+            public void onFailure(Call<ResponseData<Void>> call, Throwable t) {
+                ToastUtils.show(getContext(),"Lỗi thông báo");
+            }
+        });
+    }
+
+    private void notifyCartChange(Long userId, String docName, int qty) {
+        String title   = (qty > 0 ? "Giỏ hàng đã cập nhật" : "Thêm vào giỏ hàng");
+        String content = docName + " x" + qty;
+
+        NotificationDto localNoti = new NotificationDto(
+                null,
+                userId,
+                title,
+                content,
+                NotificationType.CART,
+                LocalDateTime.now(),
+                false
+        );
+        notificationDao.addNotification(localNoti);
+
+        NotificationHelper.showNotification(
+                requireContext(),
+                NotificationHelper.Channel.CART,
+                title,
+                content
+        );
+
+        sendServerNotification(userId, title, content);
+    }
 }
