@@ -21,6 +21,7 @@ public class NotificationDao extends BaseDao{
     public static final String COLUMN_TYPE = "Type";
     public static final String COLUMN_CREATED_DATE = "CreatedDate";
     public static final String COLUMN_IS_READ = "IsRead";
+    public static final String COLUMN_USER_ID = "UserId";
 
     public static final String CREATE_TABLE =
             "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -29,7 +30,8 @@ public class NotificationDao extends BaseDao{
                     COLUMN_CONTENT + " TEXT NOT NULL, " +
                     COLUMN_TYPE + " TEXT NOT NULL, " +
                     COLUMN_CREATED_DATE + " TEXT NOT NULL, " +
-                    COLUMN_IS_READ + " INTEGER NOT NULL DEFAULT 0" +
+                    COLUMN_IS_READ + " INTEGER NOT NULL DEFAULT 0, " +
+                    COLUMN_USER_ID + " INTEGER NOT NULL" +
                     ");";
 
     private static final DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -44,6 +46,7 @@ public class NotificationDao extends BaseDao{
         values.put(COLUMN_TYPE, notification.getType().toString());
         values.put(COLUMN_CREATED_DATE, LocalDateTime.now().format(fmt));
         values.put(COLUMN_IS_READ, 0);
+        values.put(COLUMN_USER_ID, notification.getUserId());
         return insert(values);
     }
 
@@ -53,12 +56,12 @@ public class NotificationDao extends BaseDao{
         return delete(where, args);
     }
 
-    public List<NotificationDto> getNotifications() {
-        return getNotificationsByTypeInternal(null);
+    public List<NotificationDto> getNotifications(Long userId) {
+        return getNotificationsByTypeInternal(null, userId);
     }
 
-    public List<NotificationDto> getNotificationsByType(NotificationType type) {
-        return getNotificationsByTypeInternal(type);
+    public List<NotificationDto> getNotificationsByType(NotificationType type, Long userId) {
+        return getNotificationsByTypeInternal(type, userId);
     }
 
 
@@ -74,9 +77,9 @@ public class NotificationDao extends BaseDao{
         return count;
     }
 
-    public int getCountByType(NotificationType type) {
-        String selection = COLUMN_TYPE + " = ?";
-        String[] args = new String[]{ type.toString() };
+    public int getCountByTypeAndUserId(NotificationType type,Long userId) {
+        String selection = COLUMN_TYPE + " = ? AND " + COLUMN_USER_ID + " = ? AND " + COLUMN_IS_READ + " = ?";
+        String[] args = new String[]{ type.toString() , userId.toString(), "0"};
         Cursor c = query(
                 new String[]{ COLUMN_ID },
                 selection,
@@ -120,13 +123,13 @@ public class NotificationDao extends BaseDao{
         return update(values, null, null);
     }
 
-    private List<NotificationDto> getNotificationsByTypeInternal(NotificationType type) {
+    private List<NotificationDto> getNotificationsByTypeInternal(NotificationType type, Long userId) {
         List<NotificationDto> list = new ArrayList<>();
         String selection = null;
         String[] args = null;
         if (type != null) {
-            selection = COLUMN_TYPE + " = ?";
-            args = new String[]{ type.toString() };
+            selection = COLUMN_TYPE + " = ? AND " + COLUMN_USER_ID + " = ?";
+            args = new String[]{ type.toString() , userId.toString()};
         }
         String[] columns = new String[]{
                 COLUMN_ID,
@@ -134,7 +137,8 @@ public class NotificationDao extends BaseDao{
                 COLUMN_CONTENT,
                 COLUMN_TYPE,
                 COLUMN_CREATED_DATE,
-                COLUMN_IS_READ
+                COLUMN_IS_READ,
+                COLUMN_USER_ID
         };
         String orderBy = COLUMN_CREATED_DATE + " DESC";
         Cursor c = query(columns, selection, args, orderBy);
@@ -151,6 +155,7 @@ public class NotificationDao extends BaseDao{
                     fmt
             ));
             dto.setRead(c.getInt(c.getColumnIndexOrThrow(COLUMN_IS_READ)) == 1);
+            dto.setServerId(c.getLong(c.getColumnIndexOrThrow(COLUMN_USER_ID)));
             list.add(dto);
         }
         c.close();

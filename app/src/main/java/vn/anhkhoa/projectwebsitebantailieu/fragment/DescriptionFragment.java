@@ -8,12 +8,16 @@ import android.view.ViewGroup;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentDescriptionBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserInfoDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +29,7 @@ public class DescriptionFragment extends Fragment {
     private FragmentDescriptionBinding binding;
 
     private DocumentDto documentDto;
+    private FileDocument fileDocument;
     private UserInfoDto userInfoDto;
 
     private CategoryDto categoryDto;
@@ -64,6 +69,8 @@ public class DescriptionFragment extends Fragment {
         Long userId = documentDto.getUserId();
         getApiLoadShopInfo(userId);
         getApiLoadCategory(documentDto.getCateId());
+        getApiFileDocument(documentDto.getDocId());
+        handlerShowFile();
         return binding.getRoot();
     }
     
@@ -119,6 +126,34 @@ public class DescriptionFragment extends Fragment {
         binding.tvNumView.setText(numView);
         binding.tvNumDownload.setText(numDownload);
         binding.tvDocDesc.setText(docDesc);
+    }
+
+    private void getApiFileDocument(Long docId){
+        ApiService.apiService.getFileDocumentByDocumentId(docId).enqueue(new Callback<ResponseData<FileDocument>>() {
+            @Override
+            public void onResponse(Call<ResponseData<FileDocument>> call, Response<ResponseData<FileDocument>> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    FileDocument file = response.body().getData();
+                    fileDocument = new FileDocument(file.getFileId(), file.getFileUrl(), file.getFileType(), documentDto.getDocName(), documentDto.getDocPage());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<FileDocument>> call, Throwable t) {
+                ToastUtils.show(getContext(), "Lỗi tải file");
+            }
+        });
+    }
+
+    private void handlerShowFile(){
+        binding.btnPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getContext() instanceof MainActivity){
+                    ((MainActivity) getContext()).openFileDocumentFragment(fileDocument, documentDto);
+                }
+            }
+        });
     }
 
 }

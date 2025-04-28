@@ -140,7 +140,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private void loadFromLocal() {
-        List<NotificationDto> localNotis = notificationDao.getNotifications();
+        List<NotificationDto> localNotis = notificationDao.getNotifications(sessionManager.getUser().getUserId());
         notificationGroups.clear();
         for (NotificationDto dto : localNotis) {
             boolean found = false;
@@ -161,7 +161,7 @@ public class NotificationFragment extends Fragment {
     }
 
     private void syncLocalToServer() {
-        List<NotificationDto> localNotis = notificationDao.getNotifications();
+        List<NotificationDto> localNotis = notificationDao.getNotifications(sessionManager.getUser().getUserId());
         if (localNotis.isEmpty()) return;
         getApiSyncNotification(localNotis);
     }

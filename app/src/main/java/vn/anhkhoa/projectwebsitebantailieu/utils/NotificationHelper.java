@@ -24,6 +24,12 @@ public class NotificationHelper {
                 "Order Notifications",
                 "Thông báo về trạng thái đơn hàng",
                 R.drawable.order_notifi
+        ),
+        DOWNLOAD(
+                "download_channel",
+                "Download Notifications",
+                "Thông báo khi tải tài liệu",
+                R.drawable.download_icon
         );
 
         private final String id;

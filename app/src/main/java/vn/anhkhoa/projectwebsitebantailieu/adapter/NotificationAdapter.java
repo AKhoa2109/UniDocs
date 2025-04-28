@@ -20,12 +20,14 @@ import vn.anhkhoa.projectwebsitebantailieu.database.NotificationDao;
 import vn.anhkhoa.projectwebsitebantailieu.enums.NotificationType;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationChildFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder>{
     private Context ctx;
     private List<NotificationGroup> groups;
     private NotificationDao notificationDao;
 
+    private SessionManager sessionManager;
     public NotificationAdapter(Context ctx, List<NotificationGroup> groups) {
         this.ctx    = ctx;
         this.groups = groups;
@@ -37,13 +39,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         View v = LayoutInflater.from(ctx)
                 .inflate(R.layout.item_notification_group, parent, false);
         notificationDao = new NotificationDao(ctx);
+        sessionManager = SessionManager.getInstance(ctx);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
         NotificationGroup g = groups.get(pos);
-        Integer count = notificationDao.getCountByType(g.getType());
+        Integer count = notificationDao.getCountByTypeAndUserId(g.getType(),sessionManager.getUser().getUserId());
         h.tvTitle.setText(g.getType().name());
         h.tvCount.setText(String.valueOf(count));
         h.ivIcon.setImageResource(iconForType(g.getType()));

@@ -207,6 +207,7 @@
                 android:text="Nội dung mô tả chi tiết của sản phẩm..."
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
             <Button
+                android:id="@+id/btnPreview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:backgroundTint="@null"

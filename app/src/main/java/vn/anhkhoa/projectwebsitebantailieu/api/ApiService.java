@@ -32,6 +32,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
@@ -47,7 +48,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.21:8080";
+    public static String ipAddress = "192.168.1.17:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -180,4 +181,12 @@ public interface ApiService {
 
     @POST("notifications/push/local")
     Call<ResponseData<Void>> pushLocalNotification(@Body NotificationDto notification);
+    @POST("notifications/push")
+    Call<ResponseData<Void>> pushWSNotification(@Body NotificationDto notification);
+
+
+
+    //File document
+    @GET("file-document/by-document/{docId}")
+    Call<ResponseData<FileDocument>> getFileDocumentByDocumentId(@Path("docId") Long docId);
 }

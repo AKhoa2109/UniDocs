@@ -25,6 +25,7 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentNotificationChild
 import vn.anhkhoa.projectwebsitebantailieu.enums.NotificationType;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,6 +40,7 @@ public class NotificationChildFragment extends Fragment {
     private List<NotificationDto> notificationsLocal;
     private NotificationType type;
     FragmentNotificationChildBinding binding;
+    private SessionManager sessionManager;
     private  String ARG_TYPE;
 
     public NotificationChildFragment() {
@@ -70,6 +72,7 @@ public class NotificationChildFragment extends Fragment {
             type = (NotificationType) bundle.getSerializable("type");
 
         }
+        sessionManager = SessionManager.getInstance(requireContext());
         notificationsLocal = new ArrayList<>();
         databaseHandler = DatabaseHandler.getInstance(requireContext());
         notificationDao = new NotificationDao(requireContext());
@@ -101,7 +104,7 @@ public class NotificationChildFragment extends Fragment {
         notificationsLocal.clear();
         notifications.clear();
         // Lấy danh sách mới nhất từ DB
-        notificationsLocal = notificationDao.getNotificationsByType(type);
+        notificationsLocal = notificationDao.getNotificationsByType(type,sessionManager.getUser().getUserId());
 
         // Map từ ID -> NotificationDto để dễ so sánh
         Map<Long, NotificationDto> localMap = new HashMap<>();

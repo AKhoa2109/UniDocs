@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.pinview)
     implementation(libs.skeletonlayout)
+    implementation(libs.android.pdf.viewer)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)

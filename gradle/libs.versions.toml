@@ -25,6 +25,8 @@ multilibrary = "6.0"
 play-services-auth = "20.4.0"
 pinview = "1.4.4"
 skeletonlayout = "6.0.0"
+android-pdf-viewer = "3.2.0-beta.3"
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -63,6 +65,8 @@ play-services-auth = { group = "com.google.android.gms", name = "play-services-a
 pinview= { group = "io.github.chaosleung", name = "pinview", version.ref = "pinview" }
 # Shimmer layout
 skeletonlayout = { group = "com.faltenreich", name = "skeletonlayout", version.ref = "skeletonlayout" }
+# PDF
+android-pdf-viewer = { group = "com.github.mhiew", name = "android-pdf-viewer", version.ref = "android-pdf-viewer" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 

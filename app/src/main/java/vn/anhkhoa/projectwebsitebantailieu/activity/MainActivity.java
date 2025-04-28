@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +31,13 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationChildFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.PreviewFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.VoucherFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
                 // Nếu đang ở ChatFragment, xử lý tùy chỉnh
                 if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment
-                    || currentFragment instanceof CartFragment || currentFragment instanceof NotificationFragment) {
+                    || currentFragment instanceof CartFragment || currentFragment instanceof NotificationFragment || currentFragment instanceof  NotificationChildFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
                 } else {
@@ -279,6 +282,20 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, fragment)
                 .addToBackStack("notification")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openFileDocumentFragment(FileDocument fileDocument, DocumentDto documentDto){
+        PreviewFragment fragment = PreviewFragment.newInstance(fileDocument, documentDto);
+        Bundle args = new Bundle();
+        args.putSerializable("file", fileDocument);
+        args.putSerializable("document", documentDto);
+        fragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack("file_document")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

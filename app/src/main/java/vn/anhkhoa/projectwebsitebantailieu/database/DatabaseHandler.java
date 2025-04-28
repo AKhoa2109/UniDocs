@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "databasesqlLite.db";
+    private static final String DATABASE_NAME = "sqllitedatabase.db";
     private static final int DATABASE_VERSION = 3;
     private static DatabaseHandler instance;
 
