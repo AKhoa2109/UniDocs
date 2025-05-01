@@ -345,7 +345,11 @@ public class HomeFragment extends Fragment {
         //    - chuyển từ model của WebSocket (nếu cần map lại) sang model NotificationDto của local
         NotificationDto local = new NotificationDto(null,dto.getUserId(),dto.getTitle(),dto.getContent(),dto.getType(),dto.getCreatedAt(),false);
         notificationDao.addNotification(local);
-
+        NotificationHelper.showNotification(
+                requireContext(),
+                NotificationHelper.Channel.DOWNLOAD,
+                dto.getTitle(),
+                dto.getContent());
         // 3. Cập nhật badge UI
         updateBadgeCount();
     }
