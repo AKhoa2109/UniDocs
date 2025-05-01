@@ -1,6 +1,5 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -18,7 +17,6 @@ import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.activity.SignIn;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentAccountBinding;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
-import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,12 +90,16 @@ public class AccountFragment extends Fragment {
         binding.btnDiscount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Context ctx = view.getContext();
-                ToastUtils.show(ctx, "btnDiscount");
-                if (ctx instanceof MainActivity) {
-                    MainActivity main = (MainActivity) ctx;
-                    DiscountFragment discountFragment = new DiscountFragment();
-                    main.showFragment(discountFragment, "discountFragment");
+//                Context ctx = view.getContext();
+//                ToastUtils.show(ctx, "btnDiscount");
+//                if (ctx instanceof MainActivity) {
+//                    MainActivity main = (MainActivity) ctx;
+//                    DiscountFragment discountFragment = new DiscountFragment();
+//                    main.showFragment(discountFragment, "discountFragment");
+//                }
+
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).openDiscountFragment();
                 }
             }
         });

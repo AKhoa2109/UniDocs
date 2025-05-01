@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="?attr/colorSurface">
+    android:id="@+id/main"
+>
 
     <LinearLayout
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -55,6 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Shop"
+                android:checked="true"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
             <RadioButton
@@ -74,6 +77,22 @@
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </RadioGroup>
 
+        <!-- Spinner cho Category -->
+        <Spinner
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:visibility="gone"/>
+
+        <!-- Spinner cho Document -->
+        <Spinner
+            android:id="@+id/spinnerDocument"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:visibility="gone"/>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutScopeId"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -81,26 +100,12 @@
             android:layout_height="wrap_content"
             android:hint="ID Phạm vi (Category/Document ID)"
             android:layout_marginBottom="12dp"
-            android:visibility="gone"> <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextScopeId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputLayoutDiscountValue"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Giá trị giảm giá"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextDiscountValue"
+            android:visibility="gone">
+                <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextScopeId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
+                android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -123,6 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Phần trăm"
+                android:checked="true"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
 
             <RadioButton
@@ -133,6 +139,23 @@
                 android:text="Số tiền cố định"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
         </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayoutDiscountValue"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Giá trị giảm giá"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextDiscountValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutUsageLimit"
@@ -169,7 +192,7 @@
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Giá trị giảm tối đa (tùy chọn)"
+            android:hint="Giá trị giảm tối đa"
             android:layout_marginBottom="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -182,33 +205,42 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngày bắt đầu"
+            android:text="Thời gian"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
             android:layout_marginBottom="8dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonStartDate"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Chọn ngày bắt đầu"
+            android:orientation="horizontal"
+            android:baselineAligned="true"
+            android:layout_marginBottom="12dp">
 
-            android:layout_marginBottom="12dp" />
+            <!-- Nút chọn ngày -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonStartDate"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn ngày bắt đầu" />
 
-        <TextView
-            android:id="@+id/textViewStartDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:layout_marginBottom="16dp"
-            tools:text="Ngày bắt đầu: 2023-10-27" />
+            <!-- TextView hiển thị kết quả, canh giữa theo chiều dọc -->
+            <TextView
+                android:id="@+id/textViewStartDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                tools:text="2023-10-27" />
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ngày kết thúc"
-            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
-            android:layout_marginBottom="8dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="true"
+        android:layout_marginBottom="12dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonEndDate"
@@ -223,9 +255,11 @@
             android:id="@+id/textViewEndDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
             android:layout_marginBottom="24dp"
-            tools:text="Ngày kết thúc: 2023-11-30" />
+            tools:text="2023-10-27" />
+    </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonCreateDiscount"

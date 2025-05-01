@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.anhkhoa.projectwebsitebantailieu.fragment.DiscountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityMainBinding;
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
                 // Nếu đang ở ChatFragment, xử lý tùy chỉnh
                 if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment
-                    || currentFragment instanceof CartFragment || currentFragment instanceof NotificationFragment || currentFragment instanceof  NotificationChildFragment) {
+                    || currentFragment instanceof CartFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
                     getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
                 } else {
@@ -212,6 +213,16 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, chatFragment)
                 .addToBackStack("chat")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openDiscountFragment(){
+        DiscountFragment discountFragment = new DiscountFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, discountFragment)
+                .addToBackStack("discountFragment")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

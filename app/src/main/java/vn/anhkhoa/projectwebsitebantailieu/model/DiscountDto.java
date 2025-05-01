@@ -22,6 +22,10 @@ public class DiscountDto implements Serializable {
     private LocalDateTime endAt;
     private Long scopeId;
 
+    public DiscountDto(){
+
+    }
+
     public DiscountDto(Long discountId, String discountName, DiscountType discountType, DiscountStatus status, Scope scope, Integer usageLimit, Integer usedCount, Double discountValue, LocalDateTime startDate, Double maxPrice, Double minPrice, LocalDateTime endAt, Long scopeId) {
         this.discountId = discountId;
         this.discountName = discountName;
