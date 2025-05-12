@@ -33,10 +33,12 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
+import vn.anhkhoa.projectwebsitebantailieu.model.MonthlyStatisticsDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.PasswordResetRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OtpRequest;
@@ -48,7 +50,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.16:8080";
+    public static String ipAddress = "192.168.1.35:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -144,6 +146,15 @@ public interface ApiService {
     @POST("user/verify-otp-for-activation")
     Call<ResponseData<String>> verifyOtpForActivation(@Body OtpRequest otpRequest);
 
+    @POST("user/forgot-password")
+    Call<ResponseData<OtpRequest>> forgotPassword(@Query("email") String email, @Query("phoneNumber") String phoneNumber);
+
+    @POST("user/check-otp")
+    Call<ResponseData<String>> checkOtp(@Body OtpRequest otpRequest);
+
+    @POST("user/verify-otp-for-password-reset")
+    Call<ResponseData<String>> verifyOtpForResetPass(@Body PasswordResetRequest request);
+
     //conversation
     @GET("conversation/{userId}")
     Call<ResponseData<List<ConversationOverviewDto>>> findConversationsOverview(@Path("userId") Long userId);
@@ -191,4 +202,8 @@ public interface ApiService {
     //File document
     @GET("file-document/by-document/{docId}")
     Call<ResponseData<FileDocument>> getFileDocumentByDocumentId(@Path("docId") Long docId);
+
+    //Dashboard
+    @GET("statistics/monthly/{userId}")
+    Call<ResponseData<List<MonthlyStatisticsDto>>> getMonthlyStats(@Path("userId") Long userId);
 }

@@ -22,5 +22,6 @@
     <string name="otp_expired">OTP expired</string>
     <string name="otp_invalid">Invalid otp</string>
     <string name="otp_invalid_lenght">"Vui lòng nhập đủ 6 ký tự"</string>
-    <string name="activate_successfull">User activated successfully!</string>
+    <string name="successfull">Successfully</string>
+    <string name="default_web_client_id">745390439189-gcabpei63r91m0aaej80bkbhgqk71t5r.apps.googleusercontent.com</string>
 </resources>

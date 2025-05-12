@@ -20,6 +20,7 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivitySignUpBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.AccountType;
 import vn.anhkhoa.projectwebsitebantailieu.enums.Role;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OtpRequest;
@@ -64,7 +65,7 @@ public class SignUp extends AppCompatActivity {
                     } else {
                         boolean isValid = validateInput(email,password,confirmPassword);
                         if (isValid) {
-                            request = new UserRegisterRequest("Khoa",email,password,"khoa.png", Role.USER,false);
+                            request = new UserRegisterRequest("Khoa",email,password,"khoa.png", Role.USER,false,"", AccountType.NORMAL);
                             getApiRegister(request);
                         }
                         else{
@@ -111,6 +112,7 @@ public class SignUp extends AppCompatActivity {
                     OtpRequest otpRequest = response.body().getData();
                     Intent intent = new Intent(SignUp.this, VerificationOTP.class);
                     intent.putExtra("otp_response", otpRequest);
+                    intent.putExtra("fp", "signup");
                     startActivity(intent);
                 }
                 else {
