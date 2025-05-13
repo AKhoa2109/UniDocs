@@ -9,14 +9,24 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.activity.SignIn;
+import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
+import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentAccountBinding;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +36,8 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
     SessionManager session;
+
+    private UserRegisterRequest user;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -58,6 +70,7 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
+
         return binding.getRoot();
 
     }
@@ -70,7 +83,8 @@ public class AccountFragment extends Fragment {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        session = SessionManager.getInstance(requireActivity());
+        session = SessionManager.getInstance(requireContext());
+        getApiUserInfo(session.getUser().getUserId());
 
         binding.btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +101,7 @@ public class AccountFragment extends Fragment {
         });
 
         //mo fragment discount khi nhan btnDiscount
-        binding.btnDiscount.setOnClickListener(new View.OnClickListener() {
+        binding.ivPromotionNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                Context ctx = view.getContext();
@@ -103,5 +117,42 @@ public class AccountFragment extends Fragment {
                 }
             }
         });
+
+        binding.ivAccountDetailNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).openUserDetailFragment(user);
+                }
+            }
+        });
+    }
+
+    private void getApiUserInfo(Long userId){
+        ApiService.apiService.getUser(userId).enqueue(new Callback<ResponseData<UserRegisterRequest>>() {
+            @Override
+            public void onResponse(Call<ResponseData<UserRegisterRequest>> call, Response<ResponseData<UserRegisterRequest>> response) {
+                if (response.isSuccessful() && response.body().getData() != null){
+                    user = response.body().getData();
+                    bindView(user);
+                }
+                else {
+                    Log.e("AccountFragment", "Error Response: " + response.errorBody());
+                    ToastUtils.show(getContext(), "Lỗi phản hồi: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<UserRegisterRequest>> call, Throwable t) {
+                Log.e("AccountFragment", "API Error: " + t.getMessage());
+                ToastUtils.show(getContext(), "Lỗi");
+            }
+        });
+    }
+
+    private void bindView(UserRegisterRequest user){
+        Glide.with(getContext()).load(user.getAvatar()).into(binding.civAvatar);
+        binding.tvName.setText(user.getName());
+        binding.tvEmail.setText(user.getEmail());
     }
 }

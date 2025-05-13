@@ -129,13 +129,15 @@ public class ShopDetailFragment extends Fragment {
         ApiService.apiService.getAllDocumentByUserId(sessionManager.getUser().getUserId()).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
-                if(response.isSuccessful()){
+                if(response.isSuccessful() && response.body().getData()!=null){
                     documents.clear();
                     documents.addAll(response.body().getData());
                     documentAdapter.notifyDataSetChanged();
                 }
                 else{
-                    ToastUtils.show(getContext(), "Lỗi lấy dữ liệu","#FF0000");
+                    documents.clear();
+                    documentAdapter.notifyDataSetChanged();
+                    ToastUtils.show(getContext(), "Không có dữ liệu","#FF0000");
                 }
             }
 

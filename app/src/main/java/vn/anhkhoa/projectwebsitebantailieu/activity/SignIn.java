@@ -22,6 +22,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.tasks.Task;
@@ -40,6 +41,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.request.OtpRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserResponse;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 public class SignIn extends AppCompatActivity {
     private static final String TAG = "GoogleSignIn";
@@ -48,6 +50,8 @@ public class SignIn extends AppCompatActivity {
     EditText etPass, etEmail;
     ActivitySignInBinding binding;
     SessionManager session;
+
+    private UserResponse userResponse;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -260,18 +264,32 @@ public class SignIn extends AppCompatActivity {
     }
 
     private void proceedWithGoogleLogin(GoogleSignInAccount account) {
-        UserResponse user = new UserResponse(
-                0,
-                account.getEmail(),
-                account.getDisplayName(),
-                account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : ""
-        );
+        ApiService.apiService.getUserByEmail(account.getEmail()).enqueue(new Callback<ResponseData<UserResponse>>() {
+            @Override
+            public void onResponse(Call<ResponseData<UserResponse>> call, Response<ResponseData<UserResponse>> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    userResponse = response.body().getData();
+                    UserResponse user = new UserResponse(
+                            userResponse.getUserId(),
+                            account.getEmail(),
+                            account.getDisplayName(),
+                            account.getPhotoUrl() != null ? account.getPhotoUrl().toString() : ""
+                    );
 
-        session.saveUser(user);
+                    session.saveUser(user);
 
-        navigateToMainActivity();
-        showSuccess("Đăng nhập thành công với Google!");
+                    navigateToMainActivity();
+                    showSuccess("Đăng nhập thành công với Google!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<UserResponse>> call, Throwable t) {
+                ToastUtils.show(SignIn.this,"Lỗi");
+            }
+        });
     }
+
 
     private void registerWithGoogle(String email, String name, String avatar, GoogleSignInAccount account) {
         UserRegisterRequest userDto = new UserRegisterRequest();
