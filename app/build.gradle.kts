@@ -63,4 +63,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     annotationProcessor(libs.glideCompiler)
+
+    implementation(libs.browser)
 }
