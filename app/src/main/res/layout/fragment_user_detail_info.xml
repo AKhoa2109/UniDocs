@@ -29,7 +29,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/civAvatar"
             android:layout_width="100dp"
-            android:layout_height="140dp"
+            android:layout_height="135dp"
             android:layout_gravity="center"
             android:paddingTop="45dp"
             android:src="@drawable/ic_launcher_background"
@@ -50,7 +50,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilName"
@@ -95,7 +95,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:hint="Sớ điện thoại"
+            android:hint="Số điện thoại"
             app:endIconMode="clear_text"
             app:hintTextColor="@color/black"
             app:startIconDrawable="@drawable/phone_call_ic">

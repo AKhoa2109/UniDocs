@@ -327,6 +327,10 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setVisibility(View.GONE);
     }
 
+    public void showBottomNavigation(){
+        binding.bottomNavigationView.setVisibility(View.VISIBLE);
+    }
+
 
     // Hủy callback khi Activity bị hủy
     @Override
