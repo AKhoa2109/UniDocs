@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +34,18 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentImageDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
+import vn.anhkhoa.projectwebsitebantailieu.model.MonthlyStatisticsDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.PasswordResetRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OtpRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserInfoDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.UserResponse;
+import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
@@ -53,6 +57,7 @@ public interface ApiService {
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
             .create();
     ApiService apiService = new Retrofit.Builder()
             .baseUrl(baseUrl)
@@ -144,6 +149,28 @@ public interface ApiService {
     @POST("user/verify-otp-for-activation")
     Call<ResponseData<String>> verifyOtpForActivation(@Body OtpRequest otpRequest);
 
+    @POST("user/forgot-password")
+    Call<ResponseData<OtpRequest>> forgotPassword(@Query("email") String email, @Query("phoneNumber") String phoneNumber);
+
+    @POST("user/check-otp")
+    Call<ResponseData<String>> checkOtp(@Body OtpRequest otpRequest);
+
+    @POST("user/verify-otp-for-password-reset")
+    Call<ResponseData<String>> verifyOtpForResetPass(@Body PasswordResetRequest request);
+
+    @GET("user/get-by-id/{userId}")
+    Call<ResponseData<UserRegisterRequest>> getUser(@Path("userId") Long userId);
+
+    @GET("user/get-by-email/{email}")
+    Call<ResponseData<UserResponse>> getUserByEmail(@Path("email") String email);
+
+    @POST("user/update-user")
+    Call<ResponseData<UserRegisterRequest>> updateUser(@Body UserRegisterRequest userRegisterRequest);
+
+    @Multipart
+    @POST("user/upload-avatar")
+    Call<ResponseData<String>> uploadAvatar(@Part MultipartBody.Part file);
+
     //conversation
     @GET("conversation/{userId}")
     Call<ResponseData<List<ConversationOverviewDto>>> findConversationsOverview(@Path("userId") Long userId);
@@ -199,4 +226,8 @@ public interface ApiService {
             @Query("amount") double amount,
             @Query("info") String info
     );
+
+    //Dashboard
+    @GET("statistics/monthly/{userId}")
+    Call<ResponseData<List<MonthlyStatisticsDto>>> getMonthlyStats(@Path("userId") Long userId);
 }

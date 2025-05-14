@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopCategoryFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopDashboardFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopDocumentFragment;
 
@@ -24,6 +25,8 @@ public class ShopPagerAdapter extends FragmentStateAdapter {
                 return new ShopDocumentFragment();
             case 2:
                 return new ShopCategoryFragment();
+            case 3:
+                return new ShopDashboardFragment();
             default:
                 return new ShopDetailFragment();
         }
@@ -31,6 +34,6 @@ public class ShopPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 3;
+        return 4;
     }
 }

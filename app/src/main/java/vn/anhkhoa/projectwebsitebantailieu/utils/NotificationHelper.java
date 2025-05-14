@@ -57,10 +57,13 @@ public class NotificationHelper {
             if (manager == null) return;
 
             for (Channel channel : Channel.values()) {
+                int importance = (channel == Channel.DOWNLOAD)
+                        ? NotificationManager.IMPORTANCE_HIGH
+                        : NotificationManager.IMPORTANCE_DEFAULT;
                 NotificationChannel nc = new NotificationChannel(
                         channel.getId(),
                         channel.getName(),
-                        NotificationManager.IMPORTANCE_DEFAULT
+                        importance
                 );
                 nc.setDescription(channel.getDescription());
                 manager.createNotificationChannel(nc);

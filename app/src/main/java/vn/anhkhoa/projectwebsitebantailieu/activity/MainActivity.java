@@ -35,11 +35,13 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PreviewFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchShopFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.UserDetailInfoFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.VoucherFragment;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
 
@@ -223,6 +225,19 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, discountFragment)
                 .addToBackStack("discountFragment")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openUserDetailFragment(UserRegisterRequest user){
+        UserDetailInfoFragment userDetailInfoFragment = new UserDetailInfoFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("user", user);
+        userDetailInfoFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, userDetailInfoFragment)
+                .addToBackStack("userDetailFragment")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

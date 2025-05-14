@@ -23,6 +23,7 @@ import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ActivityVerificationOtpBinding;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OtpRequest;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.PasswordResetRequest;
 
 public class VerificationOTP extends AppCompatActivity {
     ActivityVerificationOtpBinding binding;
@@ -30,6 +31,7 @@ public class VerificationOTP extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private static final long TOTAL_TIME = 5 * 60 * 1000;
     private boolean isExpired = false;
+    private String functional;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +44,7 @@ public class VerificationOTP extends AppCompatActivity {
             return insets;
         });
         otpRequest = (OtpRequest) getIntent().getSerializableExtra("otp_response");
+        functional = (String) getIntent().getStringExtra("fp");
         if (otpRequest != null) {
             Log.d("OTP", "Email: " + otpRequest.getEmail());
             Log.d("OTP", "OTP: " + otpRequest.getOtp());
@@ -58,7 +61,12 @@ public class VerificationOTP extends AppCompatActivity {
         binding.btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                handlerConfirmClick();
+                if(functional.equals("signup")){
+                    handlerConfirmSUClick();
+                }
+                else{
+                    handlerConfirmFPClick();
+                }
             }
         });
     }
@@ -86,7 +94,7 @@ public class VerificationOTP extends AppCompatActivity {
         binding.btnConfirm.setEnabled(true);
     }
 
-    private void handlerConfirmClick(){
+    private void handlerConfirmSUClick(){
         if (isExpired) {
             Toast.makeText(this, "Không thể xác nhận: OTP đã hết hạn. Vui lòng gửi lại mã mới.", Toast.LENGTH_SHORT).show();
             return;
@@ -101,6 +109,21 @@ public class VerificationOTP extends AppCompatActivity {
         }
     }
 
+    private void handlerConfirmFPClick(){
+        if (isExpired) {
+            Toast.makeText(this, "Không thể xác nhận: OTP đã hết hạn. Vui lòng gửi lại mã mới.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String otp = binding.pinView.getText().toString();
+        if(otp.length()<6){
+            Toast.makeText(this, getString(R.string.otp_invalid_lenght), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else{
+            getAPICheckOtp(otpRequest);
+        }
+    }
+
     private void getAPIVerifyOTP(OtpRequest otpRequest){
         ApiService.apiService.verifyOtpForActivation(otpRequest).enqueue(new Callback<ResponseData<String>>() {
             @Override
@@ -108,7 +131,7 @@ public class VerificationOTP extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     handleServerMessage(response.body().getData());
                 } else {
-                    Toast.makeText(VerificationOTP.this, getString(R.string.activate_successfull), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VerificationOTP.this, getString(R.string.successfull), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -118,6 +141,26 @@ public class VerificationOTP extends AppCompatActivity {
             }
         });
     }
+
+    private void getAPICheckOtp(OtpRequest otpRequest){
+        ApiService.apiService.checkOtp(otpRequest).enqueue(new Callback<ResponseData<String>>() {
+            @Override
+            public void onResponse(Call<ResponseData<String>> call, Response<ResponseData<String>> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    handleServerMessage(response.body().getData());
+                }
+                else{
+                    Toast.makeText(VerificationOTP.this, getString(R.string.successfull), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<String>> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     private void handleServerMessage(String msg) {
         if (msg.equals(getString(R.string.user_not_found))) {
@@ -132,9 +175,15 @@ public class VerificationOTP extends AppCompatActivity {
         else if (msg.equals(getString(R.string.otp_invalid))) {
             setErrorPinView(getString(R.string.otp_invalid));
         }
-        else if (msg.equals(getString(R.string.activate_successfull))) {
-            Toast.makeText(this, R.string.activate_successfull, Toast.LENGTH_LONG).show();
+        else if (msg.equals(getString(R.string.successfull)) && functional.equals("signup")) {
+            Toast.makeText(this, R.string.successfull, Toast.LENGTH_LONG).show();
             Intent intent = new Intent(VerificationOTP.this, SignIn.class);
+            startActivity(intent);
+        }
+        else if (msg.equals(getString(R.string.successfull)) && functional.equals("forgetPassword")) {
+            Toast.makeText(this, R.string.successfull, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(VerificationOTP.this, ResetPasswordActivity.class);
+            intent.putExtra("otp", otpRequest);
             startActivity(intent);
         }
         else {

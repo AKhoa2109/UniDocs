@@ -106,7 +106,7 @@ public class SearchShopFragment extends Fragment {
         ApiService.apiService.getAllDocumentByUserId(userId).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
-                if(response.isSuccessful() && response.body() != null){
+                if(response.isSuccessful() && response.body().getData() != null){
                     originalList.clear();
                     originalList.addAll(response.body().getData());
                     documentDtos.clear();
@@ -114,6 +114,9 @@ public class SearchShopFragment extends Fragment {
                     documentAdapter.updateList(originalList);
                 }
                 else{
+                    originalList.clear();
+                    documentDtos.clear();
+                    documentAdapter.updateList(originalList);
                     ToastUtils.show(getContext(), "Lỗi lấy dữ liệu","#FF0000");
                 }
             }

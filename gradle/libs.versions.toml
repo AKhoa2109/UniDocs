@@ -27,6 +27,7 @@ play-services-auth = "20.4.0"
 pinview = "1.4.4"
 skeletonlayout = "6.0.0"
 android-pdf-viewer = "3.2.0-beta.3"
+mpandroidchart = "3.1.0"
 
 [libraries]
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -69,6 +70,8 @@ pinview= { group = "io.github.chaosleung", name = "pinview", version.ref = "pinv
 skeletonlayout = { group = "com.faltenreich", name = "skeletonlayout", version.ref = "skeletonlayout" }
 # PDF
 android-pdf-viewer = { group = "com.github.mhiew", name = "android-pdf-viewer", version.ref = "android-pdf-viewer" }
+# Chart
+mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 

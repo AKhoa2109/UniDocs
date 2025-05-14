@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.pinview)
     implementation(libs.skeletonlayout)
     implementation(libs.android.pdf.viewer)
+    implementation(libs.mpandroidchart)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.ext.junit)
