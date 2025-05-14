@@ -67,7 +67,7 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         }
 
         holder.tvConditions.setText(conditionText.toString());
-        holder.tvExpiry.setText("Hạn dùng: " + v.getEndAt().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        holder.tvExpiry.setText("Hạn dùng: " + v.getEndAt().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")));
         Integer remainingQuantity = v.getUsageLimit() - v.getUsedCount();
         holder.tvRemainingQuantity.setText("x" +remainingQuantity);
 
