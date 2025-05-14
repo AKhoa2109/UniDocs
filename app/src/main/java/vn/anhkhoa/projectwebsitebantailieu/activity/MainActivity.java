@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.DiscountFragment;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.database.DatabaseHandler;
@@ -31,6 +32,8 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.DocumentDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.HomeFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationChildFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.NotificationFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.OrderDetailFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.OrderStatusFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PostFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.PreviewFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.SearchShopFragment;
@@ -41,6 +44,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
@@ -322,6 +326,31 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, fragment)
                 .addToBackStack("file_document")
+                .commit();
+
+        binding.bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    public void openOrderStatusFragment(OrderStatus orderStatus){
+        OrderStatusFragment orderStatusFragment = new OrderStatusFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("status", orderStatus);
+        orderStatusFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, orderStatusFragment)
+                .addToBackStack("orderStatusFragment")
+                .commit();
+
+    }
+
+    public void openOrderDetailFragment(OrderDtoRequest orderDtoRequest){
+        OrderDetailFragment orderDetailFragment = new OrderDetailFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("order", orderDtoRequest);
+        orderDetailFragment.setArguments(args);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_layout, orderDetailFragment)
+                .addToBackStack("orderDetailFragment")
                 .commit();
 
         binding.bottomNavigationView.setVisibility(View.GONE);

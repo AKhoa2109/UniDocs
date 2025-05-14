@@ -21,4 +21,5 @@
     <color name="black_overlay">#66000000</color>
     <color name="unreadBackground">#FFEBEE</color>
     <color name="readBackground">#F5F5F5</color>
+    <color name="redBtn">#FF6A00</color>
 </resources>

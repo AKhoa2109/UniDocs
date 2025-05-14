@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,6 +25,7 @@ import vn.anhkhoa.projectwebsitebantailieu.activity.SignIn;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentAccountBinding;
+import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
@@ -76,8 +78,9 @@ public class AccountFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState){
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        
         ViewCompat.setOnApplyWindowInsetsListener(binding.fragmentAccountLayout, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -124,6 +127,38 @@ public class AccountFragment extends Fragment {
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).openUserDetailFragment(user);
                 }
+            }
+        });
+
+        // Xử lý click vào nút xem tất cả đơn hàng
+        binding.ivOrderNext.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openOrderStatusFragment(OrderStatus.PENDING);
+            }
+        });
+
+        // Xử lý click vào các icon trạng thái đơn hàng
+        binding.ivOrderInconfim.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openOrderStatusFragment(OrderStatus.PENDING);
+            }
+        });
+
+        binding.ivOrderDelivered.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openOrderStatusFragment(OrderStatus.DELIVERED);
+            }
+        });
+
+        binding.ivOrderConfirmed.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openOrderStatusFragment(OrderStatus.CONFIRMED);
+            }
+        });
+
+        binding.ivOrderCancel.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openOrderStatusFragment(OrderStatus.CANCELED);
             }
         });
     }

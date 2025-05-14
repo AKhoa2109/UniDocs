@@ -221,13 +221,12 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
             }
         });
 
-        binding.ivBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(getActivity() instanceof MainActivity){
-                    ((MainActivity) getActivity()).showBottomNavigation();
-                }
-                requireActivity().getOnBackPressedDispatcher().onBackPressed();
+        binding.ivBack.setOnClickListener(v -> {
+            // Sử dụng OnBackPressedDispatcher để xử lý back stack đúng cách
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
+
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).showBottomNavigation();
             }
         });
 

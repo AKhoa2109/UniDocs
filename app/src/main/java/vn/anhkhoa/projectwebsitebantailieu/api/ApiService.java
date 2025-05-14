@@ -27,6 +27,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
@@ -37,8 +38,10 @@ import vn.anhkhoa.projectwebsitebantailieu.model.FileDocument;
 import vn.anhkhoa.projectwebsitebantailieu.model.MonthlyStatisticsDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
+import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.OrderDetailDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.PasswordResetRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
@@ -222,4 +225,15 @@ public interface ApiService {
     //Dashboard
     @GET("statistics/monthly/{userId}")
     Call<ResponseData<List<MonthlyStatisticsDto>>> getMonthlyStats(@Path("userId") Long userId);
+
+    @GET("order/status")
+    Call<ResponseData<List<OrderDtoRequest>>> getOrdersByStatus(
+            @Query("userId") Long userId,
+            @Query("status") OrderStatus status
+    );
+
+    @GET("order/order-detail/{orderId}/{docId}/{userId}")
+    Call<ResponseData<OrderDetailDtoRequest>> getOrderDetail(@Path("orderId") Long orderId,
+                                                             @Path("docId") Long docId,
+                                                             @Path("userId") Long userId);
 }
