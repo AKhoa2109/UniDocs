@@ -96,6 +96,8 @@ public class ShopFragment extends Fragment {
                             break;
                         case 3:
                             tab.setText("Thống kê");
+                        case 4:
+                            tab.setText("Quản lý đơn hàng");
                             break;
                     }
                 }).attach();

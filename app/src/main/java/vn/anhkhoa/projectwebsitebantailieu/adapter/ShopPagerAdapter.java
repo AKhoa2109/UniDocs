@@ -9,6 +9,7 @@ import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopCategoryFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopDashboardFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopDetailFragment;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopDocumentFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopOrderFragment;
 
 public class ShopPagerAdapter extends FragmentStateAdapter {
     public ShopPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
@@ -27,6 +28,8 @@ public class ShopPagerAdapter extends FragmentStateAdapter {
                 return new ShopCategoryFragment();
             case 3:
                 return new ShopDashboardFragment();
+            case 4:
+                return new ShopOrderFragment();
             default:
                 return new ShopDetailFragment();
         }
@@ -34,6 +37,6 @@ public class ShopPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 5;
     }
 }

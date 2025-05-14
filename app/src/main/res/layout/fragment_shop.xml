@@ -199,11 +199,16 @@
             </LinearLayout>
 
             <!-- Main Tabs -->
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
+            <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabMode="fixed"/>
+                android:layout_height="wrap_content">
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:tabMode="fixed"/>
+            </HorizontalScrollView>
+
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPager2"
