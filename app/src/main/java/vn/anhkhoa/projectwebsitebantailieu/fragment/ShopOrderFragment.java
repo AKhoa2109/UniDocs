@@ -13,6 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentPagerAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopOrderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopOrderBinding;
 
 /**
@@ -74,7 +75,8 @@ public class ShopOrderFragment extends Fragment {
     }
 
     private void setupNestedViewPager() {
-        binding.nestedViewPager.setAdapter(new DocumentPagerAdapter(getChildFragmentManager(), getLifecycle()));
+        String[] statusValues = getResources().getStringArray(R.array.orderStatus);
+        binding.nestedViewPager.setAdapter(new ShopOrderAdapter(this, statusValues));
 
         new TabLayoutMediator(binding.nestedTabLayout, binding.nestedViewPager, (tab, position) -> {
             switch (position) {

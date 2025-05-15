@@ -253,7 +253,7 @@ public interface ApiService {
                                                              @Path("docId") Long docId,
                                                              @Path("userId") Long userId);
     @GET("order/shop/order")
-    Call<ResponseData<OrderDtoRequest>> getShopOrderStatus(@Query("status") OrderStatus status,@Query("postId") Long postId);
+    Call<ResponseData<List<OrderDtoRequest>>> getShopOrderStatus(@Query("status") OrderStatus status,@Query("postId") Long postId);
 
     @POST("order/update-order")
     Call<ResponseData<Void>> updateOrderStatus(@Query("orderId") Long orderId,@Query("status") OrderStatus status);

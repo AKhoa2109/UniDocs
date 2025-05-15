@@ -106,20 +106,20 @@ public class ShopOrderChildFragment extends Fragment {
 
     // Hàm lấy dữ liệu từ API và load recyclerView
     private void loadData(OrderStatus status,Long postId){
-        ApiService.apiService.getShopOrderStatus(status,postId).enqueue(new Callback<ResponseData<OrderDtoRequest>>() {
+        ApiService.apiService.getShopOrderStatus(status,postId).enqueue(new Callback<ResponseData<List<OrderDtoRequest>>>() {
             @Override
-            public void onResponse(Call<ResponseData<OrderDtoRequest>> call, Response<ResponseData<OrderDtoRequest>> response) {
+            public void onResponse(Call<ResponseData<List<OrderDtoRequest>>> call, Response<ResponseData<List<OrderDtoRequest>>> response) {
                 if(response.isSuccessful() && response.body().getData() !=null){
                     orders.clear();
-                    orders.add(response.body().getData());
+                    orders = response.body().getData();
                     adapter.notifyDataSetChanged();
                     updateEmptyState();
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseData<OrderDtoRequest>> call, Throwable t) {
-                ToastUtils.show(getContext(),"Lỗi kết nối đến server");
+            public void onFailure(Call<ResponseData<List<OrderDtoRequest>>> call, Throwable t) {
+                ToastUtils.show(getContext(), "Lỗi kết nối");
             }
         });
     }
