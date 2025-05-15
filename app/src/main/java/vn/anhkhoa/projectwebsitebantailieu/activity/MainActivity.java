@@ -1,4 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.activity;
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -48,6 +50,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.receiver.NetworkChangeReceiver;
+import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private OnBackPressedCallback onBackPressedCallback;
     private NetworkChangeReceiver networkReceiver;
     private DatabaseHandler databaseHandler;
+    private SessionManager sessionManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        sessionManager = new SessionManager(this);
+
         databaseHandler = DatabaseHandler.getInstance(this);
         /*networkReceiver = new NetworkChangeReceiver();
         registerNetworkReceiver();*/
@@ -82,55 +88,51 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-//        // Thêm fragment mặc định
-//        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.frame_layout, conversationListFragment)
-//                .commit();
-//        binding.bottomNavigationView.setOnItemSelectedListener(item->{
-//            int id = item.getItemId();
-//
-//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//            // Ẩn tất cả các fragment trước khi hiển thị fragment được chọn
-//            if (homeFragment.isAdded()) transaction.hide(homeFragment);
-//            if (shopFragment.isAdded()) transaction.hide(shopFragment);
-//            if (accountFragment.isAdded()) transaction.hide(accountFragment);
-//            if (conversationListFragment.isAdded()) transaction.hide(conversationListFragment);
-//
-//            if (id == R.id.home) {
-//                if (!homeFragment.isAdded()) {
-//                    transaction.add(R.id.frame_layout, homeFragment);
-//                }
-//                transaction.show(homeFragment);
-//            } else if (id == R.id.shop) {
-//                if (!shopFragment.isAdded()) {
-//                    transaction.add(R.id.frame_layout, shopFragment);
-//                }
-//                transaction.show(shopFragment);
-//            } else if (id == R.id.chat) {
-//                if (!conversationListFragment.isAdded()) {
-//                    transaction.add(R.id.frame_layout, conversationListFragment);
-//                }
-//                transaction.show(conversationListFragment);
-//            }else if (id == R.id.account) {
-//                if (!accountFragment.isAdded()) {
-//                    transaction.add(R.id.frame_layout, accountFragment);
-//                }
-//                transaction.show(accountFragment);
-//            }
-//            transaction.commit();
-//            return true;
-//        });
 
         // Thêm fragment mặc định
         showFragment(homeFragment, "home");
 
+//        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+//            int id = item.getItemId();
+//
+//            boolean isLoggedIn = sessionManager.isLoggedIn();
+//
+//            // Gọi hàm showFragment thay vì xử lý từng Fragment trực tiếp
+//            if (id == R.id.home) {
+//                showFragment(homeFragment, "home");
+//            } else if (id == R.id.shop) {
+//                showFragment(shopFragment, "shop");
+//            } else if (id == R.id.post){
+//                showFragment(postFragment, "post");
+//            } else if (id == R.id.chat) {
+//                showFragment(conversationListFragment, "chat");
+//            } else if (id == R.id.account) {
+//                showFragment(accountFragment, "account");
+//            }
+//
+//            return true;
+//        });
+//
+//        setupBackPressedCallback();
+
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+
+            boolean isLoggedIn = sessionManager.isLoggedIn();
 
             // Gọi hàm showFragment thay vì xử lý từng Fragment trực tiếp
             if (id == R.id.home) {
                 showFragment(homeFragment, "home");
-            } else if (id == R.id.shop) {
+                return true;
+            }else if (!isLoggedIn){
+                // Nếu chưa đăng nhập và không phải Home, chuyển sang màn hình đăng nhập
+                showLoginDialogOrActivity();
+                // Giữ nguyên tab Home được chọn
+                binding.bottomNavigationView.setSelectedItemId(R.id.home);
+                return false;
+            }
+
+            if (id == R.id.shop) {
                 showFragment(shopFragment, "shop");
             } else if (id == R.id.post){
                 showFragment(postFragment, "post");
@@ -144,16 +146,24 @@ public class MainActivity extends AppCompatActivity {
         });
 
         setupBackPressedCallback();
+
+
     }
 
-    //phuong thuc goi fragment co an navBar
-    public void showFragment(Fragment fragment, String tag, Boolean hideNavBar){
-        showFragment(fragment, tag);
-        if(hideNavBar){
-            binding.bottomNavigationView.setVisibility(View.GONE);
-        }else {
-            binding.bottomNavigationView.setVisibility(View.VISIBLE);
-        }
+//    private void showLoginDialogOrActivity() {
+//        Intent intent = new Intent(this, SignIn.class);
+//        startActivity(intent);
+//    }
+
+    public void showLoginDialogOrActivity() {
+        new AlertDialog.Builder(this)
+                .setTitle("Yêu cầu đăng nhập")
+                .setMessage("Bạn cần đăng nhập để sử dụng chức năng này!")
+                .setPositiveButton("Đăng nhập", (dialog, which) -> {
+                    startActivity(new Intent(this, SignIn.class));
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     //goi ham nay khi can show fragment
@@ -295,6 +305,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openCartFragment(){
+        if(sessionManager.getUser() == null){
+            showLoginDialogOrActivity();
+            return;
+        }
         CartFragment cartFragment = new CartFragment();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout, cartFragment)

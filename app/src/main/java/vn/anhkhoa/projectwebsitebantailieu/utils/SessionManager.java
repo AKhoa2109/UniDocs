@@ -19,6 +19,9 @@ public class SessionManager {
     private UserResponse cachedUserResponse;
     private boolean isLoggedIn;
 
+    public void setLoggedIn(boolean loggedIn) {
+        isLoggedIn = loggedIn;
+    }
 
     // Private constructor
     public SessionManager(Context context) {
@@ -71,6 +74,7 @@ public class SessionManager {
     public UserResponse getUser() {
         return cachedUserResponse;
     }
+
 
     public boolean isLoggedIn() {
         return isLoggedIn;

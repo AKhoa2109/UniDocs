@@ -143,7 +143,10 @@ public class DocumentDetailFragment extends Fragment {
         notificationDao = new NotificationDao(requireContext());
         NotificationHelper.init(requireContext());
 
-        handlerCartCount(sessionManager.getUser().getUserId());
+        if(sessionManager.getUser() != null){
+            handlerCartCount(sessionManager.getUser().getUserId());
+
+        }
         getApiImageByDocumentId(documentDto.getDocId());
         getApiDocumentDetail(documentDto.getDocId());
         handlerAddToCart();
@@ -154,6 +157,10 @@ public class DocumentDetailFragment extends Fragment {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).openCartFragment();
             }
+        });
+
+        binding.btnChat.setOnClickListener(v->{
+
         });
     }
 
@@ -272,6 +279,12 @@ public class DocumentDetailFragment extends Fragment {
         binding.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(sessionManager.getUser() == null){
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).showLoginDialogOrActivity();
+                    }
+                }
+
                 handlerAnimation(documentDto.getDocImageUrl());
                 String quantityStr = binding.edtQuantity.getText().toString();
                 int quantity = Integer.parseInt(quantityStr);

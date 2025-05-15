@@ -154,8 +154,12 @@ public class HomeFragment extends Fragment {
         notificationDao = new NotificationDao(requireContext());
         connectWebSocket();
         updateBadgeCount();
-        int cartCount = cartDao.getCountCart(sessionManager.getUser().getUserId());
-        binding.tvCartBadge.setText(String.valueOf(cartCount));
+        //
+        if(sessionManager.getUser() != null){
+            int cartCount = cartDao.getCountCart(sessionManager.getUser().getUserId());
+            binding.tvCartBadge.setText(String.valueOf(cartCount));
+        }
+
         initBannerImages();
         setupViewPager();
         GridLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
@@ -170,7 +174,14 @@ public class HomeFragment extends Fragment {
     }
 
     private void callApiGetListDocument(){
-        ApiService.apiService.getListDocument(sessionManager.getUser().getUserId()).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
+
+//        if(sessionManager.getUser() == null)
+//            return;
+        Long userId = sessionManager.getUser() != null
+                ? sessionManager.getUser().getUserId()
+                : null;
+
+        ApiService.apiService.getListDocument(userId).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
                 ResponseData<List<DocumentDto>> data = response.body();
@@ -320,6 +331,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void subscribeToNotifications() {
+        if (sessionManager.getUser() == null)
+            return;
         long userId = SessionManager.getInstance(requireContext()).getUser().getUserId();
         String topic = "/queue/notifications/" + userId;
         notifSub = stompClient.topic(topic)
@@ -329,6 +342,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void onNewNotification(StompMessage topicMessage) {
+        if (sessionManager.getUser() == null)
+            return;
         // 1. Parse payload
         NotificationDto dto = new Gson().fromJson(topicMessage.getPayload(), NotificationDto.class);
 
@@ -346,6 +361,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateBadgeCount() {
+        if(sessionManager.getUser() == null)
+            return;
+
         // Lấy tổng số chưa đọc
         int countUnread = notificationDao.getNotifications(sessionManager.getUser().getUserId())
                 .stream()
