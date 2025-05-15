@@ -96,6 +96,11 @@ public class VoucherFragment extends Fragment implements DiscountAdapter.Listene
         discountAdapter = new DiscountAdapter(discountDtos, this);
         binding.rcVoucher.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         binding.rcVoucher.setAdapter(discountAdapter);
+
+        //btn thoat
+        binding.btnBack.setOnClickListener(v->{
+            requireActivity().onBackPressed();
+        });
     }
 
 

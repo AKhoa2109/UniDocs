@@ -298,10 +298,26 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
 
         public void bind(ChatLineDto message, boolean showTime) {
             //gan noi dung
-            //receivedBinding.tvMessage.setText(message.getContent());
-            binding.tvFileName.setText(message.getFileChatLines().get(0).getName());
-            binding.tvFileSize.setText(String.valueOf( message.getFileChatLines().get(0).getSize()));
-            //  binding.tvFileSize.setText(message.getFileChatLines().get(0));
+//            binding.tvFileName.setText(message.getFileChatLines().get(0).getName());
+//            binding.tvFileSize.setText(String.valueOf( message.getFileChatLines().get(0).getSize()));
+            List<FileChatLine> files = message.getFileChatLines();
+            if (files != null && !files.isEmpty()) {
+                // Lấy file đầu tiên
+                FileChatLine fileDto = files.get(0);
+
+                // Hiển thị thông tin
+                binding.tvFileName.setText(fileDto.getName());
+                binding.tvFileSize.setText(String.valueOf(fileDto.getSize()));
+
+                // Chỉ bật listener khi có file
+                binding.getRoot().setOnClickListener(v ->
+                        handleFileClick(fileDto.getFileId(), fileDto.getName())
+                );
+
+            } else {
+                // Không có file → ẩn hẳn container
+                // binding.fileContainer.setVisibility(View.GONE);
+            }
 
             //kiem tra hien thoi gian
             if (showTime) {
@@ -337,8 +353,30 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
         public void bind(ChatLineDto message, boolean showTime) {
             //gan noi dung
             //receivedBinding.tvMessage.setText(message.getContent());
-            binding.tvFileName.setText(message.getFileChatLines().get(0).getName());
-            binding.tvFileSize.setText(String.valueOf( message.getFileChatLines().get(0).getSize()));
+            List<FileChatLine> files = message.getFileChatLines();
+            if (files != null && !files.isEmpty()) {
+                // Lấy file đầu tiên
+                FileChatLine fileDto = files.get(0);
+
+                // Hiển thị thông tin
+                binding.tvFileName.setText(fileDto.getName());
+                binding.tvFileSize.setText(String.valueOf(fileDto.getSize()));
+
+                // Chỉ bật listener khi có file
+                binding.getRoot().setOnClickListener(v ->
+                        handleFileClick(fileDto.getFileId(), fileDto.getName())
+                );
+
+                // Hiện view chứa file (nếu bạn có container riêng)
+             //   binding.fileContainer.setVisibility(View.VISIBLE);
+            } else {
+                // Không có file → ẩn hẳn container
+               // binding.fileContainer.setVisibility(View.GONE);
+            }
+
+//            binding.tvFileName.setText(message.getFileChatLines().get(0).getName());
+//            binding.tvFileSize.setText(String.valueOf( message.getFileChatLines().get(0).getSize()));
+
             //kiem tra hien thoi gian
             if (showTime) {
                 binding.tvTime.setText(DateTimeUtils.formatTime(message.getSendAt()));
@@ -353,7 +391,6 @@ public class ChatAdapter extends ListAdapter<ChatLineDto, RecyclerView.ViewHolde
                 public void onClick(View view) {
                     Long fileId = message.getFileChatLines().get(0).getFileId();
                     String fileName = message.getFileChatLines().get(0).getName();
-
                     handleFileClick(fileId, fileName);
                 }
             });

@@ -183,17 +183,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+//    private void setupBackPressedCallback() {
+//        onBackPressedCallback = new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//                Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
+//                // Nếu đang ở ChatFragment, xử lý tùy chỉnh
+//                if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment
+//                    || currentFragment instanceof CartFragment) {
+//                    binding.bottomNavigationView.setVisibility(View.VISIBLE);
+//                    getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
+//                } else {
+//                    // Mặc định: Thoát Activity nếu không có Fragment nào trong back stack
+//                    if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+//                        finish();
+//                    } else {
+//                        remove(); // Hủy callback và để hệ thống xử lý
+//                    }
+//                }
+//            }
+//        };
+//
+//        // Đăng ký callback với dispatcher
+//        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+//    }
+
+    //nếu fragment hiện tại là Home, Shop, Post, Chat, Account thì hiện lại thanh nav
     private void setupBackPressedCallback() {
         onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.frame_layout);
-                // Nếu đang ở ChatFragment, xử lý tùy chỉnh
-                if (currentFragment instanceof ChatFragment || currentFragment instanceof DocumentDetailFragment
-                    || currentFragment instanceof CartFragment) {
+                // Nếu đang ở các fragment đặc biệt thì show nav
+                if (currentFragment instanceof ChatFragment
+                        || currentFragment instanceof DocumentDetailFragment
+                        || currentFragment instanceof CartFragment) {
                     binding.bottomNavigationView.setVisibility(View.VISIBLE);
-                    getSupportFragmentManager().popBackStack(); // Quay lại Fragment trước đó
+                    getSupportFragmentManager().popBackStack();
                 } else {
+                    // Nếu đang ở các fragment chính (home, shop, post, account)
+                    if (currentFragment instanceof HomeFragment
+                            || currentFragment instanceof ShopFragment
+                            || currentFragment instanceof PostFragment
+                            || currentFragment instanceof AccountFragment
+                            || currentFragment instanceof ConversationListFragment) {
+                        binding.bottomNavigationView.setVisibility(View.VISIBLE);
+                    }
                     // Mặc định: Thoát Activity nếu không có Fragment nào trong back stack
                     if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
                         finish();
@@ -203,8 +238,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
-        // Đăng ký callback với dispatcher
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
@@ -356,6 +389,7 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setVisibility(View.GONE);
     }
 
+    //hien thi nav
     public void showBottomNavigation(){
         binding.bottomNavigationView.setVisibility(View.VISIBLE);
     }

@@ -22,6 +22,7 @@ import java.util.Optional;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentPostBinding;
@@ -90,6 +91,14 @@ public class PostFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = FragmentPostBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showBottomNavigation();
+        }
     }
 
     @Override

@@ -100,6 +100,8 @@ public class NotificationFragment extends Fragment {
         notificationAdapter = new NotificationAdapter(getContext(),notificationGroups);
         binding.rvNotification.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         binding.rvNotification.setAdapter(notificationAdapter);
+
+        binding.btnBack.setOnClickListener(v->{requireActivity().onBackPressed();});
     }
 
     private void getApiNotificationGroup(Long userId){
