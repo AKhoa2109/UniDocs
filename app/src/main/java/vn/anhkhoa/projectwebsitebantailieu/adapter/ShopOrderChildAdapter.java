@@ -7,12 +7,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -61,6 +64,7 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
         TextView tvOrderStatus, tvDocumentName, tvDocumentQuantity, tvDocumentOriginalPrice, tvDocumentSellPrice;
         AutoCompleteTextView actvStatus;
         Button btnSave;
+        ImageView ivDocument;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -71,7 +75,7 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
             tvDocumentSellPrice = itemView.findViewById(R.id.tvDocumentSellPrice);
             actvStatus = itemView.findViewById(R.id.actvGender);
             btnSave = itemView.findViewById(R.id.btnSubmit);
-
+            ivDocument = itemView.findViewById(R.id.ivDocument);
             setupStatusDropdown();
         }
 
@@ -131,6 +135,8 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
                     ToastUtils.show(itemView.getContext(), "Trạng thái không hợp lệ");
                 }
             });
+
+            Glide.with(itemView.getContext()).load(order.getDocImageUrl()).into(ivDocument);
         }
     }
 }

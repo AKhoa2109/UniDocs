@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
 
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,7 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             binding.tvDocumentOriginalPrice.setText(
                     CurrentFormatter.format(order.getOriginalPrice())
             );
+            binding.tvDocumentOriginalPrice.setPaintFlags(binding.tvDocumentOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             binding.tvDocumentSellPrice.setText(
                     CurrentFormatter.format(order.getOriginalPrice())
             );
