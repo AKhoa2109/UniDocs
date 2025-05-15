@@ -39,6 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentUserDetailInfoBinding;
@@ -46,6 +47,8 @@ import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.UserRegisterRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.FilePickerUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.utils.LoadingDialog;
+import vn.anhkhoa.projectwebsitebantailieu.utils.CheckValidInput;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -115,7 +118,42 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
         return binding.getRoot();
     }
 
-
+    private void setupImagePicker() {
+        pickImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Uri selectedImageUri = result.getData().getData();
+                    if (selectedImageUri != null) {
+                        try {
+                            // Hiển thị ảnh đã chọn
+                            binding.civAvatar.setImageURI(selectedImageUri);
+                            
+                            // Chuyển đổi Uri thành File
+                            String[] projection = {MediaStore.Images.Media.DATA};
+                            android.database.Cursor cursor = requireContext().getContentResolver().query(selectedImageUri, projection, null, null, null);
+                            if (cursor != null && cursor.moveToFirst()) {
+                                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                                String filePath = cursor.getString(columnIndex);
+                                cursor.close();
+                                
+                                File imageFile = new File(filePath);
+                                if (imageFile.exists()) {
+                                    uploadToCloudinary(imageFile);
+                                } else {
+                                    Toast.makeText(getContext(), "Không thể truy cập file ảnh", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(getContext(), "Không thể truy cập file ảnh", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Không thể xử lý ảnh đã chọn", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+        );
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -125,6 +163,8 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        
+        setupImagePicker();
         setupGenderInput();
         filePickerUtils = new FilePickerUtils(this, this);
 
@@ -155,14 +195,38 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
         };
 
         binding.ivEditAvatar.setOnClickListener(v -> {
-            // Mở picker chỉ hình, cho phép chọn nhiều (nếu cần)
-            filePickerUtils.checkPermissionAndPick(FilePickerUtils.PICKER_TYPE_IMAGE);
+            // Check for Android 13+ (API 33+) permission
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if (requireContext().checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) 
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{android.Manifest.permission.READ_MEDIA_IMAGES}, 100);
+                } else {
+                    openImagePicker();
+                }
+            } else {
+                // For Android 12 and below, check for legacy storage permission
+                if (requireContext().checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) 
+                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+                } else {
+                    openImagePicker();
+                }
+            }
         });
 
         binding.btnEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 confirmUpdate();
+            }
+        });
+
+        binding.ivBack.setOnClickListener(v -> {
+            // Sử dụng OnBackPressedDispatcher để xử lý back stack đúng cách
+            requireActivity().getOnBackPressedDispatcher().onBackPressed();
+
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).showBottomNavigation();
             }
         });
 
@@ -175,6 +239,24 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
         binding.tilBirthday.setEndIconOnClickListener(showDatePicker);
 
         bindView(userRegisterRequest);
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        pickImageLauncher.launch(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                openImagePicker();
+            } else {
+                Toast.makeText(getContext(), "Cần quyền truy cập ảnh để thực hiện chức năng này", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -214,7 +296,100 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
         });
     }
 
+    private boolean checkInput() {
+        boolean isValid = true;
+
+        // Check name
+        String name = binding.edtName.getText().toString().trim();
+        if (name.isEmpty()) {
+            binding.tilName.setError("Vui lòng nhập họ tên");
+            binding.tilName.setErrorEnabled(true);
+            isValid = false;
+        } else {
+            binding.tilName.setError(null);
+            binding.tilName.setErrorEnabled(false);
+        }
+
+        // Check email
+        String email = binding.edtEmail.getText().toString().trim();
+        if (email.isEmpty()) {
+            binding.tilEmail.setError("Vui lòng nhập email");
+            binding.tilEmail.setErrorEnabled(true);
+            isValid = false;
+        } else if (!CheckValidInput.checkEmail(email)) {
+            binding.tilEmail.setError("Email không hợp lệ");
+            binding.tilEmail.setErrorEnabled(true);
+            isValid = false;
+        } else {
+            binding.tilEmail.setError(null);
+            binding.tilEmail.setErrorEnabled(false);
+        }
+
+        // Check phone
+        String phone = binding.edtPhone.getText().toString().trim();
+        if (phone.isEmpty()) {
+            binding.tilPhone.setError("Vui lòng nhập số điện thoại");
+            binding.tilPhone.setErrorEnabled(true);
+            isValid = false;
+        } else if (!CheckValidInput.checkPhoneNumber(phone)) {
+            binding.tilPhone.setError("Số điện thoại không hợp lệ");
+            binding.tilPhone.setErrorEnabled(true);
+            isValid = false;
+        } else {
+            binding.tilPhone.setError(null);
+            binding.tilPhone.setErrorEnabled(false);
+        }
+
+        // Check address
+        String address = binding.edtAddress.getText().toString().trim();
+        if (address.isEmpty()) {
+            binding.tilAddress.setError("Vui lòng nhập địa chỉ");
+            binding.tilAddress.setErrorEnabled(true);
+            isValid = false;
+        } else {
+            binding.tilAddress.setError(null);
+            binding.tilAddress.setErrorEnabled(false);
+        }
+
+        // Check gender
+        String gender = binding.actvGender.getText().toString().trim();
+        if (gender.isEmpty()) {
+            binding.tilgender.setError("Vui lòng chọn giới tính");
+            binding.tilgender.setErrorEnabled(true);
+            isValid = false;
+        } else {
+            binding.tilgender.setError(null);
+            binding.tilgender.setErrorEnabled(false);
+        }
+
+        // Check birthday
+        String birthday = binding.edtBirthday.getText().toString().trim();
+        if (birthday.isEmpty()) {
+            binding.tilBirthday.setError("Vui lòng chọn ngày sinh");
+            binding.tilBirthday.setErrorEnabled(true);
+            isValid = false;
+        } else if (!CheckValidInput.checkAge(birthday)) {
+            binding.tilBirthday.setError("Bạn phải đủ 18 tuổi");
+            binding.tilBirthday.setErrorEnabled(true);
+            isValid = false;
+        } else {
+            binding.tilBirthday.setError(null);
+            binding.tilBirthday.setErrorEnabled(false);
+        }
+
+        return isValid;
+    }
+
     private void confirmUpdate(){
+        // Validate all inputs
+        if (!checkInput()) {
+            return;
+        }
+
+        // Show loading dialog
+        LoadingDialog loadingDialog = new LoadingDialog();
+        loadingDialog.show(getChildFragmentManager(), "loading");
+
         String name = binding.edtName.getText().toString();
         String email = binding.edtEmail.getText().toString();
         String phone = binding.edtPhone.getText().toString();
@@ -234,15 +409,22 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
         ApiService.apiService.updateUser(user).enqueue(new Callback<ResponseData<UserRegisterRequest>>() {
             @Override
             public void onResponse(Call<ResponseData<UserRegisterRequest>> call, Response<ResponseData<UserRegisterRequest>> response) {
+                // Dismiss loading dialog
+                loadingDialog.dismiss();
+                
                 if(response.isSuccessful() && response.body().getData() != null){
                     UserRegisterRequest user = response.body().getData();
                     bindView(user);
                     Toast.makeText(getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseData<UserRegisterRequest>> call, Throwable t) {
+                // Dismiss loading dialog
+                loadingDialog.dismiss();
                 Toast.makeText(getContext(), "Lỗi khi cập nhật", Toast.LENGTH_SHORT).show();
             }
         });
@@ -275,7 +457,7 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
     }
 
     private void bindView(UserRegisterRequest userRegisterRequest) {
-        Glide.with(getContext()).load(userRegisterRequest.getAvatar()).into(binding.civAvatar);
+        Glide.with(requireContext()).load(userRegisterRequest.getAvatar()).error(R.drawable.avatar_nam).into(binding.civAvatar);
         binding.edtName.setText(userRegisterRequest.getName());
         binding.edtEmail.setText(userRegisterRequest.getEmail());
         binding.edtPhone.setText(userRegisterRequest.getPhoneNumber());
@@ -297,6 +479,5 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
             binding.edtBirthday.setText(formattedDate);
         }
     }
-
 
 }

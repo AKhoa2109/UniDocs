@@ -31,6 +31,10 @@ public class DocumentDto implements Serializable {
     public DocumentDto() {
 
     }
+    public DocumentDto(Long docId){
+        this.docId = docId;
+    }
+
     public DocumentDto(Long doc_id, String doc_name) {
         this.docId = doc_id;
         this.docName = doc_name;

@@ -150,13 +150,18 @@ public class DiscountFragment extends Fragment {
                     @Override
                     public void onResponse(Call<ResponseData<List<DocumentDto>>> call,
                                            Response<ResponseData<List<DocumentDto>>> response) {
-                        if (response.isSuccessful() && response.body() != null) {
+                        if (response.isSuccessful() && response.body().getData() != null) {
                             documentNames.clear();
                             documentIds.clear();
                             for (DocumentDto dto : response.body().getData()) {
                                 documentNames.add(dto.getDocName()); // hoặc getter tương ứng
                                 documentIds.add(dto.getDocId());
                             }
+                            docAdapter.notifyDataSetChanged();
+                        }
+                        else{
+                            documentNames.clear();
+                            documentIds.clear();
                             docAdapter.notifyDataSetChanged();
                         }
                     }
