@@ -54,7 +54,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.ViewHolder> 
                     .load(media.getFileUrl())
                     .into(h.imgMedia);
 
-        } else { // VIDEO
+        } else if(media.getFileType() == FileType.VIDEO){ // VIDEO
             h.imgPlayIcon.setVisibility(View.VISIBLE);
             // Lấy 1 frame thumbnail của video
             Glide.with(context)
