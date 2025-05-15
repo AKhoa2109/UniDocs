@@ -217,13 +217,13 @@ public interface ApiService {
     Call<ResponseData<Long>> addDiscount(@Path("userId") Long userId,@Body DiscountDto discountDto);
 
     //File document
-    @GET("file-document/by-document/{docId}")
+    @POST("file-document/by-document/{docId}")
     Call<ResponseData<FileDocument>> getFileDocumentByDocumentId(@Path("docId") Long docId);
 
     //payment
 
-    @GET("payment/{orderId}")
-    Call<Map<String, String>> createPayment(@Body CreateOrderFromCartRequest request);
+    @POST("payment/")
+    Call<ResponseData<Map<String, String>>> createPayment(@Body CreateOrderFromCartRequest request);
 
 //    @GET("payment/{orderId}")
 //    Call<Map<String, String>> createPayment(

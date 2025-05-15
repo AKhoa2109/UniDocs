@@ -1,5 +1,4 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -37,13 +37,12 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentCartBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.DiscountType;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.CreateOrderFromCartRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CartViewModel;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NetworkUtil;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
-import vn.anhkhoa.projectwebsitebantailieu.utils.SyncManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
-import vn.anhkhoa.projectwebsitebantailieu.model.CreateOrderFromCartRequest;
 import com.google.gson.Gson;
 import java.io.IOException;
 
@@ -61,16 +60,14 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     private List<CartDto> cartItems;
     private CartViewModel viewModel;
     DatabaseHandler databaseHandler;
-    private double totalPrice = 0;
+    private double totalPrice;
     private CompoundButton.OnCheckedChangeListener selectAllListener =
             (buttonView, isChecked) -> {
                 cartAdapter.selectAllItems(isChecked);
                 if (isChecked) {
                     viewModel.setSelectedCartItems(new ArrayList<>(cartItems));
-                    binding.ibRemoveAll.setVisibility(View.VISIBLE);
                 } else {
                     viewModel.clearSelectedCartItems();
-                    binding.ibRemoveAll.setVisibility(View.INVISIBLE);
                 }
                 calculateTotalAmount();
             };
@@ -174,19 +171,20 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                         .collect(Collectors.toList());
 
                 // Lấy voucher đã chọn (nếu có)
-                DiscountDto selectedVoucher = null;
-                if (binding.tvVoucherName.getText().toString().length() > 0) {
-                    // Lấy voucher từ ViewModel hoặc lưu trữ tạm thời
-                    selectedVoucher = (DiscountDto) getParentFragmentManager()
-                            .getFragmentResult("voucherResult")
-                            .getSerializable("selectedDiscount");
+                AtomicReference<DiscountDto> selectedVoucher = new AtomicReference<>();
+                if (!binding.tvVoucherName.getText().toString().isEmpty()) {
+                    getParentFragmentManager().setFragmentResultListener("voucherResult", getViewLifecycleOwner(), (requestKey, result) -> {
+                        if (result != null && result.containsKey("selectedDiscount")) {
+                            selectedVoucher.set((DiscountDto) result.getSerializable("selectedDiscount"));
+                        }
+                    });
                 }
 
                 // Tạo request object
                 CreateOrderFromCartRequest request = new CreateOrderFromCartRequest(
                     cartIds,
-                    selectedVoucher != null ? selectedVoucher.getDiscountId() : null,
-                    "VNPAY"  // hoặc paymentMethod khác tùy theo yêu cầu
+                    selectedVoucher.get() != null ? selectedVoucher.get().getDiscountId() : null,
+                    sessionManager.getUser().getUserId()
                 );
 
                 // Hiển thị loading
@@ -194,7 +192,7 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                 binding.btnBuy.setEnabled(false);
 
                 // Gọi API createOrderFromCart
-                ApiService.apiService.createOrderFromCart(request).enqueue(new Callback<ResponseData<Map<String, String>>>() {
+                ApiService.apiService.createPayment(request).enqueue(new Callback<ResponseData<Map<String, String>>>() {
                     @Override
                     public void onResponse(Call<ResponseData<Map<String, String>>> call, Response<ResponseData<Map<String, String>>> response) {
                         // Ẩn loading
@@ -203,31 +201,29 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
 
                         if (response.isSuccessful() && response.body() != null) {
                             Map<String, String> data = response.body().getData();
-                            String orderId = data.get("orderId");
                             String paymentUrl = data.get("paymentUrl");
                             
                             if (paymentUrl != null && !paymentUrl.isEmpty()) {
-                                // Lưu orderId để xử lý callback sau này
-                                sessionManager.saveOrderId(orderId);
                                 // Mở trang thanh toán
                                 openInCustomTab(view, paymentUrl);
                             } else {
                                 Toast.makeText(getContext(), "Không lấy được URL thanh toán", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            String errorMessage = "Đặt hàng thất bại";
-                            if (response.errorBody() != null) {
-                                try {
-                                    ResponseData<?> errorResponse = new Gson().fromJson(
-                                        response.errorBody().string(), 
-                                        ResponseData.class
-                                    );
-                                    errorMessage = errorResponse.getMessage();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+//                            String errorMessage = "Đặt hàng thất bại";
+//                            if (response.errorBody() != null) {
+//                                try {
+//                                    ResponseData<?> errorResponse = new Gson().fromJson(
+//                                        response.errorBody().string(),
+//                                        ResponseData.class
+//                                    );
+//                                    errorMessage = errorResponse.getMessage();
+//                                } catch (IOException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                            ToastUtils.show(requireActivity(), "Đặt hàng thất bại !");
                         }
                     }
 
@@ -430,19 +426,20 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
 
     private void calculateTotalAmount() {
         totalPrice = 0;
-        for(CartDto item : cartItems) {
-            if(item.isSelected()) {
+        // Lấy danh sách items đã chọn từ ViewModel
+        List<CartDto> selectedItems = viewModel.getSelectedCartItems().getValue();
+        
+        if (selectedItems != null) {
+            for(CartDto item : selectedItems) {
                 totalPrice += item.getSellPrice() * item.getQuantity();
             }
         }
+        
         binding.tvPrice.setText(CurrentFormatter.format(totalPrice));
     }
 
     @Override
     public void onCheckboxClick(int position, boolean isChecked) {
-        if (viewModel == null) {
-            viewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
-        }
         CartDto item = cartItems.get(position);
         item.setSelected(isChecked);
         if (isChecked) {

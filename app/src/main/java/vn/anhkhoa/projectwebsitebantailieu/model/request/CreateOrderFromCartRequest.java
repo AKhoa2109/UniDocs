@@ -7,6 +7,12 @@ public class CreateOrderFromCartRequest {
     private Long discountId;     // ID của discount được áp dụng (có thể null)
     private Long userId;         // ID của user
 
+    public CreateOrderFromCartRequest(List<Long> cartIds, Long discountId, Long userId) {
+        this.cartIds = cartIds;
+        this.discountId = discountId;
+        this.userId = userId;
+    }
+
     public List<Long> getCartIds() {
         return cartIds;
     }
