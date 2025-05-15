@@ -452,8 +452,52 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
 
     @Override
     public void onQuantityChanged(int position, int quantity) {
-        cartItems.get(position).setQuantity(quantity);
-        calculateTotalAmount();
+        // Lấy thông tin sản phẩm trong giỏ hàng tại vị trí được chọn
+        CartDto cartItem = cartItems.get(position);
+        // Cập nhật số lượng mới
+        cartItem.setQuantity(quantity);
+        
+        // Kiểm tra kết nối mạng
+        boolean isOnline = NetworkUtil.isNetworkAvailable(getContext());
+        if (isOnline) {
+            // Gọi API cập nhật số lượng giỏ hàng
+            ApiService.apiService.updateCart(cartItem).enqueue(new Callback<ResponseData<CartDto>>() {
+                @Override
+                public void onResponse(Call<ResponseData<CartDto>> call, Response<ResponseData<CartDto>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Lấy dữ liệu giỏ hàng đã được cập nhật từ server
+                        CartDto updatedCart = response.body().getData();
+                        if (updatedCart != null) {
+                            // Cập nhật vào cơ sở dữ liệu local
+                            cartDao.updateCartItem(updatedCart);
+                            // Cập nhật giao diện người dùng
+                            cartItems.set(position, updatedCart);
+                            cartAdapter.notifyItemChanged(position);
+                            // Tính toán lại tổng tiền
+                            calculateTotalAmount();
+                        }
+                    } else {
+                        // Nếu API call thất bại, khôi phục lại số lượng cũ
+                        cartItem.setQuantity(cartItem.getQuantity());
+                        cartAdapter.notifyItemChanged(position);
+                        Toast.makeText(getContext(), "Cập nhật số lượng thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseData<CartDto>> call, Throwable t) {
+                    // Nếu có lỗi kết nối, khôi phục lại số lượng cũ
+                    cartItem.setQuantity(cartItem.getQuantity());
+                    cartAdapter.notifyItemChanged(position);
+                    Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Chế độ offline - chỉ cập nhật cơ sở dữ liệu local
+            cartDao.updateCartItem(cartItem);
+            cartAdapter.notifyItemChanged(position);
+            calculateTotalAmount();
+        }
     }
 
     @Override
