@@ -21,7 +21,7 @@ public class SessionManager {
 
 
     // Private constructor
-    private SessionManager(Context context) {
+    public SessionManager(Context context) {
         Context appContext = context.getApplicationContext();
         sharedPreferences = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 

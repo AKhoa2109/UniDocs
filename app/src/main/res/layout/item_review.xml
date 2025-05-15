@@ -35,28 +35,30 @@
                 android:text="Nguyen Van A"
                 android:textStyle="bold"
                 android:textSize="15sp"/>
-
-<!--            <TextView-->
-<!--                android:id="@+id/tvReviewDate"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="17/08/2023"-->
-<!--                android:textSize="12sp"-->
-<!--                android:textColor="@android:color/darker_gray"/>-->
         </LinearLayout>
-
         <RatingBar
             android:id="@+id/ratingBar"
+            style="@style/Widget.AppCompat.RatingBar.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="1"
-            android:isIndicator="true"
-            android:rating="5"
-            android:layout_marginEnd="8dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
-            style="@style/Widget.AppCompat.RatingBar.Small"/>
+            android:numStars="5"
+            android:stepSize="1" />
+
+<!--        <RatingBar-->
+<!--            android:id="@+id/ratingBar"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:numStars="5"-->
+<!--            android:stepSize="1"-->
+<!--            android:isIndicator="true"-->
+<!--            android:rating="5"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:progressDrawable="@drawable/ratingbar_star"-->
+<!--            android:layout_marginTop="2dp"-->
+<!--            android:layout_marginBottom="2dp"-->
+<!--            style="@style/Widget.AppCompat.RatingBar.Small"/>-->
     </LinearLayout>
 
     <!-- Loại sản phẩm -->
