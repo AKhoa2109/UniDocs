@@ -187,6 +187,18 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <Button
+                android:id="@+id/btnWriteReview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_button_outline"
+                android:text="Viết đánh giá"
+                android:textColor="#488cf2"
+                android:layout_margin="10dp"
+                android:visibility="visible"/>
+
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -11,12 +11,23 @@ public class ReviewDto implements Serializable {
     private String content;
     private Long userId;
     private String name;
-
     private String avatar;
+    private List<FileMedia> fileMedias;
+
+    public List<FileMedia> getFileMedias() {
+        return fileMedias;
+    }
+
+    public void setFileMedias(List<FileMedia> fileMedias) {
+        this.fileMedias = fileMedias;
+    }
 
     private List<ReviewCriterialDto> criterialDtos;
 
-    public ReviewDto(Long reviewId, Integer rate, LocalDateTime createdAt, String content, Long userId, String name, String avatar,List<ReviewCriterialDto> criterialDtos) {
+//    public ReviewDto() {
+//    }
+
+    public ReviewDto(Long reviewId, Integer rate, LocalDateTime createdAt, String content, Long userId, String name, String avatar, List<ReviewCriterialDto> criterialDtos) {
         this.reviewId = reviewId;
         this.rate = rate;
         this.createdAt = createdAt;

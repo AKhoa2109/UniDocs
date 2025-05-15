@@ -2,6 +2,8 @@ package vn.anhkhoa.projectwebsitebantailieu.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -34,13 +36,16 @@ import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
 public class ReviewFragment extends Fragment {
     private FragmentReviewBinding binding;
 
+    // Danh sách các đánh giá (review) của tài liệu
     private List<ReviewDto> reviews;
 
+    // Lưu số lượng đánh giá cho từng mức sao (1-5)
     private Map<Integer,Long> rateCount;
+    // Thông tin tài liệu đang được xem đánh giá
     private DocumentDto documentDto;
+    private ReviewAdapter reviewAdapter;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    // Các hằng số dùng cho Bundle arguments
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -52,8 +57,7 @@ public class ReviewFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-    // TODO: Rename and change types and number of parameters
+    // Hàm tạo instance mới của Fragment, truyền vào DocumentDto
     public static ReviewFragment newInstance(DocumentDto documentDto) {
         ReviewFragment fragment = new ReviewFragment();
         Bundle args = new Bundle();
@@ -65,6 +69,7 @@ public class ReviewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Lấy dữ liệu DocumentDto từ arguments
         if (getArguments() != null) {
             documentDto = (DocumentDto) getArguments().getSerializable("document");
         }
@@ -73,24 +78,33 @@ public class ReviewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Khởi tạo ViewBinding và inflate layout
         binding = FragmentReviewBinding.inflate(inflater, container, false);
-        reviews = new ArrayList<>();
-        getApiReviewById(documentDto.getDocId());
-        setBindDataView();
-        getApiRateCount(documentDto.getDocId());
         return binding.getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView();
+        // Gọi API lấy danh sách review
+        getApiReviewById(documentDto.getDocId());
+        // Gán dữ liệu tổng quan lên giao diện
+
+        // Gọi API lấy thống kê số lượng đánh giá theo từng mức sao
+        getApiRateCount(documentDto.getDocId());
+
+    }
+
+    // Gọi API lấy danh sách review của tài liệu
     private void getApiReviewById(Long docId) {
         ApiService.apiService.getReviewsByDocumentId(docId).enqueue(new Callback<ResponseData<List<ReviewDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<ReviewDto>>> call, Response<ResponseData<List<ReviewDto>>> response) {
                 if(response.isSuccessful() && response.body() != null){
-                    List<ReviewDto> reviews = response.body().getData();
-                    binding.rvReviews.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
-                    ReviewAdapter reviewAdapter = new ReviewAdapter(reviews);
-                    binding.rvReviews.setAdapter(reviewAdapter);
+                    // Lấy danh sách review từ response
+                    reviews = response.body().getData();
+                    reviewAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -99,34 +113,52 @@ public class ReviewFragment extends Fragment {
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
+    // Gọi API lấy số lượng đánh giá cho từng mức sao (1-5)
     private void getApiRateCount(Long docId){
-        ApiService.apiService.getRateReportByDocumentId(docId).enqueue(new Callback<ResponseData<Map<Integer, Long>>>() {
-            @Override
-            public void onResponse(Call<ResponseData<Map<Integer, Long>>> call, Response<ResponseData<Map<Integer, Long>>> response) {
-                if(response.isSuccessful() && response.body() != null){
-                    rateCount = response.body().getData();
-                    updateProgressBars(rateCount);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseData<Map<Integer, Long>>> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        ApiService.apiService.getRateReportByDocumentId(docId).enqueue(new Callback<ResponseData<Map<Integer, Long>>>() {
+//            @Override
+//            public void onResponse(Call<ResponseData<Map<Integer, Long>>> call, Response<ResponseData<Map<Integer, Long>>> response) {
+//                if(response.isSuccessful() && response.body() != null){
+//                    // Lưu dữ liệu vào biến rateCount
+//                    rateCount = response.body().getData();
+//                    // Cập nhật biểu đồ tỷ lệ sao trên giao diện
+//                    updateProgressBars(rateCount);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseData<Map<Integer, Long>>> call, Throwable t) {
+//                Toast.makeText(getContext(), "Lỗi", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
-    private void setBindDataView(){
+    // Hiển thị tổng số đánh giá, điểm trung bình, và RatingBar trung bình lên giao diện
+    private void initView(){
         String numReview = documentDto.getTotalReview()+" đánh giá";
         String avgRate = documentDto.getAvgRate()+"";
         binding.tvTotalReviews.setText(numReview);
         binding.tvAverageRating.setText(avgRate);
         binding.ratingBarAverage.setRating(Float.valueOf(avgRate));
+
+        reviews = new ArrayList<>();
+        binding.rvReviews.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        reviewAdapter = new ReviewAdapter(reviews);
+        binding.rvReviews.setAdapter(reviewAdapter);
+
+//        reviews.add(new ReviewDto(1L, 1, null, "coontexn", 1L, "loc", "img", null));
+//        reviews.add(new ReviewDto(2L, 1, null, "coontexn", 1L, "loc", "img", null));
+//        reviews.add(new ReviewDto(3L, 1, null, "coontexn", 1L, "loc", "img", null));
+//        reviews.add(new ReviewDto(4L, 1, null, "coontexn", 1L, "loc", "img", null));
+
+        reviewAdapter.notifyDataSetChanged();
+
+
     }
 
+    // Cập nhật các ProgressBar thể hiện tỷ lệ từng mức sao
     private void updateProgressBars(Map<Integer, Long> rateMap) {
         long total = 0;
         for (Long count : rateMap.values()) {
@@ -142,6 +174,7 @@ public class ReviewFragment extends Fragment {
         setProgressBar(R.id.pb1Star, rateMap.getOrDefault(1, 0L), total);
     }
 
+    // Thiết lập giá trị phần trăm cho từng ProgressBar mức sao
     private void setProgressBar(int progressBarId, long count, long total) {
         ProgressBar progressBar = getView().findViewById(progressBarId);
         int percent = (int) ((count * 100.0f) / total);
