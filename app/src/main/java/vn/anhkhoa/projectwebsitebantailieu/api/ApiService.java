@@ -199,6 +199,9 @@ public interface ApiService {
     @POST("cart/add-update")
     Call<ResponseData<CartDto>> addOrUpdate(@Body CartDto cart);
 
+    @POST("cart/update")
+    Call<ResponseData<CartDto>> updateCart(@Body CartDto cart);
+
     // discount
     @GET("discount/scope")
     Call<ResponseData<List<DiscountDto>>> getDiscountByScope(@Query("userIds") List<Long> userIds,
