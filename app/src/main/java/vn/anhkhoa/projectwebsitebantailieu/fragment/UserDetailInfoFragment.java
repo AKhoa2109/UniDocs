@@ -276,8 +276,8 @@ public class UserDetailInfoFragment extends Fragment implements FilePickerUtils.
                 MediaType.parse("image/*"),
                 file
         );
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("file", file.getName(), reqFile);
+
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), reqFile);
 
         ApiService.apiService.uploadAvatar(body).enqueue(new Callback<ResponseData<String>>() {
             @Override

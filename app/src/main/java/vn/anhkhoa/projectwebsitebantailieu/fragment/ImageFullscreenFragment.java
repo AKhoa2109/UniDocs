@@ -28,11 +28,6 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentImageFullscreenBi
 import vn.anhkhoa.projectwebsitebantailieu.utils.DownloadUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ImageFullscreenFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ImageFullscreenFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
@@ -92,7 +87,6 @@ public class ImageFullscreenFragment extends Fragment {
         binding.btnBack.setOnClickListener(v -> onBackPressed());
         binding.btnDownload.setOnClickListener(v -> downloadImage());
         binding.btnMore.setOnClickListener(v -> onMoreClicked(v));
-
     }
 
     private void onBackPressed() {
@@ -132,9 +126,7 @@ public class ImageFullscreenFragment extends Fragment {
             }
         });
         popupMenu.show();
-
     }
-
     private void showOriginalMessage() {
         ToastUtils.show(getContext(), "show original message");
     }

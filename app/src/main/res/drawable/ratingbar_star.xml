@@ -1,0 +1,26 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <scale
+            android:scaleWidth="60%"
+            android:scaleHeight="60%"
+            android:drawable="@drawable/starxam"
+            android:gravity="center"/>
+    </item>
+
+    <item android:id="@android:id/secondaryProgress">
+        <scale
+            android:scaleWidth="60%"
+            android:scaleHeight="60%"
+            android:drawable="@drawable/starvang"
+            android:gravity="center"/>
+    </item>
+
+    <item android:id="@android:id/progress">
+        <scale
+            android:scaleWidth="60%"
+            android:scaleHeight="60%"
+            android:drawable="@drawable/starvang"
+            android:gravity="center"/>
+    </item>
+
+</layer-list>
