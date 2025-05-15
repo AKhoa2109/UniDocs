@@ -1,6 +1,7 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -22,6 +23,8 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     public interface OnOrderClickListener {
         void onDetailClick(OrderDtoRequest order);
         void onBuyAgainClick(OrderDtoRequest order);
+
+        void onCancelClick(OrderDtoRequest order);
     }
 
     public OrderHistoryAdapter(OnOrderClickListener listener) {
@@ -90,6 +93,29 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                     listener.onBuyAgainClick(order);
                 }
             });
+
+            binding.btnCancel.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCancelClick(order);
+                }
+            });
+
+            if(order.getStatus() == OrderStatus.CANCELED){
+                binding.btnDetail.setVisibility(View.VISIBLE);
+                binding.btnBuyAgain.setVisibility(View.VISIBLE);
+                binding.btnCancel.setVisibility(View.GONE);
+            }
+            else if(order.getStatus() == OrderStatus.CONFIRMED){
+                binding.btnDetail.setVisibility(View.VISIBLE);
+                binding.btnBuyAgain.setVisibility(View.VISIBLE);
+                binding.btnCancel.setVisibility(View.GONE);
+            }
+            else{
+                binding.btnDetail.setVisibility(View.VISIBLE);
+                binding.btnBuyAgain.setVisibility(View.VISIBLE);
+                binding.btnCancel.setVisibility(View.VISIBLE);
+            }
+
         }
 
         private String setStatus(OrderStatus status){

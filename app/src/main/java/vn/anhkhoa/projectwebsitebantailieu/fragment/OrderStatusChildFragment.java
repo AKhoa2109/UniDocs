@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +23,7 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentOrderStatusChildB
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
+import vn.anhkhoa.projectwebsitebantailieu.utils.OrderViewModel;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
@@ -34,6 +38,8 @@ public class OrderStatusChildFragment extends Fragment implements OrderHistoryAd
     private FragmentOrderStatusChildBinding binding;
     private OrderHistoryAdapter adapter;
     private SessionManager sessionManager;
+
+    private OrderViewModel vm;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,7 +81,11 @@ public class OrderStatusChildFragment extends Fragment implements OrderHistoryAd
                            Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentOrderStatusChildBinding.inflate(inflater, container, false);
+        vm = new ViewModelProvider(requireActivity()).get(OrderViewModel.class);
         sessionManager = SessionManager.getInstance(requireContext());
+        vm.getReloadTrigger().observe(getViewLifecycleOwner(), unused -> {
+            loadOrders(sessionManager.getUser().getUserId(),status);
+        });
         setupRecyclerView();
         loadOrders(sessionManager.getUser().getUserId(), status);
         return binding.getRoot();
@@ -139,5 +149,35 @@ public class OrderStatusChildFragment extends Fragment implements OrderHistoryAd
         }
         Toast.makeText(getContext(), "Buy again: " + order.getDocName(), 
                      Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCancelClick(OrderDtoRequest order)
+    {
+        OrderStatus newStatus = OrderStatus.CANCELED;
+        OrderStatus oldStatus = order.getStatus();
+        if (newStatus == oldStatus) return;
+        order.setStatus(newStatus);
+
+        ApiService.apiService.updateOrderStatus(order.getOrderId(), newStatus).enqueue(new Callback<ResponseData<Void>>() {
+            @Override
+            public void onResponse(Call<ResponseData<Void>> call, Response<ResponseData<Void>> response) {
+                if (response.isSuccessful()) {
+                    ToastUtils.show(getContext(), "Cập nhật thành công");
+                    OrderViewModel vm = new ViewModelProvider((FragmentActivity) requireContext())
+                            .get(OrderViewModel.class);
+                    vm.triggerReload();
+                } else {
+                    order.setStatus(oldStatus);
+                    ToastUtils.show(getContext(), "Cập nhật thất bại");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseData<Void>> call, Throwable t) {
+                order.setStatus(oldStatus);
+                ToastUtils.show(getContext(), "Lỗi kết nối");
+            }
+        });
     }
 }
