@@ -123,6 +123,7 @@ public class HomeFragment extends Fragment {
 
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -267,6 +268,9 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         sliderHandler.postDelayed(sliderRunnable, 5000);
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showBottomNavigation();
+        }
     }
 
     @Override

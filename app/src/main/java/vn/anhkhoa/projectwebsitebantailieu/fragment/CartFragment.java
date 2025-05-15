@@ -238,6 +238,11 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                 });
             }
         });
+
+        //btnback
+        binding.btnBack.setOnClickListener(v->{
+            requireActivity().onBackPressed();
+        });
     }
     // Mở link bằng Chrome Custom Tabs
     private void openInCustomTab(View view, String url) {
