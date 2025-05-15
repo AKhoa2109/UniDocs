@@ -162,7 +162,6 @@ public class HomeFragment extends Fragment {
         LinearLayoutManager  linearLayoutCateManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL,false);
         binding.rcvCategory.setLayoutManager(linearLayoutCateManager);
         documentDtos = new ArrayList<>();
-        showSkeletonDocument();
         callApiGetListDocument();
         callApiGetListCategory();
         handlderImgCartClick();
@@ -173,7 +172,6 @@ public class HomeFragment extends Fragment {
         ApiService.apiService.getListDocument(sessionManager.getUser().getUserId()).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
-                skeleton.showOriginal();
                 ResponseData<List<DocumentDto>> data = response.body();
 
                 if(data == null)
@@ -201,7 +199,6 @@ public class HomeFragment extends Fragment {
         ApiService.apiService.getListCategory().enqueue(new Callback<ResponseData<List<CategoryDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<CategoryDto>>> call, Response<ResponseData<List<CategoryDto>>> response) {
-                skeleton.showOriginal();
                 if(response.isSuccessful()){
                     ResponseData<List<CategoryDto>> data = response.body();
                     if(data == null)
@@ -300,16 +297,6 @@ public class HomeFragment extends Fragment {
         });
     }
 
-
-    private void showSkeletonDocument() {
-        // Apply skeleton using item_document layout as mask, showing 6 placeholder items
-        skeleton = SkeletonLayoutUtils.applySkeleton(
-                binding.rcvDocument,
-                R.layout.item_document,
-                6
-        );
-        skeleton.showSkeleton();
-    }
 
     private void connectWebSocket() {
         String WS_URL = "ws://"+ApiService.ipAddress+"/ws/websocket";
