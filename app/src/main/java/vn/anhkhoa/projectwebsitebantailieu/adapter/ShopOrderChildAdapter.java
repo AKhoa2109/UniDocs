@@ -1,5 +1,6 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,29 +10,31 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
+import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OrderDetailDtoRequest;
+import vn.anhkhoa.projectwebsitebantailieu.utils.OrderViewModel;
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
-public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAdapter.OrderViewHolder>{
+public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAdapter.OrderViewHolder> {
     private List<OrderDtoRequest> orderList;
-    private static OnStatusChangeListener statusChangeListener;
+    private Context context;
 
-    public ShopOrderChildAdapter(List<OrderDtoRequest> orderList) {
+    public ShopOrderChildAdapter(Context context, List<OrderDtoRequest> orderList) {
+        this.context = context;
         this.orderList = orderList;
-    }
-
-    public interface OnStatusChangeListener {
-        void onStatusChanged(int position, OrderStatus newStatus);
-    }
-
-    public void setOnStatusChangeListener(OnStatusChangeListener listener) {
-        this.statusChangeListener = listener;
     }
 
     @NonNull
@@ -45,7 +48,7 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
         OrderDtoRequest order = orderList.get(position);
-        holder.bind(order);
+        holder.bind(order, position);
     }
 
     @Override
@@ -53,7 +56,8 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
         return orderList.size();
     }
 
-    public static class OrderViewHolder extends RecyclerView.ViewHolder {
+
+    public class OrderViewHolder extends RecyclerView.ViewHolder {
         TextView tvOrderStatus, tvDocumentName, tvDocumentQuantity, tvDocumentOriginalPrice, tvDocumentSellPrice;
         AutoCompleteTextView actvStatus;
         Button btnSave;
@@ -72,7 +76,7 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
         }
 
         private void setupStatusDropdown() {
-            String[] orderStatus = {"PENDING", "CONFIRMED", "DELIVERED", "CANCELED"};
+            String[] orderStatus = {"PENDING", "DELIVERED", "CONFIRMED", "CANCELED"};
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     itemView.getContext(),
                     android.R.layout.simple_dropdown_item_1line,
@@ -81,28 +85,53 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
             actvStatus.setAdapter(adapter);
         }
 
-        public void bind(OrderDtoRequest order) {
+        public void bind(OrderDtoRequest order, int position) {
             tvOrderStatus.setText(order.getStatus().name());
             tvDocumentName.setText(order.getDocName());
             tvDocumentQuantity.setText("Số lượng: " + order.getQuantity());
             tvDocumentOriginalPrice.setText(String.format("%,.0f đồng", order.getOriginalPrice()));
             tvDocumentSellPrice.setText(String.format("Giá: %,.0f đồng", order.getSellPrice()));
 
-            // Set current status
             actvStatus.setText(order.getStatus().name(), false);
 
             btnSave.setOnClickListener(v -> {
                 String selected = actvStatus.getText().toString();
-                OrderStatus selectedStatus = OrderStatus.valueOf(selected);
-                order.setStatus(selectedStatus);
+                try {
+                    OrderStatus newStatus = OrderStatus.valueOf(selected);
+                    OrderStatus oldStatus = order.getStatus();
+                    if (newStatus == oldStatus) return;
 
-                if (statusChangeListener != null) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        statusChangeListener.onStatusChanged(position, selectedStatus);
-                    }
+                    // Optimistic update
+                    order.setStatus(newStatus);
+                    notifyItemChanged(position);
+
+                    ApiService.apiService.updateOrderStatus(order.getOrderId(), newStatus).enqueue(new Callback<ResponseData<Void>>() {
+                        @Override
+                        public void onResponse(Call<ResponseData<Void>> call, Response<ResponseData<Void>> response) {
+                            if (response.isSuccessful()) {
+                                ToastUtils.show(context, "Cập nhật thành công");
+                                OrderViewModel vm = new ViewModelProvider((FragmentActivity) context)
+                                        .get(OrderViewModel.class);
+                                vm.triggerReload();
+                            } else {
+                                order.setStatus(oldStatus);
+                                notifyItemChanged(position);
+                                ToastUtils.show(context, "Cập nhật thất bại");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseData<Void>> call, Throwable t) {
+                            order.setStatus(oldStatus);
+                            notifyItemChanged(position);
+                            ToastUtils.show(context, "Lỗi kết nối");
+                        }
+                    });
+                } catch (IllegalArgumentException e) {
+                    ToastUtils.show(itemView.getContext(), "Trạng thái không hợp lệ");
                 }
             });
         }
     }
 }
+

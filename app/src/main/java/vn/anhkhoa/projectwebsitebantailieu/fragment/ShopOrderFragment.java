@@ -1,18 +1,14 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
-
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-
 import vn.anhkhoa.projectwebsitebantailieu.R;
-import vn.anhkhoa.projectwebsitebantailieu.adapter.DocumentPagerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopOrderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopOrderBinding;
 
@@ -70,15 +66,14 @@ public class ShopOrderFragment extends Fragment {
         // Inflate the layout for this fragment
         binding =  FragmentShopOrderBinding.inflate(inflater, container, false);
         setupNestedViewPager();
-        handlerTabLayout();
         return binding.getRoot();
     }
 
     private void setupNestedViewPager() {
-        String[] statusValues = getResources().getStringArray(R.array.orderStatus);
-        binding.nestedViewPager.setAdapter(new ShopOrderAdapter(this, statusValues));
+        binding.nestedViewPager.setAdapter(new ShopOrderAdapter(this));
 
         new TabLayoutMediator(binding.nestedTabLayout, binding.nestedViewPager, (tab, position) -> {
+            Log.d("TAB_DEBUG", "Tab position: " + position); // Thêm dòng này
             switch (position) {
                 case 0:
                     tab.setText("Chưa xác nhận");
@@ -94,22 +89,6 @@ public class ShopOrderFragment extends Fragment {
                     break;
             }
         }).attach();
-    }
 
-    private void handlerTabLayout(){
-        binding.nestedTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                binding.nestedViewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
     }
 }

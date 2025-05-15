@@ -20,11 +20,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
-import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopOrderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopOrderChildAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
-import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopOrderChildBinding;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopOrderChildCancelledBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.OrderViewModel;
@@ -33,25 +32,34 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ShopOrderChildFragment#newInstance} factory method to
+ * Use the {@link ShopOrderChildCancelledFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ShopOrderChildFragment extends Fragment {
+public class ShopOrderChildCancelledFragment extends Fragment {
+    FragmentShopOrderChildCancelledBinding binding;
     private OrderStatus status;
-    FragmentShopOrderChildBinding binding;
     private ShopOrderChildAdapter adapter;
     private List<OrderDtoRequest> orders;
     private OrderViewModel vm;
 
     private SessionManager sessionManager;
-    public ShopOrderChildFragment() {
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public ShopOrderChildCancelledFragment() {
         // Required empty public constructor
     }
 
-
     // TODO: Rename and change types and number of parameters
-    public static ShopOrderChildFragment newInstance(OrderStatus status) {
-        ShopOrderChildFragment fragment = new ShopOrderChildFragment();
+    public static ShopOrderChildCancelledFragment newInstance(OrderStatus status) {
+        ShopOrderChildCancelledFragment fragment = new ShopOrderChildCancelledFragment();
         Bundle args = new Bundle();
         args.putSerializable("status",status);
         fragment.setArguments(args);
@@ -70,7 +78,7 @@ public class ShopOrderChildFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentShopOrderChildBinding.inflate(inflater, container, false);
+        binding = FragmentShopOrderChildCancelledBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -94,10 +102,13 @@ public class ShopOrderChildFragment extends Fragment {
     private void setupRecyclerView() {
         orders = new ArrayList<>();
         adapter = new ShopOrderChildAdapter(getContext(),orders);
+
+
         binding.rvOrders.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         binding.rvOrders.setAdapter(adapter);
     }
 
+    // Tìm vị trí của đơn hàng dựa trên orderId và thực hiện cập nhật UI
 
     // Hàm lấy dữ liệu từ API và load recyclerView
     private void loadData(OrderStatus status, Long postId) {

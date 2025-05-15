@@ -20,11 +20,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
-import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopOrderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ShopOrderChildAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
-import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopOrderChildBinding;
+import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentShopOrderChildDeliveredBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.OrderViewModel;
@@ -33,25 +32,35 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ShopOrderChildFragment#newInstance} factory method to
+ * Use the {@link ShopOrderChildDeliveredFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ShopOrderChildFragment extends Fragment {
+public class ShopOrderChildDeliveredFragment extends Fragment {
+    FragmentShopOrderChildDeliveredBinding binding;
     private OrderStatus status;
-    FragmentShopOrderChildBinding binding;
     private ShopOrderChildAdapter adapter;
     private List<OrderDtoRequest> orders;
-    private OrderViewModel vm;
 
     private SessionManager sessionManager;
-    public ShopOrderChildFragment() {
+    private OrderViewModel vm;
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public ShopOrderChildDeliveredFragment() {
         // Required empty public constructor
     }
 
 
     // TODO: Rename and change types and number of parameters
-    public static ShopOrderChildFragment newInstance(OrderStatus status) {
-        ShopOrderChildFragment fragment = new ShopOrderChildFragment();
+    public static ShopOrderChildDeliveredFragment newInstance(OrderStatus status) {
+        ShopOrderChildDeliveredFragment fragment = new ShopOrderChildDeliveredFragment();
         Bundle args = new Bundle();
         args.putSerializable("status",status);
         fragment.setArguments(args);
@@ -70,7 +79,7 @@ public class ShopOrderChildFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentShopOrderChildBinding.inflate(inflater, container, false);
+        binding = FragmentShopOrderChildDeliveredBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -98,14 +107,12 @@ public class ShopOrderChildFragment extends Fragment {
         binding.rvOrders.setAdapter(adapter);
     }
 
-
     // Hàm lấy dữ liệu từ API và load recyclerView
     private void loadData(OrderStatus status, Long postId) {
         ApiService.apiService.getShopOrderStatus(status, postId).enqueue(new Callback<ResponseData<List<OrderDtoRequest>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<OrderDtoRequest>>> call, Response<ResponseData<List<OrderDtoRequest>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
-                    // Giữ nguyên tham chiếu đến orders, chỉ cập nhật nội dung
                     orders.clear();
                     orders.addAll(response.body().getData());
                     adapter.notifyDataSetChanged();
@@ -133,5 +140,6 @@ public class ShopOrderChildFragment extends Fragment {
             binding.rvOrders.setVisibility(View.VISIBLE);
         }
     }
+
 
 }

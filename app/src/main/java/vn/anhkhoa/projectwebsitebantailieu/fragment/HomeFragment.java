@@ -170,7 +170,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void callApiGetListDocument(){
-        ApiService.apiService.getListDocument().enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
+        ApiService.apiService.getListDocument(sessionManager.getUser().getUserId()).enqueue(new Callback<ResponseData<List<DocumentDto>>>() {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
                 skeleton.showOriginal();
@@ -232,7 +232,7 @@ public class HomeFragment extends Fragment {
         // Thêm dữ liệu ảnh mẫu (thay thế bằng dữ liệu thực tế)
         bannerImages.add("https://as2.ftcdn.net/jpg/04/32/48/41/1000_F_432484133_WnmdDXCWu7i2tR90K7flMtnJ4zOOfnM2.jpg");
         bannerImages.add("https://static.vecteezy.com/system/resources/previews/023/107/446/non_2x/promo-sale-banner-with-reading-stack-of-books-wooden-letter-tiles-school-books-pile-world-book-day-bookstore-bookshop-library-book-lover-bibliophile-education-a4-for-poster-cover-vector.jpg");
-        bannerImages.add("https://www.shutterstock.com/image-vector/promo-sale-banner-library-bookshop-260nw-1790872166.jpg");
+        bannerImages.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk2tzj10CnY8tcE9svBC2VZBES3gsyZCAm8g&s");
     }
 
     private void setupViewPager() {

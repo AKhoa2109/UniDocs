@@ -56,7 +56,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "196.169.2.158:8080";
+    public static String ipAddress = "192.168.1.35:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -84,7 +84,7 @@ public interface ApiService {
 
     //document
     @GET("document/list")
-    Call<ResponseData<List<DocumentDto>>> getListDocument();
+    Call<ResponseData<List<DocumentDto>>> getListDocument(@Query("userId") Long userId);
 
     @GET("document/search-document")
     Call<ResponseData<List<DocumentDto>>> searchDocument(@Query("keyword") String keyword);

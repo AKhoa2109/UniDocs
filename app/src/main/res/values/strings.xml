@@ -18,8 +18,8 @@
     </array>
     <array name="orderStatus">
         <item>PENDING</item>
-        <item>CONFIRMED</item>
         <item>DELIVERED</item>
+        <item>CONFIRMED</item>
         <item>CANCELED</item>
     </array>
     <string name="dummy_button">Dummy Button</string>

@@ -58,11 +58,12 @@ public class DocumentDto implements Serializable {
         this.sellPrice = sell_price;
     }
 
-    public DocumentDto(Long doc_id, String doc_name, String doc_image_url, Double sell_price, Long totalSold) {
-        this.docId = doc_id;
-        this.docName = doc_name;
-        this.docImageUrl = doc_image_url;
-        this.sellPrice = sell_price;
+    public DocumentDto(Long docId, String docName, String docImageUrl, Double sellPrice, Double originalPrice,Long totalSold) {
+        this.docId = docId;
+        this.docName = docName;
+        this.docImageUrl = docImageUrl;
+        this.sellPrice = sellPrice;
+        this.originalPrice = originalPrice;
         this.totalSold = totalSold;
     }
 

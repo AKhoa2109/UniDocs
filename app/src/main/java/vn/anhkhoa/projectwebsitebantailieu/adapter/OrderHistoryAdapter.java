@@ -13,6 +13,7 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemOrderHistoryBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
+import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 
 public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder> {
     private List<OrderDtoRequest> orderList = new ArrayList<>();
@@ -63,8 +64,12 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             binding.tvOrderStatus.setText(setStatus(order.getStatus()));
             binding.tvDocumentName.setText(order.getDocName());
             binding.tvDocumentQuantity.setText("Số lượng: " + order.getQuantity());
-            binding.tvDocumentOriginalPrice.setText(String.format("%,d đồng", order.getOriginalPrice()));
-            binding.tvDocumentSellPrice.setText(String.format("Giá: %,d đồng", order.getSellPrice()));
+            binding.tvDocumentOriginalPrice.setText(
+                    CurrentFormatter.format(order.getOriginalPrice())
+            );
+            binding.tvDocumentSellPrice.setText(
+                    CurrentFormatter.format(order.getOriginalPrice())
+            );
             
             // Load image using Glide
             if (order.getDocImageUrl() != null && !order.getDocImageUrl().isEmpty()) {
