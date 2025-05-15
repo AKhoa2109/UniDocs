@@ -6,6 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.fragment.OrderStatusChildFragment;
+import vn.anhkhoa.projectwebsitebantailieu.fragment.ShopOrderChildFragment;
 
 public class ShopOrderAdapter extends FragmentStateAdapter {
     private final String[] statusValues;
@@ -22,7 +23,7 @@ public class ShopOrderAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         // Tạo fragment con với status tương ứng
-        return OrderStatusChildFragment.newInstance(OrderStatus.valueOf(statusValues[position]));
+        return ShopOrderChildFragment.newInstance(OrderStatus.valueOf(statusValues[position]));
     }
 
     @Override
