@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -56,7 +57,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
 public interface ApiService {
     //Gson gson = new GsonBuilder().setDateFormat("dd-MM-yyyy").create();
     //sua IP
-    public static String ipAddress = "192.168.1.35:8080";
+    public static String ipAddress = "10.0.2.2:8080";
     String baseUrl = "http://" + ipAddress + "/api/";
     /*String baseUrl = "https://hippo-powerful-fully.ngrok-free.app/api/";*/
      Gson gson = new GsonBuilder()
@@ -183,8 +184,12 @@ public interface ApiService {
     @GET("review/by-document/{docId}")
     Call<ResponseData<List<ReviewDto>>> getReviewsByDocumentId(@Path("docId") Long docId);
 
-    @GET("review/rate-report/{docId}")
-    Call<ResponseData<Map<Integer, Long>>> getRateReportByDocumentId(@Path("docId") Long docId);
+    @Multipart
+    @POST("review/add")
+    Call<ResponseData<Boolean>> addReview(
+            @Part("reviewDto") RequestBody reviewDto,
+            @Part List<MultipartBody.Part> files
+    );
 
     //cart
     @GET("cart/user/{userId}")
