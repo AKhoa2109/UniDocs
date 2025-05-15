@@ -16,6 +16,12 @@
         <item>Nữ</item>
         <item>Khác</item>
     </array>
+    <array name="orderStatus">
+        <item>PENDING</item>
+        <item>DELIVERED</item>
+        <item>CONFIRMED</item>
+        <item>CANCELED</item>
+    </array>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="error_invalid_email">Email không hợp lệ</string>

@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import java.util.List;
+import java.util.Locale;
+
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
@@ -46,6 +48,19 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         holder.tvSellPrice.setText(CurrentFormatter.format(documentDto.getSellPrice()));
         String totalSold = String.valueOf(documentDto.getTotalSold())+" lượt xem";
         holder.tvTotalSold.setText(totalSold);
+        // Tính % giảm giá: (Giá gốc - Giá bán) / Giá gốc * 100
+        Double originalObj = documentDto.getOriginalPrice();
+        Double sellObj     = documentDto.getSellPrice();
+        double original    = originalObj != null ? originalObj : 0.0;
+        double sell        = sellObj     != null ? sellObj     : 0.0;
+
+        // Tính % giảm giá chỉ khi có giá gốc > 0
+        double discountPercent = 0;
+        if (original > 0) {
+            discountPercent = (original - sell) / original * 100;
+        }
+        // Hiển thị "-45%" hoặc "-0%" nếu không có dữ liệu
+        holder.tvDiscount.setText(String.format(Locale.getDefault(), "-%.0f%%", discountPercent));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,7 +86,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private ImageView imgDocument;
-        private TextView tvDocName, tvSellPrice, tvTotalSold;
+        private TextView tvDocName, tvSellPrice, tvTotalSold, tvDiscount;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -80,6 +95,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
             tvDocName = itemView.findViewById(R.id.tv_doc_name);
             tvSellPrice = itemView.findViewById(R.id.tv_sell_price);
             tvTotalSold = itemView.findViewById(R.id.tvNumSold);
+            tvDiscount = itemView.findViewById(R.id.tv_percent_sale);
         }
     }
 }

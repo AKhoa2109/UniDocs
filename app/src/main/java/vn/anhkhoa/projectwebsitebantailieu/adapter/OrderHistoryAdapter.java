@@ -1,6 +1,7 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -13,6 +14,7 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.databinding.ItemOrderHistoryBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
+import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 
 public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapter.OrderHistoryViewHolder> {
     private List<OrderDtoRequest> orderList = new ArrayList<>();
@@ -21,6 +23,8 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
     public interface OnOrderClickListener {
         void onDetailClick(OrderDtoRequest order);
         void onBuyAgainClick(OrderDtoRequest order);
+
+        void onCancelClick(OrderDtoRequest order);
     }
 
     public OrderHistoryAdapter(OnOrderClickListener listener) {
@@ -63,8 +67,12 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
             binding.tvOrderStatus.setText(setStatus(order.getStatus()));
             binding.tvDocumentName.setText(order.getDocName());
             binding.tvDocumentQuantity.setText("Số lượng: " + order.getQuantity());
-            binding.tvDocumentOriginalPrice.setText(String.format("%,d đồng", order.getOriginalPrice()));
-            binding.tvDocumentSellPrice.setText(String.format("Giá: %,d đồng", order.getSellPrice()));
+            binding.tvDocumentOriginalPrice.setText(
+                    CurrentFormatter.format(order.getOriginalPrice())
+            );
+            binding.tvDocumentSellPrice.setText(
+                    CurrentFormatter.format(order.getOriginalPrice())
+            );
             
             // Load image using Glide
             if (order.getDocImageUrl() != null && !order.getDocImageUrl().isEmpty()) {
@@ -85,6 +93,29 @@ public class OrderHistoryAdapter extends RecyclerView.Adapter<OrderHistoryAdapte
                     listener.onBuyAgainClick(order);
                 }
             });
+
+            binding.btnCancel.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onCancelClick(order);
+                }
+            });
+
+            if(order.getStatus() == OrderStatus.CANCELED){
+                binding.btnDetail.setVisibility(View.VISIBLE);
+                binding.btnBuyAgain.setVisibility(View.VISIBLE);
+                binding.btnCancel.setVisibility(View.GONE);
+            }
+            else if(order.getStatus() == OrderStatus.CONFIRMED){
+                binding.btnDetail.setVisibility(View.VISIBLE);
+                binding.btnBuyAgain.setVisibility(View.VISIBLE);
+                binding.btnCancel.setVisibility(View.GONE);
+            }
+            else{
+                binding.btnDetail.setVisibility(View.VISIBLE);
+                binding.btnBuyAgain.setVisibility(View.VISIBLE);
+                binding.btnCancel.setVisibility(View.VISIBLE);
+            }
+
         }
 
         private String setStatus(OrderStatus status){

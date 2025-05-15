@@ -97,6 +97,9 @@ public class ShopFragment extends Fragment {
                         case 3:
                             tab.setText("Thống kê");
                             break;
+                        case 4:
+                            tab.setText("Quản lý đơn hàng");
+                            break;
                     }
                 }).attach();
         binding.searchView.setFocusable(false);

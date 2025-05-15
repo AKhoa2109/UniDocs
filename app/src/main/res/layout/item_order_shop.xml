@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <com.google.android.material.card.MaterialCardView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:cardElevation="2dp"
-    android:layout_margin="4dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="2dp"
+        android:layout_margin="4dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
                         android:id="@+id/ivDocument"
                         android:padding="10dp"
                         android:layout_width="120dp"
-                        android:layout_height="120dp"
+                        android:layout_height="160dp"
                         android:src="@drawable/ic_launcher_background" />
                 </LinearLayout>
 
@@ -55,7 +55,6 @@
                         android:id="@+id/tvDocumentName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="20dp"
                         android:text="Tài liệu toán 1"
                         android:textSize="14sp"
                         android:textStyle="bold"
@@ -65,7 +64,6 @@
                         android:id="@+id/tvDocumentQuantity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingLeft="20dp"
                         android:text="Số lượng"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -77,9 +75,7 @@
                         <TextView
                             android:id="@+id/tvDocumentOriginalPrice"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:gravity="bottom|right"
+                            android:layout_height="wrap_content"
                             android:paddingRight="20dp"
                             android:text="45.000 đồng"
                             android:textSize="14sp"
@@ -87,13 +83,32 @@
                         <TextView
                             android:id="@+id/tvDocumentSellPrice"
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:gravity="bottom|right"
+                            android:layout_height="wrap_content"
                             android:paddingRight="20dp"
                             android:text="Giá: 45.000 đồng"
                             android:textSize="16sp"
                             android:textStyle="bold" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilgender"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            android:layout_width="200dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="left"
+                            android:hint="Trạng thái"
+                            android:paddingRight="10dp"
+                            android:paddingBottom="10dp"
+                            app:endIconMode="dropdown_menu"
+                            app:hintTextColor="@color/black">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/actvGender"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
                 </LinearLayout>
@@ -104,38 +119,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="10dp"
-                android:gravity="right">
-                <Button
-                    android:id="@+id/btnDetail"
-                    android:layout_width="95dp"
-                    android:layout_height="45dp"
-                    app:backgroundTint="@null"
-                    android:background="@drawable/bg_button_outline"
-                    android:text="Chi tiết"
-                    android:textColor="@color/text_color_selector"
-                    android:layout_marginRight="5dp"
-                    android:textSize="12sp"
-                    android:gravity="center"/>
-                <Button
-                    android:id="@+id/btnBuyAgain"
-                    android:layout_width="95dp"
-                    android:layout_height="45dp"
-                    app:backgroundTint="@null"
-                    android:background="@drawable/bg_button_outline"
-                    android:text="Mua lại"
-                    android:textColor="@color/text_color_selector"
-                    android:layout_marginRight="5dp"
-                    android:textSize="12sp"
-                    android:gravity="center"/>
+                android:gravity="center">
 
                 <Button
-                    android:id="@+id/btnCancel"
-                    android:layout_width="90dp"
-                    android:layout_height="45dp"
+                    android:id="@+id/btnSubmit"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
                     app:backgroundTint="@null"
                     android:background="@drawable/bg_button_outline"
-                    android:text="Hủy"
+                    android:text="Lưu"
+                    android:layout_marginRight="10dp"
                     android:textColor="@color/text_color_selector"
                     android:textSize="12sp"
                     android:gravity="center"/>

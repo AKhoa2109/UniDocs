@@ -8,15 +8,15 @@ public class OrderDtoRequest implements Serializable {
     private Long orderId;
     private Long docId;
     private String docName;
-    private Long originalPrice;
-    private Long sellPrice;
+    private Double originalPrice;
+    private Double sellPrice;
     private String docImageUrl;
     private String docDesc;
     private Integer quantity;
 
     private OrderStatus status;
 
-    public OrderDtoRequest(Long orderId, Long docId, String docName, Long originalPrice, Long sellPrice, String docImageUrl, String docDesc, Integer quantity, OrderStatus status) {
+    public OrderDtoRequest(Long orderId, Long docId, String docName, Double originalPrice, Double sellPrice, String docImageUrl, String docDesc, Integer quantity, OrderStatus status) {
         this.orderId = orderId;
         this.docId = docId;
         this.docName = docName;
@@ -52,19 +52,19 @@ public class OrderDtoRequest implements Serializable {
         this.docName = docName;
     }
 
-    public Long getOriginalPrice() {
+    public Double getOriginalPrice() {
         return originalPrice;
     }
 
-    public void setOriginalPrice(Long originalPrice) {
+    public void setOriginalPrice(Double originalPrice) {
         this.originalPrice = originalPrice;
     }
 
-    public Long getSellPrice() {
+    public Double getSellPrice() {
         return sellPrice;
     }
 
-    public void setSellPrice(Long sellPrice) {
+    public void setSellPrice(Double sellPrice) {
         this.sellPrice = sellPrice;
     }
 
