@@ -1,8 +1,11 @@
 package vn.anhkhoa.projectwebsitebantailieu.fragment;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,7 +18,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import retrofit2.Call;
@@ -31,12 +37,14 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentCartBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.DiscountType;
 import vn.anhkhoa.projectwebsitebantailieu.model.CartDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.CreateOrderFromCartRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CartViewModel;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 import vn.anhkhoa.projectwebsitebantailieu.utils.NetworkUtil;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
-import vn.anhkhoa.projectwebsitebantailieu.utils.SyncManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
+import com.google.gson.Gson;
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,20 +60,17 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     private List<CartDto> cartItems;
     private CartViewModel viewModel;
     DatabaseHandler databaseHandler;
-    private double totalPrice = 0;
+    private double totalPrice;
     private CompoundButton.OnCheckedChangeListener selectAllListener =
             (buttonView, isChecked) -> {
                 cartAdapter.selectAllItems(isChecked);
                 if (isChecked) {
                     viewModel.setSelectedCartItems(new ArrayList<>(cartItems));
-                    binding.ibRemoveAll.setVisibility(View.VISIBLE);
                 } else {
                     viewModel.clearSelectedCartItems();
-                    binding.ibRemoveAll.setVisibility(View.INVISIBLE);
                 }
                 calculateTotalAmount();
             };
-
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -147,9 +152,101 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
         cartAdapter = new CartAdapter(cartItems, this);
         binding.rcCartItem.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         binding.rcCartItem.setAdapter(cartAdapter);
+        Random random = new Random();
+
+        binding.btnBuy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Lấy danh sách items đã chọn từ ViewModel
+                List<CartDto> selectedItems = viewModel.getSelectedCartItems().getValue();
+                
+                if (selectedItems == null || selectedItems.isEmpty()) {
+                    Toast.makeText(getContext(), "Vui lòng chọn sản phẩm", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Tạo danh sách cartIds từ selectedItems
+                List<Long> cartIds = selectedItems.stream()
+                        .map(CartDto::getCartId)
+                        .collect(Collectors.toList());
+
+                // Lấy voucher đã chọn (nếu có)
+                AtomicReference<DiscountDto> selectedVoucher = new AtomicReference<>();
+                if (!binding.tvVoucherName.getText().toString().isEmpty()) {
+                    getParentFragmentManager().setFragmentResultListener("voucherResult", getViewLifecycleOwner(), (requestKey, result) -> {
+                        if (result != null && result.containsKey("selectedDiscount")) {
+                            selectedVoucher.set((DiscountDto) result.getSerializable("selectedDiscount"));
+                        }
+                    });
+                }
+
+                // Tạo request object
+                CreateOrderFromCartRequest request = new CreateOrderFromCartRequest(
+                    cartIds,
+                    selectedVoucher.get() != null ? selectedVoucher.get().getDiscountId() : null,
+                    sessionManager.getUser().getUserId()
+                );
+
+                // Hiển thị loading
+                binding.progressBar.setVisibility(View.VISIBLE);
+                binding.btnBuy.setEnabled(false);
+
+                // Gọi API createOrderFromCart
+                ApiService.apiService.createPayment(request).enqueue(new Callback<ResponseData<Map<String, String>>>() {
+                    @Override
+                    public void onResponse(Call<ResponseData<Map<String, String>>> call, Response<ResponseData<Map<String, String>>> response) {
+                        // Ẩn loading
+                        binding.progressBar.setVisibility(View.GONE);
+                        binding.btnBuy.setEnabled(true);
+
+                        if (response.isSuccessful() && response.body() != null) {
+                            Map<String, String> data = response.body().getData();
+                            String paymentUrl = data.get("paymentUrl");
+                            
+                            if (paymentUrl != null && !paymentUrl.isEmpty()) {
+                                // Mở trang thanh toán
+                                openInCustomTab(view, paymentUrl);
+                            } else {
+                                Toast.makeText(getContext(), "Không lấy được URL thanh toán", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+//                            String errorMessage = "Đặt hàng thất bại";
+//                            if (response.errorBody() != null) {
+//                                try {
+//                                    ResponseData<?> errorResponse = new Gson().fromJson(
+//                                        response.errorBody().string(),
+//                                        ResponseData.class
+//                                    );
+//                                    errorMessage = errorResponse.getMessage();
+//                                } catch (IOException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                            ToastUtils.show(requireActivity(), "Đặt hàng thất bại !");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseData<Map<String, String>>> call, Throwable t) {
+                        // Ẩn loading
+                        binding.progressBar.setVisibility(View.GONE);
+                        binding.btnBuy.setEnabled(true);
+                        
+                        Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
-
-
+    // Mở link bằng Chrome Custom Tabs
+    private void openInCustomTab(View view, String url) {
+        Context ctx = view.getContext();
+        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
+                .setShowTitle(true)
+                .build();
+        customTabsIntent.launchUrl(requireActivity(), Uri.parse(url));
+    }
 
     private void handlerVoucher(){
         binding.imageButtonVoucher.setOnClickListener(new View.OnClickListener() {
@@ -327,22 +424,22 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
         binding.cbSelect.setOnCheckedChangeListener(selectAllListener);
     }
 
-
     private void calculateTotalAmount() {
         totalPrice = 0;
-        for(CartDto item : cartItems) {
-            if(item.isSelected()) {
+        // Lấy danh sách items đã chọn từ ViewModel
+        List<CartDto> selectedItems = viewModel.getSelectedCartItems().getValue();
+        
+        if (selectedItems != null) {
+            for(CartDto item : selectedItems) {
                 totalPrice += item.getSellPrice() * item.getQuantity();
             }
         }
+        
         binding.tvPrice.setText(CurrentFormatter.format(totalPrice));
     }
 
     @Override
     public void onCheckboxClick(int position, boolean isChecked) {
-        if (viewModel == null) {
-            viewModel = new ViewModelProvider(requireActivity()).get(CartViewModel.class);
-        }
         CartDto item = cartItems.get(position);
         item.setSelected(isChecked);
         if (isChecked) {
@@ -384,15 +481,6 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
         super.onResume();
     }
 
-    private void syncCartWhenOnline() {
-        if (NetworkUtil.isNetworkAvailable(getContext())) {
-            new SyncManager().syncCarts(getContext());
-            Long userId = sessionManager.getUser().getUserId();
-            if (userId != null) {
-                getApiCartByUserId(userId);
-            }
-        }
-    }
 
     private void getVoucherBackData(){
         getParentFragmentManager().setFragmentResultListener("voucherResult", getViewLifecycleOwner(), (requestKey, result) -> {
@@ -400,7 +488,7 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
             DiscountDto selectedVoucher = (DiscountDto) result.getSerializable("selectedDiscount");
             // Lấy lại list CartDto đã chọn
             List<CartDto> returnedSelected = (List<CartDto>) result.getSerializable("selectedCartItems");
-
+//****
             Double price = 0.0;
 
             if (returnedSelected != null) {
@@ -448,5 +536,4 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
 
         binding.tvTotalPrice.setText(CurrentFormatter.format(Math.max(finalTotal, 0)));
     }
-
 }

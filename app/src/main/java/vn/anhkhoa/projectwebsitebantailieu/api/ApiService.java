@@ -40,6 +40,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.NotificationGroup;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.ReviewDto;
+import vn.anhkhoa.projectwebsitebantailieu.model.request.CreateOrderFromCartRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.LoginRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OrderDetailDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.PasswordResetRequest;
@@ -219,8 +220,23 @@ public interface ApiService {
     Call<ResponseData<Long>> addDiscount(@Path("userId") Long userId,@Body DiscountDto discountDto);
 
     //File document
-    @GET("file-document/by-document/{docId}")
+    @POST("file-document/by-document/{docId}")
     Call<ResponseData<FileDocument>> getFileDocumentByDocumentId(@Path("docId") Long docId);
+
+    //payment
+
+    @POST("payment/")
+    Call<ResponseData<Map<String, String>>> createPayment(@Body CreateOrderFromCartRequest request);
+
+//    @GET("payment/{orderId}")
+//    Call<Map<String, String>> createPayment(
+//            @Path("orderId") String orderId,
+//            @Query("amount") double amount,
+//            @Query("info") String info
+//    );
+
+//    @POST("/create")
+//    Call<ResponseData<Long>> createOrderFromCart(@Body CreateOrderFromCartRequest request);
 
     //Dashboard
     @GET("statistics/monthly/{userId}")

@@ -5,6 +5,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 
 public class CurrentFormatter {
+    //chuyen double thanh dang 1.234,50 đ
     public static String format(double value) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
         symbols.setGroupingSeparator('.');
