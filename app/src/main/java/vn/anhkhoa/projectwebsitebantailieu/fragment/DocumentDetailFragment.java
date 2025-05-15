@@ -38,6 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.DetailPagerAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.SliderAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
@@ -146,6 +147,14 @@ public class DocumentDetailFragment extends Fragment {
         getApiImageByDocumentId(documentDto.getDocId());
         getApiDocumentDetail(documentDto.getDocId());
         handlerAddToCart();
+
+        binding.btnBack.setOnClickListener(v->{requireActivity().onBackPressed();});
+
+        binding.imgViewCart.setOnClickListener(v->{
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openCartFragment();
+            }
+        });
     }
 
     private void getApiDocumentDetail(Long id){

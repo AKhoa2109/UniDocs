@@ -88,6 +88,8 @@ public class SearchActivity extends AppCompatActivity {
     private void initViews() {
         edtSearch = findViewById(R.id.edtSearch);
         ivFilter = findViewById(R.id.ivFilter);
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v->{ onBackPressed();});
     }
 
     private void handlerEditText(){
