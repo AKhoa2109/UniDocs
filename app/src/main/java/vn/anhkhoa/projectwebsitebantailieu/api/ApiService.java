@@ -265,4 +265,11 @@ public interface ApiService {
 
     @POST("order/update-order")
     Call<ResponseData<Void>> updateOrderStatus(@Query("orderId") Long orderId,@Query("status") OrderStatus status);
+
+    @Multipart
+    @POST("document/push-media")
+    Call<ResponseData<DocumentDto>> pushDocumentMedia(
+            @Part("documentDto") RequestBody documentDto,
+            @Part List<MultipartBody.Part> files
+    );
 }

@@ -55,6 +55,7 @@ import vn.anhkhoa.projectwebsitebantailieu.model.ChatLineDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.response.ConversationOverviewDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.FilePickerUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.LocalDateTimeAdapter;
+import vn.anhkhoa.projectwebsitebantailieu.utils.NotificationHelper;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 import android.net.Uri;
@@ -414,6 +415,12 @@ public class ChatFragment extends Fragment  implements FilePickerUtils.FilePicke
                             // Nếu đang ở cuối -> cuộn xuống
                             binding.rvMessages.scrollToPosition(chatAdapter.getItemCount() - 1);
                         } else {
+                            NotificationHelper.showNotification(
+                                    requireContext(),
+                                    NotificationHelper.Channel.CHAT,
+                                    "Tin nhắn mới",
+                                    "Bạn có tin nhắn mới"
+                            );
                             // Nếu không ở cuối -> hiện Toast
                             requireActivity().runOnUiThread(() ->
                                     ToastUtils.show(requireContext(), "Có tin nhắn mới", "#2ab857")

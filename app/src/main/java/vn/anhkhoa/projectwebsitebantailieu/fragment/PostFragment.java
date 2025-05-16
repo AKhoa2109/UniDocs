@@ -14,11 +14,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.google.gson.Gson;
+
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,6 +35,7 @@ import vn.anhkhoa.projectwebsitebantailieu.databinding.FragmentPostBinding;
 import vn.anhkhoa.projectwebsitebantailieu.enums.DocumentType;
 import vn.anhkhoa.projectwebsitebantailieu.model.CategoryDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
+import vn.anhkhoa.projectwebsitebantailieu.utils.FilePickerUtils;
 import vn.anhkhoa.projectwebsitebantailieu.utils.SessionManager;
 import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
 
@@ -37,7 +44,7 @@ import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
  * Use the {@link PostFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PostFragment extends Fragment {
+public class PostFragment extends Fragment implements FilePickerUtils.FilePickerCallback{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -69,12 +76,19 @@ public class PostFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+    private FilePickerUtils filePickerUtils;
     private FragmentPostBinding binding;
     private SessionManager sessionManager;
     private List<CategoryDto> categoryDtoList;
     private ArrayAdapter categoryAdapter;
     //danh muc duoc chon
     private Long selectedCateId = null;
+    private List<File> selectedImageFiles = new ArrayList<>();
+
+    private void showLoading(boolean show) {
+        binding.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        binding.buttonUpload.setEnabled(!show);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,6 +125,7 @@ public class PostFragment extends Fragment {
             return insets;
         });
         sessionManager = SessionManager.getInstance(requireContext());
+        filePickerUtils = new FilePickerUtils(this, this);
 
         //lay id category khi duoc chon
         binding.spinnerCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -155,14 +170,62 @@ public class PostFragment extends Fragment {
             }
         });
 
+//        binding.buttonUpload.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                DocumentDto documentDto = getFormData();
+//                if(documentDto == null) return;
+//                ApiService.apiService.pushDocument(documentDto).enqueue(new Callback<ResponseData<DocumentDto>>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseData<DocumentDto>> call, Response<ResponseData<DocumentDto>> response) {
+//                        if(response.isSuccessful() && response.body() != null){
+//                            ResponseData<DocumentDto> responseData = response.body();
+//                            if (responseData.getStatus() == 200){
+//                                ToastUtils.show(binding.getRoot().getContext(), "Tai len thanh cong: " + responseData.getData().getDocName());
+//                            }else {
+//                                ToastUtils.show(binding.getRoot().getContext(), "Loi API");
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponseData<DocumentDto>> call, Throwable t) {
+//                        ToastUtils.show(binding.getRoot().getContext(), "Loi ket noi internet!");
+//                    }
+//                });
+//            }
+//        });
+
+        binding.buttonChooseImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                filePickerUtils.checkPermissionAndPick(FilePickerUtils.PICKER_TYPE_IMAGE);
+            }
+        });
+
         binding.buttonUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DocumentDto documentDto = getFormData();
+                Gson gson = new Gson();
+                String documentJson = gson.toJson(documentDto);
+                RequestBody documentBody = RequestBody.create(MediaType.parse("application/json"), documentJson);
+
+                List<MultipartBody.Part> fileParts = new ArrayList<>();
+                if (!selectedImageFiles.isEmpty()) {
+                    for (File file : selectedImageFiles) {
+                        RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+                        MultipartBody.Part part = MultipartBody.Part.createFormData("files", file.getName(), requestFile);
+                        fileParts.add(part);
+                    }
+                }
+
                 if(documentDto == null) return;
-                ApiService.apiService.pushDocument(documentDto).enqueue(new Callback<ResponseData<DocumentDto>>() {
+                showLoading(true);
+                ApiService.apiService.pushDocumentMedia(documentBody, fileParts).enqueue(new Callback<ResponseData<DocumentDto>>() {
                     @Override
                     public void onResponse(Call<ResponseData<DocumentDto>> call, Response<ResponseData<DocumentDto>> response) {
+                        showLoading(false);
                         if(response.isSuccessful() && response.body() != null){
                             ResponseData<DocumentDto> responseData = response.body();
                             if (responseData.getStatus() == 200){
@@ -175,6 +238,7 @@ public class PostFragment extends Fragment {
 
                     @Override
                     public void onFailure(Call<ResponseData<DocumentDto>> call, Throwable t) {
+                        showLoading(false);
                         ToastUtils.show(binding.getRoot().getContext(), "Loi ket noi internet!");
                     }
                 });
@@ -257,6 +321,16 @@ public class PostFragment extends Fragment {
         documentDto.setCateId(selectedCateId);
 
         return documentDto;
+    }
+
+    @Override
+    public void onFilesPicked(List<File> files, int currentPickerType) {
+        if (currentPickerType == FilePickerUtils.PICKER_TYPE_IMAGE) {
+            selectedImageFiles.addAll(files);
+//            selectedImageAdapter.notifyDataSetChanged();
+//            //kiem tra neu co hinh thì hien thi khung hinh
+//            updateSelectedImagesVisibility();
+        }
     }
 
 //    public DocumentDto getFormData(){

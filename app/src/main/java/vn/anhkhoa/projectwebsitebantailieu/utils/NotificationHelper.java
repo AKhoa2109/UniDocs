@@ -30,7 +30,14 @@ public class NotificationHelper {
                 "Download Notifications",
                 "Thông báo khi tải tài liệu",
                 R.drawable.download_icon
-        );
+        ),
+
+        CHAT(
+                "chat_channel",
+                        "Chat Notifications",
+                        "Thông báo khi co1 tin nhắn",
+                R.drawable.chat_icon
+                );
 
         private final String id;
         private final String name;
