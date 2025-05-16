@@ -10,6 +10,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.NotificationAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
@@ -86,7 +87,14 @@ public class NotificationFragment extends Fragment {
         databaseHandler = DatabaseHandler.getInstance(requireContext());
         notificationDao = new NotificationDao(requireContext());
         if(NetworkUtil.isNetworkAvailable(requireContext())){
-            getApiNotificationGroup(sessionManager.getUser().getUserId());
+            if(sessionManager.getUser() != null){
+                getApiNotificationGroup(sessionManager.getUser().getUserId());
+            }
+            else {
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).showLoginDialogOrActivity();
+                }
+            }
         }
         else {
             loadFromLocal();

@@ -30,6 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.MediaAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.adapter.ReviewAdapter;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
@@ -146,7 +147,9 @@ public class ReviewFragment extends Fragment implements FilePickerUtils.FilePick
         binding.tvTotalReviews.setText(numReview);
         binding.tvAverageRating.setText(avgRate);
         binding.ratingBarAverage.setRating(Float.valueOf(avgRate));
-        binding.tvUserNameWrite.setText(sessionManager.getUser().getName());
+        if(sessionManager.getUser() != null){
+            binding.tvUserNameWrite.setText(sessionManager.getUser().getName());
+        }
 
         reviews = new ArrayList<>();
         binding.rvReviews.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
@@ -172,6 +175,12 @@ public class ReviewFragment extends Fragment implements FilePickerUtils.FilePick
         });
 
         binding.btnSubmitReview.setOnClickListener(v -> {
+            if(sessionManager.getUser() == null){
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).showLoginDialogOrActivity();
+                }
+                return;
+            }
             // Hiện ProgressBar khi bắt đầu gửi
             binding.progressBar.setVisibility(View.VISIBLE);
             binding.btnSubmitReview.setEnabled(false);

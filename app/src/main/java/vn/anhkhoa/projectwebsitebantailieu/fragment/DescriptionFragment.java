@@ -90,11 +90,13 @@ public class DescriptionFragment extends Fragment {
         });
     }
 
+    boolean check = false;
     private void getApiLoadCategory(Long categoryId){
         ApiService.apiService.getDocumentById(categoryId).enqueue(new Callback<ResponseData<CategoryDto>>() {
             @Override
             public void onResponse(Call<ResponseData<CategoryDto>> call, Response<ResponseData<CategoryDto>> response) {
                 if(response.isSuccessful() && response.body() != null){
+
                     categoryDto = response.body().getData();
                     binding.tvCategory.setText("Loại: "+categoryDto.getCateName());
                 }
@@ -131,7 +133,7 @@ public class DescriptionFragment extends Fragment {
         ApiService.apiService.getFileDocumentByDocumentId(docId).enqueue(new Callback<ResponseData<FileDocument>>() {
             @Override
             public void onResponse(Call<ResponseData<FileDocument>> call, Response<ResponseData<FileDocument>> response) {
-                if(response.isSuccessful() && response.body() != null){
+                if(response.isSuccessful() && response.body().getData() != null){
                     FileDocument file = response.body().getData();
                     fileDocument = new FileDocument(file.getFileId(), file.getFileUrl(), file.getFileType(), documentDto.getDocName(), documentDto.getDocPage());
                 }

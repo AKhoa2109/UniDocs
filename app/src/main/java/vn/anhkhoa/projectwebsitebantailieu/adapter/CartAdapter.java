@@ -48,6 +48,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>{
         holder.tvProductName.setText(item.getDocName());
         holder.tvProductPrice.setText(String.format("%sđ", item.getSellPrice()));
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
+        holder.cbSelect.setChecked(item.isSelected());
         Glide.with(holder.itemView.getContext()).load(item.getDocImageUrl()).into(holder.ivProduct);
 
         holder.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -59,6 +60,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>{
             int newQuantity = item.getQuantity() + 1;
             item.setQuantity(newQuantity);
             holder.tvQuantity.setText(String.valueOf(newQuantity));
+            holder.cbSelect.setChecked(item.isSelected());
             if(item.isSelected())
                 listener.onQuantityChanged(position, newQuantity);
         });
@@ -68,6 +70,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder>{
                 int newQuantity = item.getQuantity() - 1;
                 item.setQuantity(newQuantity);
                 holder.tvQuantity.setText(String.valueOf(newQuantity));
+                holder.cbSelect.setChecked(item.isSelected());
                 if(item.isSelected())
                     listener.onQuantityChanged(position, newQuantity);
             }

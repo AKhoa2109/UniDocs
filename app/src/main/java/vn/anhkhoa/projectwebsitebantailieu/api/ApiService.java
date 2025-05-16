@@ -228,7 +228,7 @@ public interface ApiService {
     Call<ResponseData<Long>> addDiscount(@Path("userId") Long userId,@Body DiscountDto discountDto);
 
     //File document
-    @POST("file-document/by-document/{docId}")
+    @GET("file-document/by-document/{docId}")
     Call<ResponseData<FileDocument>> getFileDocumentByDocumentId(@Path("docId") Long docId);
 
     //payment

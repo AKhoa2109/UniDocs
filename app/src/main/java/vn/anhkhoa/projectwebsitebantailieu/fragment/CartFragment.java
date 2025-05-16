@@ -60,6 +60,7 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     private List<CartDto> cartItems;
     private CartViewModel viewModel;
     DatabaseHandler databaseHandler;
+    private DiscountDto currentVoucher = null;
     private double totalPrice;
     private CompoundButton.OnCheckedChangeListener selectAllListener =
             (buttonView, isChecked) -> {
@@ -430,18 +431,42 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
     }
 
     private void calculateTotalAmount() {
-        totalPrice = 0;
-        // Lấy danh sách items đã chọn từ ViewModel
-        List<CartDto> selectedItems = viewModel.getSelectedCartItems().getValue();
-        
-        if (selectedItems != null) {
-            for(CartDto item : selectedItems) {
-                totalPrice += item.getSellPrice() * item.getQuantity();
+        // 1. Tính tổng giá cơ bản
+        double baseTotal = 0;
+        List<CartDto> selected = viewModel.getSelectedCartItems().getValue();
+        if (selected != null) {
+            for (CartDto c : selected) {
+                baseTotal += c.getSellPrice() * c.getQuantity();
             }
         }
-        
-        binding.tvPrice.setText(CurrentFormatter.format(totalPrice));
+
+        // 2. Hiển thị tổng giá sản phẩm
+        binding.tvPrice.setText(CurrentFormatter.format(baseTotal));
+
+        // 3. Áp dụng voucher (nếu có)
+        if (currentVoucher != null) {
+            double discountValue = currentVoucher.getDiscountValue();
+            double discountAmount;
+            if (currentVoucher.getDiscountType() == DiscountType.PERCENT) {
+                // % discount
+                discountAmount = baseTotal * discountValue / 100;
+            } else {
+                // fixed discount
+                discountAmount = discountValue;
+            }
+            // đảm bảo không âm
+            discountAmount = Math.min(discountAmount, baseTotal);
+            binding.tvDiscount.setText(CurrentFormatter.format(discountAmount));
+
+            double finalTotal = baseTotal - discountAmount;
+            binding.tvTotalPrice.setText(CurrentFormatter.format(finalTotal));
+        } else {
+            // không có voucher
+            binding.tvDiscount.setText(CurrentFormatter.format(0));
+            binding.tvTotalPrice.setText(CurrentFormatter.format(baseTotal));
+        }
     }
+
 
     @Override
     public void onCheckboxClick(int position, boolean isChecked) {
@@ -452,8 +477,9 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
         } else {
             viewModel.removeSelectedCartItem(item);
         }
-        calculateTotalAmount();
+        calculateTotalAmount();  // luôn cập nhật
     }
+
 
     @Override
     public void onQuantityChanged(int position, int quantity) {
@@ -495,6 +521,7 @@ public class CartFragment extends Fragment implements CartAdapter.Listener{
                     cartItem.setQuantity(cartItem.getQuantity());
                     cartAdapter.notifyItemChanged(position);
                     Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    calculateTotalAmount();
                 }
             });
         } else {

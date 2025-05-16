@@ -159,9 +159,9 @@ public class DocumentDetailFragment extends Fragment {
             }
         });
 
-        binding.btnChat.setOnClickListener(v->{
-
-        });
+//        binding.btnChat.setOnClickListener(v->{
+//
+//        });
     }
 
     private void getApiDocumentDetail(Long id){
@@ -283,6 +283,7 @@ public class DocumentDetailFragment extends Fragment {
                     if (getActivity() instanceof MainActivity) {
                         ((MainActivity) getActivity()).showLoginDialogOrActivity();
                     }
+                    return;
                 }
 
                 handlerAnimation(documentDto.getDocImageUrl());

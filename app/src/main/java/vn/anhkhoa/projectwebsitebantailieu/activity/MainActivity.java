@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
 //        startActivity(intent);
 //    }
 
+    //**
     public void showLoginDialogOrActivity() {
         new AlertDialog.Builder(this)
                 .setTitle("Yêu cầu đăng nhập")
@@ -277,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setVisibility(View.GONE);
     }
 
+    //** detail fragment
     public void openUserDetailFragment(UserRegisterRequest user){
         UserDetailInfoFragment userDetailInfoFragment = new UserDetailInfoFragment();
         Bundle args = new Bundle();
@@ -387,7 +389,6 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.frame_layout, orderStatusFragment)
                 .addToBackStack("orderStatusFragment")
                 .commit();
-
     }
 
     public void openOrderDetailFragment(OrderDtoRequest orderDtoRequest){
@@ -418,10 +419,4 @@ public class MainActivity extends AppCompatActivity {
         }
         /*unregisterReceiver(networkReceiver);*/
     }
-
-    /*private void registerNetworkReceiver() {
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkReceiver, filter);
-    }*/
-
 }
