@@ -13,6 +13,7 @@ import java.util.Locale;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
+import vn.anhkhoa.projectwebsitebantailieu.activity.SearchActivity;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
 
@@ -47,6 +48,9 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
         holder.tvDocName.setText(documentDto.getDocName());
         holder.tvSellPrice.setText(CurrentFormatter.format(documentDto.getSellPrice()));
         String totalSold = String.valueOf(documentDto.getTotalSold())+" lượt xem";
+        if(documentDto.getTotalSold()==null){
+            holder.tvTotalSold.setVisibility(View.GONE);
+        }
         holder.tvTotalSold.setText(totalSold);
         // Tính % giảm giá: (Giá gốc - Giá bán) / Giá gốc * 100
         Double originalObj = documentDto.getOriginalPrice();

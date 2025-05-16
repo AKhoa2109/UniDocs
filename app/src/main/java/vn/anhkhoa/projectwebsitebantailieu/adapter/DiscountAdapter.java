@@ -1,4 +1,5 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,9 @@ import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.enums.Scope;
 import vn.anhkhoa.projectwebsitebantailieu.model.DiscountDto;
 import vn.anhkhoa.projectwebsitebantailieu.utils.CurrentFormatter;
-public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.DiscountViewHolder>{
+import vn.anhkhoa.projectwebsitebantailieu.utils.ToastUtils;
+
+public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.DiscountViewHolder> {
     private List<DiscountDto> discounts;
     private Listener listener;
     private double totalCartPrice = 0.0;
@@ -27,6 +30,7 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         this.discounts = discounts;
         this.listener = listener;
     }
+
     public void setTotalCartPrice(double price) {
         this.totalCartPrice = price;
     }
@@ -42,6 +46,11 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
     @Override
     public void onBindViewHolder(@NonNull DiscountViewHolder holder, int position) {
         DiscountDto v = discounts.get(position);
+        androidx.core.content.ContextCompat.getMainExecutor(holder.itemView.getContext());
+        // Context for ToastUtils
+        final android.content.Context ctx = holder.itemView.getContext();
+
+        // Scope
         Scope scope = v.getScope();
         switch (scope) {
             case SHOP:
@@ -55,6 +64,8 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
                 break;
         }
         holder.tvName.setText(v.getDiscountName());
+
+        // Conditions text
         StringBuilder conditionText = new StringBuilder("Áp dụng cho đơn từ ");
         if (v.getMinPrice() != null && v.getMinPrice() > 0) {
             conditionText.append(CurrentFormatter.format(v.getMinPrice()));
@@ -62,27 +73,42 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
             conditionText.append("0đ");
         }
 
-        if (v.getMaxPrice() != null && v.getMaxPrice() > 0) {
-            conditionText.append(" đến ").append(CurrentFormatter.format(v.getMaxPrice()));
+        holder.tvConditions.setText(conditionText.toString());
+
+        // Expiry
+        holder.tvExpiry.setText("Hạn dùng: " +
+                v.getEndAt().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")));
+
+        // Remaining quantity
+        int remainingQuantity = v.getUsageLimit() - v.getUsedCount();
+        holder.tvRemainingQuantity.setText("x" + remainingQuantity);
+
+        // Conditions
+        boolean isValidStatus = v.getStatus() != null
+                && v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.DISABLED
+                && v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.EXPIRED;
+        boolean isWithinPriceRange = (v.getMinPrice() == null || totalCartPrice >= v.getMinPrice());
+        boolean hasRemaining = remainingQuantity > 0;
+        boolean notExpired = v.getEndAt().isAfter(LocalDateTime.now());
+
+        // Toast unmet conditions
+        if (!isValidStatus) {
+            ToastUtils.show(ctx, "Voucher " + v.getDiscountName() + " trạng thái không hợp lệ: " + v.getStatus());
+        }
+        if (!isWithinPriceRange) {
+            ToastUtils.show(ctx, "Voucher " + v.getDiscountName() + " giá không trong khoảng: đơn="
+                    + CurrentFormatter.format(totalCartPrice) + ", min=" + CurrentFormatter.format(v.getMinPrice())
+                    + ", max=" + CurrentFormatter.format(v.getMaxPrice()));
+        }
+        if (!hasRemaining) {
+            ToastUtils.show(ctx, "Voucher " + v.getDiscountName() + " đã hết lượt sử dụng");
+        }
+        if (!notExpired) {
+            ToastUtils.show(ctx, "Voucher " + v.getDiscountName() + " đã hết hạn ngày: "
+                    + v.getEndAt().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")));
         }
 
-        holder.tvConditions.setText(conditionText.toString());
-        holder.tvExpiry.setText("Hạn dùng: " + v.getEndAt().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")));
-        Integer remainingQuantity = v.getUsageLimit() - v.getUsedCount();
-        holder.tvRemainingQuantity.setText("x" +remainingQuantity);
-
-        boolean isExpired = v.getEndAt().isAfter(LocalDateTime.now());
-
-        boolean isReamining = remainingQuantity >= 0;
-
-        boolean isValidStatus = v.getStatus() != null &&
-                v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.DISABLED &&
-                v.getStatus() != vn.anhkhoa.projectwebsitebantailieu.enums.DiscountStatus.EXPIRED;
-
-        boolean isWithinPriceRange = (v.getMinPrice() == null || totalCartPrice >= v.getMinPrice()) &&
-                (v.getMaxPrice() == null || totalCartPrice <= v.getMaxPrice());
-
-        boolean isSelectable = isValidStatus && isWithinPriceRange && isReamining && isExpired;
+        boolean isSelectable = isValidStatus && isWithinPriceRange && hasRemaining && notExpired;
 
         holder.rbSelect.setEnabled(isSelectable);
         holder.rbSelect.setChecked(position == selectedPosition);
@@ -90,7 +116,6 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         holder.rbSelect.setOnClickListener(view -> {
             int current = holder.getAdapterPosition();
             if (current == RecyclerView.NO_POSITION || !isSelectable) return;
-
             if (selectedPosition == current) {
                 int prev = selectedPosition;
                 selectedPosition = -1;
@@ -110,12 +135,13 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
 
     @Override
     public int getItemCount() {
-        return discounts.size();
+        return discounts != null ? discounts.size() : 0;
     }
 
     static class DiscountViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvConditions, tvExpiry, tvRemainingQuantity, tvScopeName;
         RadioButton rbSelect;
+
         public DiscountViewHolder(@NonNull View itemView) {
             super(itemView);
             tvScopeName = itemView.findViewById(R.id.tvScopeName);
@@ -127,4 +153,3 @@ public class DiscountAdapter extends RecyclerView.Adapter<DiscountAdapter.Discou
         }
     }
 }
-
