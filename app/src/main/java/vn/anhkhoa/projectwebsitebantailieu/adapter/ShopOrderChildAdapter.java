@@ -1,6 +1,7 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import retrofit2.Call;
@@ -25,7 +27,9 @@ import retrofit2.Response;
 import vn.anhkhoa.projectwebsitebantailieu.R;
 import vn.anhkhoa.projectwebsitebantailieu.api.ApiService;
 import vn.anhkhoa.projectwebsitebantailieu.api.ResponseData;
+import vn.anhkhoa.projectwebsitebantailieu.enums.NotificationType;
 import vn.anhkhoa.projectwebsitebantailieu.enums.OrderStatus;
+import vn.anhkhoa.projectwebsitebantailieu.model.NotificationDto;
 import vn.anhkhoa.projectwebsitebantailieu.model.OrderDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.model.request.OrderDetailDtoRequest;
 import vn.anhkhoa.projectwebsitebantailieu.utils.OrderViewModel;
@@ -88,6 +92,7 @@ public class ShopOrderChildAdapter extends RecyclerView.Adapter<ShopOrderChildAd
             );
             actvStatus.setAdapter(adapter);
         }
+
 
         public void bind(OrderDtoRequest order, int position) {
             tvOrderStatus.setText(order.getStatus().name());
