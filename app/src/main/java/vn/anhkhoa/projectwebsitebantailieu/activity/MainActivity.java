@@ -292,6 +292,16 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavigationView.setVisibility(View.GONE);
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        DocumentDto doc = (DocumentDto) intent.getSerializableExtra("documentDto");
+        if (doc != null) {
+            openProductDetailFragment(doc);
+        }
+    }
+
+
     public void openProductDetailFragment(DocumentDto document){
         DocumentDetailFragment documentDetailFragment = new DocumentDetailFragment();
         Bundle args = new Bundle();

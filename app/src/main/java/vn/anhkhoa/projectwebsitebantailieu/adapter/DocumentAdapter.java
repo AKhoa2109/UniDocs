@@ -1,5 +1,7 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +70,20 @@ public class DocumentAdapter extends RecyclerView.Adapter<DocumentAdapter.ViewHo
                 if (context instanceof MainActivity) {
                     ((MainActivity) context).openProductDetailFragment(documentDto);
                 }
+                else {
+                    Context ctx = holder.itemView.getContext();
+                    Intent intent = new Intent(ctx, MainActivity.class);
+                    intent.putExtra("documentDto", documentDto);
+                    // Đảm bảo reuse MainActivity đang tồn tại
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    ctx.startActivity(intent);
+
+                    // Nếu context đang là Activity thì finish nó
+                    if (ctx instanceof Activity) {
+                        ((Activity) ctx).finish();
+                    }
+                }
+
             }
         });
     }

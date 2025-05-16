@@ -1,5 +1,8 @@
 package vn.anhkhoa.projectwebsitebantailieu.adapter;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import vn.anhkhoa.projectwebsitebantailieu.R;
+import vn.anhkhoa.projectwebsitebantailieu.activity.MainActivity;
 import vn.anhkhoa.projectwebsitebantailieu.model.DocumentDto;
 
 public class SuggestionDocumentAdapter extends RecyclerView.Adapter<SuggestionDocumentAdapter.ViewHolder> {
@@ -40,6 +44,23 @@ public class SuggestionDocumentAdapter extends RecyclerView.Adapter<SuggestionDo
                 .load(documentDto.getDocImageUrl())
                 .into(holder.imgDocument);
         holder.tvDocName.setText(documentDto.getDocName());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context ctx = holder.itemView.getContext();
+                Intent intent = new Intent(ctx, MainActivity.class);
+                intent.putExtra("documentDto", documentDto);
+                // Đảm bảo reuse MainActivity đang tồn tại
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                ctx.startActivity(intent);
+
+                // Nếu context đang là Activity thì finish nó
+                if (ctx instanceof Activity) {
+                    ((Activity) ctx).finish();
+                }
+            }
+        });
     }
 
     @Override

@@ -96,12 +96,14 @@ public class ShopDocumentChildFragment extends Fragment {
             @Override
             public void onResponse(Call<ResponseData<List<DocumentDto>>> call, Response<ResponseData<List<DocumentDto>>> response) {
                 skeleton.showOriginal();
-                if(response.isSuccessful() && response.body() != null){
+                if(response.isSuccessful() && response.body().getData() != null){
                     documentDtos.clear();
                     documentDtos.addAll(response.body().getData());
                     documentAdapter.notifyDataSetChanged();
                 }
                 else{
+                    documentDtos.clear();
+                    documentAdapter.notifyDataSetChanged();
                     ToastUtils.show(getContext(), "Lỗi lấy dữ liệu","#FF0000");
                 }
             }
